@@ -54,6 +54,14 @@ const generateBattleCommentaryFlow = ai.defineFlow(
     name: 'generateBattleCommentaryFlow',
     inputSchema: GenerateBattleCommentaryInputSchema,
     outputSchema: GenerateBattleCommentaryOutputSchema,
+    retry: {
+      maxAttempts: 3,
+      backoff: {
+        delay: '1s',
+        maxDelay: '10s',
+        multiplier: 2,
+      },
+    },
   },
   async input => {
     const {output} = await prompt(input);
