@@ -6,8 +6,8 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
-import Link from 'next/link';
 import { Trophy } from 'lucide-react';
+import { TournamentBracket } from '@/components/tournament-bracket';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound } = useTournament();
@@ -47,9 +47,6 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
-            <Button asChild variant="secondary">
-                <Link href="/bracket">Bracket</Link>
-            </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
@@ -79,6 +76,7 @@ export default function Home() {
             </Card>
           </div>
         ) : (
+          <div className="space-y-8">
             <BattleArena
               key={currentMatch?.id}
               match={currentMatch}
@@ -86,6 +84,8 @@ export default function Home() {
               onPlayMatch={handlePlayMatch}
               roundNumber={currentRound}
             />
+            <TournamentBracket tournament={tournament} currentMatchId={tournament.currentMatchId} />
+          </div>
         )}
       </main>
     </div>
