@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from './ui/button';
 
 const trailerLines = [
   "In a world of part 3 course development and change  proposals...",
@@ -36,7 +37,7 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
   }, [index, onFinished]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-black items-center justify-center text-white">
+    <div className="flex flex-col min-h-screen bg-black items-center justify-center text-white p-4">
         <AnimatePresence mode="wait">
             <motion.p
                 key={index}
@@ -46,9 +47,12 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
                 transition={{ duration: 0.8 }}
                 className="text-4xl text-center font-headline p-8"
             >
-                {trailerLines[index]}
+                {trailerLines[index] || ''}
             </motion.p>
         </AnimatePresence>
+        <div className="absolute bottom-8 right-8">
+            <Button variant="ghost" onClick={onFinished}>Skip</Button>
+        </div>
     </div>
   );
 }
