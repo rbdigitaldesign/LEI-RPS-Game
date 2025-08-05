@@ -68,13 +68,13 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
 
       {!reveal && (
         <Card className="mt-8 bg-card border-2">
-          <CardContent className="p-6 space-y-6">
-            <div className="grid grid-cols-2 gap-6">
+          <CardContent className="p-4 md:p-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <h3 className="font-bold text-lg text-primary text-center">{match.pod1.name}</h3>
                 <div className="flex justify-center gap-2">
                   {MOVES.map((m) => (
-                    <Button key={m} variant={pod1Move === m ? 'default' : 'outline'} size="lg" onClick={() => setPod1Move(m)} disabled={isProcessing}>
+                    <Button key={m} variant={pod1Move === m ? 'default' : 'outline'} size="sm" onClick={() => setPod1Move(m)} disabled={isProcessing} className="text-xs md:text-sm">
                       {m}
                     </Button>
                   ))}
@@ -84,7 +84,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
                 <h3 className="font-bold text-lg text-primary text-center">{match.pod2.name}</h3>
                 <div className="flex justify-center gap-2">
                   {MOVES.map((m) => (
-                    <Button key={m} variant={pod2Move === m ? 'default' : 'outline'} size="lg" onClick={() => setPod2Move(m)} disabled={isProcessing}>
+                    <Button key={m} variant={pod2Move === m ? 'default' : 'outline'} size="sm" onClick={() => setPod2Move(m)} disabled={isProcessing} className="text-xs md:text-sm">
                       {m}
                     </Button>
                   ))}
