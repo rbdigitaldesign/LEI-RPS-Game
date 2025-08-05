@@ -55,11 +55,18 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
   const hasWinner = !!match.winner;
   const isDraw = reveal && !hasWinner;
 
+  const getWinningMove = (): Move | null => {
+    if (!match.winner || !match.moves) return null;
+    return match.winner.id === match.pod1?.id ? match.moves.pod1 : match.moves.pod2;
+  }
+  
+  const winningMove = getWinningMove();
+
   return (
     <div className="space-y-4 relative">
         <AnimatePresence>
-            {hasWinner && reveal && (
-                <MatchWinner winner={match.winner as Pod} />
+            {hasWinner && reveal && winningMove && (
+                <MatchWinner winner={match.winner as Pod} winningMove={winningMove} />
             )}
         </AnimatePresence>
 

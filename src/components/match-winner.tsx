@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion';
-import type { Pod } from '@/lib/types';
+import type { Pod, Move } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Trophy } from 'lucide-react';
+import { MoveIcon } from './icons/move-icon';
 
 type MatchWinnerProps = {
     winner: Pod;
+    winningMove: Move;
 };
 
-export function MatchWinner({ winner }: MatchWinnerProps) {
+export function MatchWinner({ winner, winningMove }: MatchWinnerProps) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -24,7 +26,7 @@ export function MatchWinner({ winner }: MatchWinnerProps) {
       >
         <Card className="text-center shadow-2xl bg-background/95 border-primary border-4">
           <CardHeader>
-             <motion.div 
+             <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1, rotate: 360 }}
                 transition={{ delay: 0.5, type: 'spring' }}
@@ -38,6 +40,13 @@ export function MatchWinner({ winner }: MatchWinnerProps) {
           <CardContent className="flex flex-col items-center space-y-4">
             <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary shadow-lg bg-secondary flex items-center justify-center">
               <span className="text-8xl">{winner.emoji}</span>
+            </div>
+            <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                <p className="text-2xl font-semibold capitalize text-primary">{winningMove}</p>
+                <div className="w-16 h-16 p-3 rounded-full bg-background text-secondary-foreground flex items-center justify-center">
+                  <MoveIcon move={winningMove} />
+                </div>
+                <p className="text-2xl font-semibold capitalize text-primary">Wins!</p>
             </div>
             <p className="text-2xl text-muted-foreground">Advances to the next round!</p>
           </CardContent>

@@ -205,7 +205,7 @@ export function useTournament() {
     if (winner) {
         setTournament(updatedTournament); 
         saveState(updatedTournament);
-        setTimeout(() => advanceTournament(updatedTournament), 2500); // Increased delay for winner screen
+        setTimeout(() => advanceTournament(updatedTournament), 4000); // Increased delay for winner screen
     } else {
         const tempState = {...updatedTournament};
         setTournament(tempState); 
