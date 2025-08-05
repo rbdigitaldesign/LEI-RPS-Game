@@ -42,19 +42,19 @@ const BracketPod = ({
   moveHistory?: Move[]
 }) => {
   if (!pod) {
-    return <div className="p-2 text-muted-foreground/50">TBD</div>;
+    return <div className="p-2 text-muted-foreground/50 text-xs">TBD</div>;
   }
   return (
     <div
       className={cn(
-        'flex flex-col items-center p-2 transition-all text-center',
+        'flex flex-col items-center p-2 transition-all text-center text-xs',
         isWinner && 'font-bold text-primary',
         isLoser && 'text-muted-foreground line-through opacity-70'
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <span>{pod.emoji} {pod.name}</span>
-        {isWinner && <Check className="w-4 h-4 text-green-500" />}
+        {isWinner && <Check className="w-3 h-3 text-green-500" />}
       </div>
       <MoveHistory moves={moveHistory || []} />
     </div>
@@ -66,7 +66,7 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent?: boolean 
   const pod2Moves = match.moveHistory?.map(h => h.pod2) ?? [];
 
   return (
-    <div className={cn('bg-card/80 border w-full', isCurrent && 'ring-2 ring-accent')}>
+    <div className={cn('bg-card/80 border-2 w-full', isCurrent && 'ring-2 ring-accent')}>
       <BracketPod 
         pod={match.pod1} 
         isWinner={match.winner?.id === match.pod1?.id} 
@@ -74,12 +74,12 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent?: boolean 
         moveHistory={pod1Moves}
       />
       {match.isBye ? (
-        <div className="text-center py-2 border-t">
-            <Badge variant="secondary">BYE</Badge>
+        <div className="text-center py-1 border-t-2">
+            <Badge variant="secondary" className="text-xs">BYE</Badge>
         </div>
       ) : (
         <>
-            <div className="border-t text-xs h-6 flex items-center justify-center text-muted-foreground">VS</div>
+            <div className="border-t-2 text-xs h-5 flex items-center justify-center text-muted-foreground">VS</div>
             <BracketPod 
               pod={match.pod2} 
               isWinner={match.winner?.id === match.pod2?.id} 
@@ -101,15 +101,15 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center font-headline text-accent">Tournament Bracket</CardTitle>
       </CardHeader>
-      <CardContent className="p-0 md:p-4">
+      <CardContent className="p-0 md:p-2">
         <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex justify-start items-start p-4">
+          <div className="flex justify-start items-start p-4 gap-4">
             {tournament.rounds.map((round, roundIndex) => (
-              <div key={round.id} className="flex flex-col items-center justify-start gap-12" style={{minWidth: 280}}>
-                <h3 className="text-xl font-semibold text-center text-primary">
+              <div key={round.id} className="flex flex-col items-center justify-start gap-8" style={{minWidth: 200}}>
+                <h3 className="text-lg font-semibold text-center text-primary">
                   Round {roundIndex + 1}
                 </h3>
-                <div className="flex flex-col justify-center items-center gap-12 w-full">
+                <div className="flex flex-col justify-center items-center gap-8 w-full">
                   {round.matches.map((match, matchIndex) => {
                     const isFinalMatchOfRoundPair = matchIndex % 2 === 1;
                     return (
@@ -117,12 +117,12 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                             <BracketMatch match={match} isCurrent={match.id === currentMatchId} />
 
                             {isFinalMatchOfRoundPair && tournament.rounds[roundIndex+1] && (
-                                <div className="absolute left-full top-1/2 w-8 h-px bg-border -translate-y-1/2"></div>
+                                <div className="absolute left-full top-1/2 w-4 h-px bg-border -translate-y-1/2"></div>
                             )}
 
                              {roundIndex < tournament.rounds.length - 1 && (
                                 <>
-                                  <div className="absolute left-full top-1/2 w-4 h-px bg-border -translate-y-1/2"></div>
+                                  <div className="absolute left-full top-1/2 w-2 h-px bg-border -translate-y-1/2"></div>
                                   <div className={cn(
                                     "absolute left-full w-px bg-border",
                                     matchIndex % 2 === 0 ? "h-full top-1/2" : "h-full bottom-1/2",
@@ -138,15 +138,15 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
               </div>
             ))}
             {tournament.winner && (
-                 <div className="flex flex-col gap-6 min-w-[280px] items-center">
-                    <h3 className="text-xl font-semibold text-center text-primary">
+                 <div className="flex flex-col gap-4 min-w-[200px] items-center">
+                    <h3 className="text-lg font-semibold text-center text-primary">
                         Winner
                     </h3>
-                    <Card className="p-4 ring-2 ring-primary bg-secondary/80 w-full max-w-[280px]">
+                    <Card className="p-4 ring-2 ring-primary bg-secondary/80 w-full max-w-[200px]">
                         <div className="flex flex-col items-center gap-2 text-center">
-                           <Trophy className="w-10 h-10 text-yellow-500" />
-                           <p className="text-lg font-bold">{tournament.winner.name}</p>
-                           <p className="text-sm text-muted-foreground">Managed by {tournament.winner.manager}</p>
+                           <Trophy className="w-8 h-8 text-yellow-500" />
+                           <p className="text-base font-bold">{tournament.winner.name}</p>
+                           <p className="text-xs text-muted-foreground">Managed by {tournament.winner.manager}</p>
                         </div>
                     </Card>
                  </div>
