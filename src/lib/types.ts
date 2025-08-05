@@ -14,6 +14,7 @@ export type Match = {
   winner: Pod | null;
   loser: Pod | null;
   moves?: { pod1: Move; pod2: Move };
+  moveHistory?: { pod1: Move, pod2: Move }[];
   isBye?: boolean;
 };
 

@@ -1,7 +1,7 @@
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { TournamentState, Match } from '@/lib/types';
+import type { TournamentState, Match, Pod, Move } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Trophy, Check } from 'lucide-react';
 
@@ -10,28 +10,69 @@ type TournamentBracketProps = {
   currentMatchId?: string | null;
 };
 
-const BracketPod = ({ pod, isWinner, isLoser }: { pod: Match['pod1'], isWinner?: boolean, isLoser?: boolean }) => {
+const getMoveEmoji = (move: Move) => {
+  switch (move) {
+    case 'rock': return '🪨';
+    case 'paper': return '📄';
+    case 'scissors': return '✂️';
+    default: return '?';
+  }
+};
+
+const MoveHistory = ({ moves }: { moves: Move[] }) => {
+  if (!moves || moves.length === 0) return null;
+  return (
+    <div className="flex gap-1 mt-1 justify-center">
+      {moves.map((move, index) => (
+        <span key={index} className="text-xs">{getMoveEmoji(move)}</span>
+      ))}
+    </div>
+  );
+};
+
+const BracketPod = ({ 
+  pod, 
+  isWinner, 
+  isLoser, 
+  moveHistory 
+}: { 
+  pod: Pod | null, 
+  isWinner?: boolean, 
+  isLoser?: boolean,
+  moveHistory?: Move[]
+}) => {
   if (!pod) {
     return <div className="p-2 text-muted-foreground/50">TBD</div>;
   }
   return (
     <div
       className={cn(
-        'flex justify-between items-center p-2 transition-all',
+        'flex flex-col items-center p-2 transition-all text-center',
         isWinner && 'font-bold text-primary',
         isLoser && 'text-muted-foreground line-through opacity-70'
       )}
     >
-      <span>{pod.emoji} {pod.name}</span>
-      {isWinner && <Check className="w-4 h-4 text-green-500" />}
+      <div className="flex items-center gap-2">
+        <span>{pod.emoji} {pod.name}</span>
+        {isWinner && <Check className="w-4 h-4 text-green-500" />}
+      </div>
+      <MoveHistory moves={moveHistory || []} />
     </div>
   );
 };
 
 const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent?: boolean }) => {
+  const pod1Moves = match.moveHistory?.map(h => h.pod1) ?? [];
+  const pod2Moves = match.moveHistory?.map(h => h.pod2) ?? [];
+
   return (
     <div className={cn('bg-card/80 border w-full', isCurrent && 'ring-2 ring-accent')}>
-      <BracketPod pod={match.pod1} isWinner={match.winner?.id === match.pod1?.id} isLoser={!!match.winner && match.winner?.id !== match.pod1?.id} />
+      <BracketPod 
+        pod={match.pod1} 
+        isWinner={match.winner?.id === match.pod1?.id} 
+        isLoser={!!match.winner && match.winner?.id !== match.pod1?.id}
+        moveHistory={pod1Moves}
+      />
       {match.isBye ? (
         <div className="text-center py-2 border-t">
             <Badge variant="secondary">BYE</Badge>
@@ -39,7 +80,12 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent?: boolean 
       ) : (
         <>
             <div className="border-t text-xs h-6 flex items-center justify-center text-muted-foreground">VS</div>
-            <BracketPod pod={match.pod2} isWinner={match.winner?.id === match.pod2?.id} isLoser={!!match.winner && match.winner?.id !== match.pod2?.id} />
+            <BracketPod 
+              pod={match.pod2} 
+              isWinner={match.winner?.id === match.pod2?.id} 
+              isLoser={!!match.winner && match.winner?.id !== match.pod2?.id}
+              moveHistory={pod2Moves}
+            />
         </>
       )}
     </div>
@@ -57,9 +103,9 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
       </CardHeader>
       <CardContent className="p-0 md:p-4">
         <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex justify-start items-center p-4">
+          <div className="flex justify-start items-start p-4">
             {tournament.rounds.map((round, roundIndex) => (
-              <div key={round.id} className="flex flex-col items-center justify-center gap-12" style={{minWidth: 280}}>
+              <div key={round.id} className="flex flex-col items-center justify-start gap-12" style={{minWidth: 280}}>
                 <h3 className="text-xl font-semibold text-center text-primary">
                   Round {roundIndex + 1}
                 </h3>
@@ -79,8 +125,9 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                                   <div className="absolute left-full top-1/2 w-4 h-px bg-border -translate-y-1/2"></div>
                                   <div className={cn(
                                     "absolute left-full w-px bg-border",
-                                    matchIndex % 2 === 0 ? "h-1/2 top-1/2" : "h-1/2 bottom-1/2",
-                                    (round.matches.length % 2 === 1 && matchIndex === round.matches.length - 1) && "h-0"
+                                    matchIndex % 2 === 0 ? "h-full top-1/2" : "h-full bottom-1/2",
+                                     (round.matches.length % 2 === 1 && matchIndex === round.matches.length - 1) && "h-0",
+                                      (round.matches.length === 1) && "h-0"
                                   )}></div>
                                 </>
                              )}

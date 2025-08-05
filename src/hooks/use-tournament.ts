@@ -61,6 +61,7 @@ export function useTournament() {
                 pod2: podsForNextRound[j + 1],
                 winner: null,
                 loser: null,
+                moveHistory: [],
             });
         }
         
@@ -72,7 +73,8 @@ export function useTournament() {
                     pod2: null,
                     winner: pod,
                     loser: null,
-                    isBye: true
+                    isBye: true,
+                    moveHistory: [],
                 });
             });
         }
@@ -207,8 +209,15 @@ export function useTournament() {
     }
 
     match.moves = { pod1: pod1Move, pod2: pod2Move };
-    match.winner = winner;
-    match.loser = loser;
+    if (!match.moveHistory) {
+      match.moveHistory = [];
+    }
+    match.moveHistory.push({ pod1: pod1Move, pod2: pod2Move });
+    
+    if (winner) {
+      match.winner = winner;
+      match.loser = loser;
+    }
     
     const revealState = {...updatedTournament};
     setTournament(revealState);
@@ -219,8 +228,6 @@ export function useTournament() {
     } else {
         setTimeout(() => {
           match.moves = undefined;
-          match.winner = null;
-          match.loser = null;
           setTournament({...updatedTournament});
           saveState(updatedTournament);
           setIsProcessing(false);
