@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const trailerLines = [
-  "In a world of quarterly reports and deadlines...",
+  "In a world of part 3 course development and change  proposals...",
   "...one decision rises above them all.",
   "The greatest show of tactical prowess LEI has ever seen...",
   "Stretch your phalanges.",
