@@ -47,7 +47,7 @@ const BracketPod = ({
   return (
     <div
       className={cn(
-        'flex flex-col items-center p-2 transition-all text-center text-xs',
+        'flex flex-col items-center p-2 transition-all text-center text-xs w-full',
         isWinner && 'font-bold text-primary',
         isLoser && 'text-muted-foreground line-through opacity-70'
       )}
@@ -66,28 +66,30 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent?: boolean 
   const pod2Moves = match.moveHistory?.map(h => h.pod2) ?? [];
 
   return (
-    <div className={cn('bg-card/80 border-2 w-full', isCurrent && 'ring-2 ring-accent')}>
-      <BracketPod 
-        pod={match.pod1} 
-        isWinner={match.winner?.id === match.pod1?.id} 
-        isLoser={!!match.winner && match.winner?.id !== match.pod1?.id}
-        moveHistory={pod1Moves}
-      />
-      {match.isBye ? (
-        <div className="text-center py-1 border-t-2">
-            <Badge variant="secondary" className="text-xs">BYE</Badge>
-        </div>
-      ) : (
-        <>
-            <div className="border-t-2 text-xs h-5 flex items-center justify-center text-muted-foreground">VS</div>
+    <div className="flex flex-col relative w-full">
+        <div className={cn('bg-card/80 border-4 border-border w-full flex flex-col', isCurrent && 'ring-2 ring-accent')}>
             <BracketPod 
-              pod={match.pod2} 
-              isWinner={match.winner?.id === match.pod2?.id} 
-              isLoser={!!match.winner && match.winner?.id !== match.pod2?.id}
-              moveHistory={pod2Moves}
+                pod={match.pod1} 
+                isWinner={match.winner?.id === match.pod1?.id} 
+                isLoser={!!match.winner && match.winner?.id !== match.pod1?.id}
+                moveHistory={pod1Moves}
             />
-        </>
-      )}
+            {match.isBye ? (
+                <div className="text-center py-1 border-t-4 border-border">
+                    <Badge variant="secondary" className="text-xs">BYE</Badge>
+                </div>
+            ) : (
+                <>
+                    <div className="border-t-4 border-border text-xs h-5 flex items-center justify-center text-muted-foreground">VS</div>
+                    <BracketPod 
+                        pod={match.pod2} 
+                        isWinner={match.winner?.id === match.pod2?.id} 
+                        isLoser={!!match.winner && match.winner?.id !== match.pod2?.id}
+                        moveHistory={pod2Moves}
+                    />
+                </>
+            )}
+        </div>
     </div>
   );
 }
@@ -103,34 +105,31 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
       </CardHeader>
       <CardContent className="p-0 md:p-2">
         <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex justify-start items-start p-4 gap-4">
+          <div className="flex justify-center items-center p-4 gap-8">
             {tournament.rounds.map((round, roundIndex) => (
-              <div key={round.id} className="flex flex-col items-center justify-start gap-8" style={{minWidth: 200}}>
-                <h3 className="text-lg font-semibold text-center text-primary">
+              <div key={round.id} className="flex flex-col items-center justify-around gap-16" style={{minWidth: 200}}>
+                <h3 className="text-lg font-semibold text-center text-primary -mb-8">
                   Round {roundIndex + 1}
                 </h3>
-                <div className="flex flex-col justify-center items-center gap-8 w-full">
+                <div className="flex flex-col justify-around items-center gap-16 w-full h-full">
                   {round.matches.map((match, matchIndex) => {
                     const isFinalMatchOfRoundPair = matchIndex % 2 === 1;
                     return (
                         <div key={match.id} className="flex items-center justify-center relative w-full">
                             <BracketMatch match={match} isCurrent={match.id === currentMatchId} />
 
-                            {isFinalMatchOfRoundPair && tournament.rounds[roundIndex+1] && (
-                                <div className="absolute left-full top-1/2 w-4 h-px bg-border -translate-y-1/2"></div>
+                            {/* Horizontal line out */}
+                            {roundIndex < tournament.rounds.length -1 && (
+                                <div className="absolute left-full top-1/2 w-4 h-1 bg-border -translate-y-1/2"></div>
                             )}
-
-                             {roundIndex < tournament.rounds.length - 1 && (
+                            
+                            {/* Vertical connecting line */}
+                            {isFinalMatchOfRoundPair && tournament.rounds[roundIndex+1] && (
                                 <>
-                                  <div className="absolute left-full top-1/2 w-2 h-px bg-border -translate-y-1/2"></div>
-                                  <div className={cn(
-                                    "absolute left-full w-px bg-border",
-                                    matchIndex % 2 === 0 ? "h-full top-1/2" : "h-full bottom-1/2",
-                                     (round.matches.length % 2 === 1 && matchIndex === round.matches.length - 1) && "h-0",
-                                      (round.matches.length === 1) && "h-0"
-                                  )}></div>
+                                  <div className="absolute left-full w-1 bg-border h-[calc(100%_+_4rem)] -translate-y-[calc(50%_+_2rem)]"></div>
+                                  <div className="absolute left-[calc(100%_+_1rem)] top-1/2 w-4 h-1 bg-border -translate-y-1/2"></div>
                                 </>
-                             )}
+                            )}
                         </div>
                     )
                   })}
