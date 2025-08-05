@@ -142,15 +142,20 @@ export function useTournament() {
     // Populate the next round with winners from the current round
     if (lastWinner && currentRoundIndex < rounds.length - 1) {
         const nextRoundIndex = currentRoundIndex + 1;
-        const allWinnersInCurrentRound = rounds[currentRoundIndex].matches.map(m => m.winner).filter(Boolean);
-        const winnerIndexInRound = allWinnersInCurrentRound.findIndex(w => w?.id === lastWinner.id);
+        
+        // Find all winners in the current round who have a defined pod
+        const winnersInCurrentRound = rounds[currentRoundIndex].matches
+          .map(m => m.winner)
+          .filter((w): w is Pod => w !== null);
 
-        if (winnerIndexInRound !== -1) {
-            const nextMatchIndex = Math.floor(winnerIndexInRound / 2);
+        const winnerIndex = winnersInCurrentRound.findIndex(w => w.id === lastWinner.id);
+        
+        if (winnerIndex !== -1) {
+            const nextMatchIndex = Math.floor(winnerIndex / 2);
             const nextMatch = rounds[nextRoundIndex]?.matches[nextMatchIndex];
             
             if (nextMatch) {
-                if (winnerIndexInRound % 2 === 0) {
+                if (winnerIndex % 2 === 0) {
                     nextMatch.pod1 = lastWinner;
                 } else {
                     nextMatch.pod2 = lastWinner;
