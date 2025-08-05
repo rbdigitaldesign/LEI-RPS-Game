@@ -6,7 +6,7 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
-import { Trophy, Download } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { TournamentReport } from '@/components/tournament-report';
 
 export default function Home() {
@@ -46,7 +46,6 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
-            {winner && <TournamentReport tournament={tournament} />}
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
@@ -69,9 +68,12 @@ export default function Home() {
                     <Trophy className="w-8 h-8"/>
                     <span>Congratulations!</span>
                 </div>
-                <Button size="lg" onClick={resetTournament} className="w-full">
-                  Play Again
-                </Button>
+                <div className="flex w-full gap-2">
+                    <Button size="lg" onClick={resetTournament} className="w-full">
+                        Play Again
+                    </Button>
+                    {winner && <TournamentReport tournament={tournament} />}
+                </div>
               </CardContent>
             </Card>
           </div>
