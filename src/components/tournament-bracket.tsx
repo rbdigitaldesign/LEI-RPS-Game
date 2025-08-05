@@ -1,0 +1,82 @@
+'use client';
+
+import type { Round, Match } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
+type TournamentBracketProps = {
+  rounds: Round[];
+};
+
+const MatchCard = ({ match }: { match: Match }) => {
+  const pod1Name = match.pod1?.name ?? 'TBD';
+  const pod2Name = match.pod2?.name ?? 'TBD';
+  const isPod1Winner = match.winner?.id === match.pod1?.id;
+  const isPod2Winner = match.winner?.id === match.pod2?.id;
+
+  if (match.isBye) {
+    return (
+      <div className="flex flex-col justify-center min-h-[76px]">
+        <div className="relative w-48 bg-card border-2 border-primary/50 p-2 my-1">
+          <div className={cn("font-bold text-primary")}>
+            <span>{pod1Name}</span>
+          </div>
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-xs font-bold uppercase tracking-widest">BYE</div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col justify-center min-h-[76px]">
+      <div className="relative w-48 bg-card border-2 border-primary/50 p-2 my-1">
+        <div className={cn("flex justify-between items-center", isPod1Winner && "font-bold text-primary")}>
+          <span>{pod1Name}</span>
+        </div>
+        <hr className="my-1 border-primary/20" />
+        <div className={cn("flex justify-between items-center", isPod2Winner && "font-bold text-primary")}>
+          <span>{pod2Name}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export function TournamentBracket({ rounds }: TournamentBracketProps) {
+  if (!rounds || rounds.length === 0) {
+    return null;
+  }
+
+  return (
+    <Card className="mt-12 bg-card border-2">
+      <CardHeader>
+        <CardTitle className="text-accent">Tournament Bracket</CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex space-x-8 pb-4">
+            {rounds.map((round, roundIndex) => (
+                <div key={round.id} className="flex flex-col space-y-4 items-center">
+                <h3 className="text-xl font-bold text-primary uppercase tracking-wider">
+                    {roundIndex === rounds.length - 1 ? 'Final' : `Round ${round.id}`}
+                </h3>
+                <div className="flex flex-col justify-around h-full space-y-8">
+                    {round.matches.map((match) => (
+                        <div key={match.id} className="flex items-center">
+                            <MatchCard match={match} />
+                            {roundIndex < rounds.length - 1 && (
+                                <div className="w-12 border-t-2 border-primary/50"></div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+                </div>
+            ))}
+            </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+}
