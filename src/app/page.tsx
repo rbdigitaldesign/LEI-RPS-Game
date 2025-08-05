@@ -6,11 +6,13 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
-import { Trophy } from 'lucide-react';
+import { Trophy, Swords } from 'lucide-react';
+import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
+import { MatchWinner } from '@/components/match-winner';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner } = useTournament();
 
   const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
     if (currentMatch) {
@@ -44,8 +46,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      {matchWinner && matchWinner.winner && matchWinner.winningMove && (
+        <MatchWinner winner={matchWinner.winner} winningMove={matchWinner.winningMove} />
+      )}
       <Header>
         <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={simulateTournament} disabled={isProcessing}>
+                <Swords className="mr-2" />
+                {isProcessing ? 'Simulating...' : 'Simulate'}
+            </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
@@ -68,7 +77,8 @@ export default function Home() {
                     <Trophy className="w-8 h-8"/>
                     <span>Congratulations!</span>
                 </div>
-                <div className="flex w-full gap-2">
+                <div className="flex w-full gap-4 mt-4">
+                    <TournamentReport tournament={tournament} />
                     <Button size="lg" onClick={resetTournament} className="w-full">
                         Play Again
                     </Button>
@@ -85,6 +95,7 @@ export default function Home() {
               onPlayMatch={handlePlayMatch}
               roundNumber={currentRound}
             />
+            <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
           </div>
         )}
       </main>
