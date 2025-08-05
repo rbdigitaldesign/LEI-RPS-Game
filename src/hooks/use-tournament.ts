@@ -44,20 +44,20 @@ export function useTournament() {
       };
     }
     
+    const rounds: Round[] = [];
+    let roundNum = 1;
+    let podsInRound = [...shuffledPods];
+    let matchesInRound: Match[] = [];
+
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
     const byes = nextPowerOfTwo - numPods;
     const numFirstRoundMatches = (numPods - byes) / 2;
 
-    const rounds: Round[] = [];
-    let roundNum = 1;
-    let podsForRound = [...shuffledPods];
-
-    // Round 1
     const round1: Round = { id: roundNum, matches: [] };
-    const podsWithByes = podsForRound.slice(0, byes);
-    const podsInFirstRound = podsForRound.slice(byes);
     
-    podsWithByes.forEach((pod, index) => {
+    // Pods with byes
+    const podsWithByes = podsInRound.slice(0, byes);
+    podsWithByes.forEach((pod) => {
       round1.matches.push({
         id: `r1-bye-${pod.id}`,
         pod1: pod,
@@ -69,6 +69,8 @@ export function useTournament() {
       });
     });
 
+    // Pods playing in the first round
+    const podsInFirstRound = podsInRound.slice(byes);
     for (let i = 0; i < numFirstRoundMatches; i++) {
         const pod1 = podsInFirstRound[i * 2];
         const pod2 = podsInFirstRound[i * 2 + 1];
@@ -82,24 +84,20 @@ export function useTournament() {
         });
     }
     rounds.push(round1);
-    
-    let winnersFromPreviousRound: (Pod | null)[] = round1.matches.map(m => m.winner);
-    let numMatchesInRound = round1.matches.length;
+
+    let winnersFromPreviousRound = round1.matches.map(m => m.winner);
     
     // Subsequent rounds
     while(winnersFromPreviousRound.length > 1) {
       roundNum++;
       const nextRound: Round = {id: roundNum, matches: []};
-      const numMatchesInNextRound = Math.ceil(winnersFromPreviousRound.filter(w => w !== null).length / 2) + Math.floor(winnersFromPreviousRound.filter(w => w === null).length / 2);
+      const numMatchesInNextRound = winnersFromPreviousRound.length / 2;
       
-      let podIndex = 0;
       for (let i=0; i < numMatchesInNextRound; i++) {
-        const pod1 = winnersFromPreviousRound[podIndex++];
-        const pod2 = winnersFromPreviousRound[podIndex++];
         nextRound.matches.push({
           id: `r${roundNum}-m${i}`,
-          pod1: pod1 || null,
-          pod2: pod2 || null,
+          pod1: null,
+          pod2: null,
           winner: null,
           loser: null,
           moveHistory: [],
@@ -118,7 +116,7 @@ export function useTournament() {
         winner: null,
     };
   };
-  
+
   const advanceTournament = (currentState: TournamentState) => {
     setIsProcessing(true);
     
@@ -150,19 +148,26 @@ export function useTournament() {
     // Advance winner to the next round's match
     if (lastWinner && currentRoundIndex < rounds.length - 1) {
         const allWinnersFromRound = rounds[currentRoundIndex].matches.map(m => m.winner);
-        let winnerCount = 0;
-        for(let i=0; i <= currentMatchIndex; i++) {
+        
+        // Find the index of the winner in the list of all winners (including nulls for TBD matches)
+        let winnerIndex = -1;
+        let winnersSoFar = 0;
+        for (let i = 0; i < rounds[currentRoundIndex].matches.length; i++) {
             if (rounds[currentRoundIndex].matches[i].winner) {
-                winnerCount++;
+                winnersSoFar++;
+            }
+            if (i === currentMatchIndex) {
+                winnerIndex = winnersSoFar - 1;
+                break;
             }
         }
         
         const nextRoundIndex = currentRoundIndex + 1;
-        const nextMatchIndex = Math.floor((winnerCount -1) / 2);
+        const nextMatchIndex = Math.floor(winnerIndex / 2);
         const nextMatch = rounds[nextRoundIndex].matches[nextMatchIndex];
         
         if (nextMatch) {
-            if ((winnerCount - 1) % 2 === 0) {
+            if (winnerIndex % 2 === 0) {
                 nextMatch.pod1 = lastWinner;
             } else {
                 nextMatch.pod2 = lastWinner;
@@ -199,7 +204,6 @@ export function useTournament() {
         setIsProcessing(false);
     }, 500); 
   };
-
 
   const startTournament = useCallback(() => {
     setIsProcessing(true);
