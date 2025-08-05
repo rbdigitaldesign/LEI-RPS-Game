@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { useTournament } from '@/hooks/use-tournament';
 import { Button } from '@/components/ui/button';
 import { BattleArena } from '@/components/battle-arena';
@@ -12,9 +13,11 @@ import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { MatchWinner } from '@/components/match-winner';
 import { IntroTrailer } from '@/components/intro-trailer';
+import { StartScreen } from '@/components/start-screen';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner } = useTournament();
+  const [introFinished, setIntroFinished] = useState(false);
 
   const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
     if (currentMatch) {
@@ -23,14 +26,10 @@ export default function Home() {
   };
 
   if (!tournament) {
-    return (
-      <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
-        <Header />
-        <main className="flex-grow flex items-center justify-center p-4">
-          <IntroTrailer onStartTournament={startTournament} isProcessing={isProcessing} />
-        </main>
-      </div>
-    );
+    if (!introFinished) {
+        return <IntroTrailer onFinished={() => setIntroFinished(true)} />;
+    }
+    return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
   }
 
   return (
