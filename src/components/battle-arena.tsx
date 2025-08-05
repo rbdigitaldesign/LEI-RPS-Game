@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { PodCard } from './pod-card';
-import type { Match, Move } from '@/lib/types';
+import type { Match, Move, Pod } from '@/lib/types';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { MOVES } from '@/lib/constants';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MatchWinner } from './match-winner';
 
 type BattleArenaProps = {
   match: Match | null;
@@ -52,19 +54,24 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
     );
   }
 
-  const isWinner1 = match.winner?.id === match.pod1.id;
-  const isWinner2 = match.winner?.id === match.pod2.id;
+  const hasWinner = !!match.winner;
   const isDraw = !!match.moves && !match.winner;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
+        <AnimatePresence>
+            {hasWinner && reveal && (
+                <MatchWinner winner={match.winner as Pod} />
+            )}
+        </AnimatePresence>
+
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-start justify-items-center">
         <PodCard
           pod={match.pod1}
           move={reveal ? match.moves?.pod1 : pod1Move}
-          isWinner={reveal && isWinner1}
-          isLoser={reveal && isWinner2}
-          isDraw={reveal && isDraw}
+          isWinner={match.winner?.id === match.pod1.id}
+          isLoser={match.winner?.id === match.pod2.id}
+          isDraw={isDraw}
           reveal={reveal}
           className="md:justify-self-end"
         />
@@ -74,9 +81,9 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
         <PodCard
           pod={match.pod2}
           move={reveal ? match.moves?.pod2 : pod2Move}
-          isWinner={reveal && isWinner2}
-          isLoser={reveal && isWinner1}
-          isDraw={reveal && isDraw}
+          isWinner={match.winner?.id === match.pod2.id}
+          isLoser={match.winner?.id === match.pod1.id}
+          isDraw={isDraw}
           reveal={reveal}
           className="md:justify-self-start"
         />
@@ -89,7 +96,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
               <h3 className="font-bold text-lg">Choose {match.pod1.name}'s Move</h3>
               <div className="flex justify-center gap-2">
                 {MOVES.map((move) => (
-                  <Button key={move} variant={pod1Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-20 h-20" onClick={() => setPod1Move(move)}>
+                  <Button key={move} variant={pod1Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-24 h-24" onClick={() => setPod1Move(move)}>
                     {getEmojiForMove(move)}
                   </Button>
                 ))}
@@ -99,7 +106,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
               <h3 className="font-bold text-lg">Choose {match.pod2.name}'s Move</h3>
               <div className="flex justify-center gap-2">
                 {MOVES.map((move) => (
-                  <Button key={move} variant={pod2Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-20 h-20" onClick={() => setPod2Move(move)}>
+                  <Button key={move} variant={pod2Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-24 h-24" onClick={() => setPod2Move(move)}>
                     {getEmojiForMove(move)}
                   </Button>
                 ))}
