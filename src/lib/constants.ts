@@ -1,17 +1,17 @@
 import type { Pod, Move } from './types';
 
 export const PODS: Omit<Pod, 'id'>[] = [
-  { name: 'Pandas', manager: 'Leila' },
-  { name: 'Owls', manager: 'Rebecca' },
-  { name: 'Racoons', manager: 'Dave' },
-  { name: 'Octopus', manager: 'Paul' },
-  { name: 'Platypus', manager: 'Simon' },
-  { name: 'Dolphins', manager: 'Jamie' },
-  { name: 'Orcas', manager: 'Tim' },
-  { name: 'Rakali', manager: 'Richard' },
-  { name: 'Capybara', manager: 'Laura' },
-  { name: 'Wombats', manager: 'Carina' },
-  { name: 'Bees', manager: 'Evan' },
+  { name: 'Pandas', manager: 'Leila', emoji: '🐼' },
+  { name: 'Owls', manager: 'Rebecca', emoji: '🦉' },
+  { name: 'Racoons', manager: 'Dave', emoji: '🦝' },
+  { name: 'Octopus', manager: 'Paul', emoji: '🐙' },
+  { name: 'Platypus', manager: 'Simon', emoji: '🦫' },
+  { name: 'Dolphins', manager: 'Jamie', emoji: '🐬' },
+  { name: 'Orcas', manager: 'Tim', emoji: '🐋' },
+  { name: 'Rakali', manager: 'Richard', emoji: '🐀' },
+  { name: 'Capybara', manager: 'Laura', emoji: '🐹' },
+  { name: 'Wombats', manager: 'Carina', emoji: '🐨' },
+  { name: 'Bees', manager: 'Evan', emoji: '🐝' },
 ];
 
 export const MOVES: Move[] = ['rock', 'paper', 'scissors'];

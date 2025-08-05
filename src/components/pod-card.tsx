@@ -1,9 +1,7 @@
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Pod, Move } from '@/lib/types';
 import { MoveIcon } from './icons/move-icon';
-import { Skeleton } from './ui/skeleton';
 
 type PodCardProps = {
   pod: Pod;
@@ -26,8 +24,8 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
       )}
     >
       <CardHeader>
-        <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-border mb-4 relative shadow-inner">
-          <Image src={`https://placehold.co/100x100.png`} alt={pod.name} layout="fill" objectFit="cover" data-ai-hint="cute animal" />
+        <div className="w-24 h-24 mx-auto rounded-full bg-secondary flex items-center justify-center border-2 border-border mb-4 relative shadow-inner">
+          <span className="text-6xl">{pod.emoji}</span>
         </div>
         <CardTitle className="font-headline">{pod.name}</CardTitle>
         <CardDescription>Managed by {pod.manager}</CardDescription>

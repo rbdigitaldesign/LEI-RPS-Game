@@ -2,6 +2,7 @@ export type Pod = {
   id: number;
   name: string;
   manager: string;
+  emoji: string;
 };
 
 export type Move = 'rock' | 'paper' | 'scissors';

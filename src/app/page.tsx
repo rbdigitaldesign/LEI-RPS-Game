@@ -6,7 +6,6 @@ import { TournamentBracket } from '@/components/tournament-bracket';
 import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Image from 'next/image';
 import type { Move } from '@/lib/types';
 
 export default function Home() {
@@ -59,8 +58,8 @@ export default function Home() {
                 <p className="text-muted-foreground">Managed by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
-                <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary shadow-lg">
-                  <Image src={`https://placehold.co/200x200.png`} alt={winner.name} layout="fill" objectFit="cover" data-ai-hint="trophy celebration" />
+                <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary shadow-lg bg-secondary flex items-center justify-center">
+                  <span className="text-8xl">{winner.emoji}</span>
                 </div>
                 <p className="text-2xl font-semibold">Congratulations!</p>
                 <Button size="lg" onClick={resetTournament} className="w-full">
