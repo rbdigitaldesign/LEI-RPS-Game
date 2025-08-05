@@ -2,11 +2,12 @@
 
 import { useTournament } from '@/hooks/use-tournament';
 import { Button } from '@/components/ui/button';
-import { TournamentBracket } from '@/components/tournament-bracket';
 import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
+import Link from 'next/link';
+import { Trophy } from 'lucide-react';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch } = useTournament();
@@ -20,7 +21,7 @@ export default function Home() {
 
   if (!tournament) {
     return (
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
         <Header />
         <main className="flex-grow flex items-center justify-center p-4">
           <Card className="w-full max-w-md text-center shadow-2xl bg-white/90 backdrop-blur-sm">
@@ -43,11 +44,16 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Header>
-        <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
-          Reset Tournament
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button asChild variant="secondary">
+                <Link href="/bracket">View Bracket</Link>
+            </Button>
+            <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
+                Reset Tournament
+            </Button>
+        </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 space-y-8">
         {winner ? (
@@ -62,7 +68,10 @@ export default function Home() {
                 <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary shadow-lg bg-secondary flex items-center justify-center">
                   <span className="text-8xl">{winner.emoji}</span>
                 </div>
-                <p className="text-2xl font-semibold">Congratulations!</p>
+                 <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
+                    <Trophy className="w-8 h-8"/>
+                    <span>Congratulations!</span>
+                </div>
                 <Button size="lg" onClick={resetTournament} className="w-full">
                   Play Again
                 </Button>
@@ -70,15 +79,12 @@ export default function Home() {
             </Card>
           </div>
         ) : (
-          <>
             <BattleArena
               key={currentMatch?.id}
               match={currentMatch}
               isProcessing={isProcessing}
               onPlayMatch={handlePlayMatch}
             />
-            <TournamentBracket tournament={tournament} currentMatchId={currentMatch?.id} />
-          </>
         )}
       </main>
     </div>
