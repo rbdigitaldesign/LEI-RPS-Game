@@ -31,8 +31,13 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                     <p className="text-muted-foreground text-xs">
                         LEI Monthly Meeting — 27th August 2025
                     </p>
-                    <Button size="lg" onClick={onStartTournament} className="w-full text-lg mt-4" disabled={isProcessing}>
-                        {isProcessing ? 'Loading...' : 'Start Tournament'}
+                    <Button 
+                      size="lg" 
+                      onClick={onStartTournament} 
+                      className="w-full text-lg mt-4 font-body text-background bg-accent hover:bg-accent/90 border-4 border-b-8 border-accent-foreground/50 hover:border-b-4 active:border-b-0 active:mt-[10px] active:mb-[6px] transition-all duration-100" 
+                      disabled={isProcessing}
+                    >
+                        {isProcessing ? 'Loading...' : 'Press Start'}
                     </Button>
                 </CardContent>
             </Card>
