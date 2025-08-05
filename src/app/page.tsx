@@ -7,7 +7,6 @@ import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
 import { Trophy } from 'lucide-react';
-import { TournamentBracket } from '@/components/tournament-bracket';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound } = useTournament();
@@ -84,7 +83,6 @@ export default function Home() {
               onPlayMatch={handlePlayMatch}
               roundNumber={currentRound}
             />
-            <TournamentBracket tournament={tournament} currentMatchId={tournament.currentMatchId} />
           </div>
         )}
       </main>
