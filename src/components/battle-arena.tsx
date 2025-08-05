@@ -18,11 +18,22 @@ type BattleArenaProps = {
 export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: BattleArenaProps) {
   const [pod1Move, setPod1Move] = useState<Move | null>(null);
   const [pod2Move, setPod2Move] = useState<Move | null>(null);
+  const [showWinner, setShowWinner] = useState(false);
 
   useEffect(() => {
+    // Reset local state when the match changes
     setPod1Move(null);
     setPod2Move(null);
-  }, [match]);
+    setShowWinner(false);
+
+    // If the new match has a winner, we need to decide whether to show the modal.
+    // The `playMatch` function now controls the flow, so we just need to react to `match.winner`.
+    if (match?.winner && match.moves) {
+        // A short delay to let the user see the played moves before the winner modal pops up.
+        const timer = setTimeout(() => setShowWinner(true), 250);
+        return () => clearTimeout(timer);
+    }
+  }, [match?.id]); // Depend on match.id to reliably detect a new match
 
   const handlePlay = () => {
     if (pod1Move && pod2Move) {
@@ -35,7 +46,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
       <Card className="text-center py-12 bg-card">
         <CardContent>
           <p className="text-muted-foreground animate-pulse">
-            {isProcessing ? 'Next match...' : 'Tournament Ended'}
+            {isProcessing ? 'Loading next match...' : 'Tournament has ended.'}
           </p>
         </CardContent>
       </Card>
@@ -45,26 +56,15 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
   const reveal = !!match.moves;
   const hasWinner = !!match.winner;
   const isDraw = reveal && !hasWinner;
-
-  const getWinningMove = (): Move | null => {
-    if (!match.winner || !match.moves) return null;
-    return match.winner.id === match.pod1?.id ? match.moves.pod1 : match.moves.pod2;
-  }
   
-  const winningMove = getWinningMove();
-
-  const handlePod1MoveSelect = (move: Move) => {
-    setPod1Move(pod1Move === move ? null : move);
-  }
-
-  const handlePod2MoveSelect = (move: Move) => {
-    setPod2Move(pod2Move === move ? null : move);
-  }
+  const winningMove = hasWinner && match.moves
+    ? (match.winner?.id === match.pod1?.id ? match.moves.pod1 : match.moves.pod2)
+    : null;
 
   return (
     <div className="space-y-4 relative">
         <AnimatePresence>
-            {hasWinner && reveal && winningMove && (
+            {showWinner && hasWinner && winningMove && (
                 <MatchWinner winner={match.winner as Pod} winningMove={winningMove} />
             )}
         </AnimatePresence>
@@ -84,9 +84,9 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           isDraw={isDraw}
           reveal={reveal}
           className="md:justify-self-end"
-          onMoveSelect={handlePod1MoveSelect}
+          onMoveSelect={(move) => setPod1Move(move)}
           selectedMove={pod1Move}
-          disabled={reveal}
+          disabled={reveal || isProcessing}
         />
         <div className="flex flex-col items-center justify-center order-first md:order-none col-span-1 md:col-span-1 h-full">
             <div className="flex-1 flex flex-col items-center justify-end">
@@ -115,9 +115,9 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           isDraw={isDraw}
           reveal={reveal}
           className="md:justify-self-start"
-          onMoveSelect={handlePod2MoveSelect}
+          onMoveSelect={(move) => setPod2Move(move)}
           selectedMove={pod2Move}
-          disabled={reveal}
+          disabled={reveal || isProcessing}
         />
       </div>
 

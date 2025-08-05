@@ -31,7 +31,7 @@ const getEmojiForMove = (move: Move) => {
 export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, className, onMoveSelect, selectedMove, disabled }: PodCardProps) {
   return (
     <motion.div
-      animate={isWinner && reveal ? { scale: 1.1, y: -10 } : isLoser && reveal ? { scale: 0.9, opacity: 0.6 } : {}}
+      animate={isWinner && reveal ? { scale: 1.05, y: -5 } : isLoser && reveal ? { scale: 0.95, opacity: 0.7 } : {}}
       transition={{ type: 'spring', stiffness: 300, damping: 10 }}
     >
       <Card
@@ -51,7 +51,7 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
           <CardDescription>Managed by {pod.manager}</CardDescription>
         </CardHeader>
         <CardContent className="h-40 flex flex-col items-center justify-center">
-          {move ? (
+          {reveal && move ? (
             <motion.div 
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -76,9 +76,9 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
             </div>
           )}
         </CardContent>
-        {reveal && (
+        {reveal && isWinner && (
           <div className={cn(
-              "absolute inset-0 flex items-center justify-center transition-opacity duration-500",
+              "absolute inset-0 flex items-center justify-center transition-opacity duration-500 pointer-events-none",
               isWinner ? 'opacity-100' : 'opacity-0'
           )}>
               <motion.span 
@@ -93,7 +93,7 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
           </div>
         )}
         {reveal && isDraw && (
-           <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 bg-black/50 opacity-100">
+           <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-500 bg-black/50 opacity-100 pointer-events-none">
               <span className="text-4xl font-bold text-white tracking-widest">DRAW</span>
           </div>
         )}

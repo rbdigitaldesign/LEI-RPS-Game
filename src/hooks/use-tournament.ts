@@ -11,9 +11,9 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
-// A short delay for showing match results during simulation
-const SIMULATION_DELAY_MS = 1000;
+const SIMULATION_DELAY_MS = 750;
 const POST_WINNER_DELAY_MS = 2500;
+const POST_DRAW_DELAY_MS = 2000;
 
 export function useTournament() {
   const [tournament, setTournament] = useState<TournamentState | null>(null);
@@ -42,16 +42,13 @@ export function useTournament() {
     const rounds: Round[] = [];
     let roundNum = 1;
 
-    // The number of byes in the first round
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
     const byes = nextPowerOfTwo - numPods;
 
-    // First round with potential byes
     const firstRound: Round = { id: roundNum, matches: [] };
     const podsWithByes = shuffledPods.slice(0, byes);
     const podsInFirstMatches = shuffledPods.slice(byes);
 
-    // Add byes as completed matches
     podsWithByes.forEach((pod, index) => {
       if(pod) {
         firstRound.matches.push({
@@ -66,7 +63,6 @@ export function useTournament() {
       }
     });
 
-    // Add first round matches
     for (let i = 0; i < podsInFirstMatches.length; i += 2) {
       firstRound.matches.push({
         id: `r${roundNum}-m${i / 2}`,
@@ -84,7 +80,7 @@ export function useTournament() {
     while(numWinnersFromPreviousRound > 1) {
         roundNum++;
         const nextRound: Round = { id: roundNum, matches: [] };
-        const numMatchesInNextRound = Math.ceil(numWinnersFromPreviousRound / 2);
+        const numMatchesInNextRound = Math.floor(numWinnersFromPreviousRound / 2);
         
         for (let i = 0; i < numMatchesInNextRound; i++) {
             nextRound.matches.push({
@@ -143,23 +139,27 @@ export function useTournament() {
     
     const lastWinner = rounds[currentRoundIndex].matches[currentMatchIndexInRound].winner;
     
+    // Populate the next round with winners from the current round
     if (lastWinner && currentRoundIndex < rounds.length - 1) {
         const nextRoundIndex = currentRoundIndex + 1;
         const allWinnersInCurrentRound = rounds[currentRoundIndex].matches.map(m => m.winner).filter(Boolean);
         const winnerIndexInRound = allWinnersInCurrentRound.findIndex(w => w?.id === lastWinner.id);
 
-        const nextMatchIndex = Math.floor(winnerIndexInRound / 2);
-        const nextMatch = rounds[nextRoundIndex]?.matches[nextMatchIndex];
-        
-        if (nextMatch) {
-            if (winnerIndexInRound % 2 === 0) {
-                nextMatch.pod1 = lastWinner;
-            } else {
-                nextMatch.pod2 = lastWinner;
+        if (winnerIndexInRound !== -1) {
+            const nextMatchIndex = Math.floor(winnerIndexInRound / 2);
+            const nextMatch = rounds[nextRoundIndex]?.matches[nextMatchIndex];
+            
+            if (nextMatch) {
+                if (winnerIndexInRound % 2 === 0) {
+                    nextMatch.pod1 = lastWinner;
+                } else {
+                    nextMatch.pod2 = lastWinner;
+                }
             }
         }
     }
     
+    // Find the very next match that is ready to be played
     let nextMatchId: string | null = null;
     outerLoop: for (let r = 0; r < rounds.length; r++) {
       for (let m = 0; m < rounds[r].matches.length; m++) {
@@ -173,6 +173,7 @@ export function useTournament() {
     
     currentState.currentMatchId = nextMatchId;
     
+    // If there's no next match, the tournament is over
     if (!nextMatchId && lastWinner) {
        const lastRound = rounds[rounds.length - 1];
        if (lastRound && lastRound.matches.length === 1 && lastRound.matches[0].winner) {
@@ -183,18 +184,12 @@ export function useTournament() {
     return currentState;
   }, []);
 
-  const playMatch = useCallback(async (pod1Move: Move, pod2Move: Move, isSimulation = false) => {
-    if (isProcessing) return;
+  const playMatch = useCallback(async (pod1Move: Move, pod2Move: Move) => {
+    if (isProcessing || !tournament || !tournament.currentMatchId) return;
 
     setIsProcessing(true);
-
-    const currentTournament = tournament;
-    if (!currentTournament || !currentTournament.currentMatchId) {
-        setIsProcessing(false);
-        return;
-    }
     
-    const updatedTournament: TournamentState = JSON.parse(JSON.stringify(currentTournament));
+    const updatedTournament: TournamentState = JSON.parse(JSON.stringify(tournament));
     const { rounds, currentMatchId } = updatedTournament;
     
     let match: Match | undefined;
@@ -209,46 +204,36 @@ export function useTournament() {
     }
 
     let winner: Pod | null = null;
-    let loser: Pod | null = null;
-
     if (pod1Move !== pod2Move) {
         if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
             (pod1Move === 'scissors' && pod2Move === 'paper') ||
             (pod1Move === 'paper' && pod2Move === 'rock')) {
             winner = match.pod1;
-            loser = match.pod2;
         } else {
             winner = match.pod2;
-            loser = match.pod1;
         }
     }
 
     match.moves = { pod1: pod1Move, pod2: pod2Move };
     match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
-    
     if (winner) {
         match.winner = winner;
-        match.loser = loser;
+        match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
     }
     
-    // Set state to show the result (winner or draw)
+    // Show the result of the moves
     setTournament(updatedTournament);
     saveState(updatedTournament);
 
-    const delay = winner
-      ? (isSimulation ? SIMULATION_DELAY_MS : POST_WINNER_DELAY_MS)
-      : (isSimulation ? SIMULATION_DELAY_MS : 2000);
-
+    const delay = winner ? POST_WINNER_DELAY_MS : POST_DRAW_DELAY_MS;
     await new Promise(resolve => setTimeout(resolve, delay));
 
-    // Prepare and set the next state
     if (winner) {
         const advancedState = advanceTournament(updatedTournament);
         const finalState = JSON.parse(JSON.stringify(advancedState));
         setTournament(finalState);
         saveState(finalState);
-    } else {
-        // It's a draw, so just reset the moves for a replay
+    } else { // It's a draw, so reset moves for a replay
         if (match) match.moves = undefined;
         const finalState = JSON.parse(JSON.stringify(updatedTournament));
         setTournament(finalState);
@@ -260,71 +245,72 @@ export function useTournament() {
   }, [tournament, isProcessing, advanceTournament]);
   
   const simulateTournament = useCallback(async () => {
+    if(isProcessing) return;
     setIsProcessing(true);
-    let currentTournamentState = tournament;
   
-    while (currentTournamentState && !currentTournamentState.winner) {
-      const currentMatchId = currentTournamentState.currentMatchId;
+    let tempTournamentState = tournament ? JSON.parse(JSON.stringify(tournament)) : null;
+  
+    if (!tempTournamentState) {
+      const initialPods = PODS.map((p, i) => ({ ...p, id: i + 1 }));
+      tempTournamentState = createBracket(initialPods);
+      setTournament(tempTournamentState);
+      saveState(tempTournamentState);
+      await new Promise(res => setTimeout(res, SIMULATION_DELAY_MS));
+    }
+  
+    while (tempTournamentState && !tempTournamentState.winner) {
+      const currentMatchId = tempTournamentState.currentMatchId;
       if (!currentMatchId) break;
   
       let match: Match | undefined;
-      for (const round of currentTournamentState.rounds) {
+      for (const round of tempTournamentState.rounds) {
         match = round.matches.find(m => m.id === currentMatchId);
         if (match) break;
       }
   
       if (!match || !match.pod1 || !match.pod2) break;
   
-      let pod1Move: Move;
-      let pod2Move: Move;
       let winner: Pod | null;
-  
-      // Loop until there is a winner for the current match
       do {
-        pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
-        pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+        const pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+        const pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
   
         winner = null;
         if (pod1Move !== pod2Move) {
-          if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
-              (pod1Move === 'scissors' && pod2Move === 'paper') ||
-              (pod1Move === 'paper' && pod2Move === 'rock')) {
-            winner = match.pod1;
-          } else {
-            winner = match.pod2;
-          }
+          winner = ((pod1Move === 'rock' && pod2Move === 'scissors') ||
+                    (pod1Move === 'scissors' && pod2Move === 'paper') ||
+                    (pod1Move === 'paper' && pod2Move === 'rock')) ? match.pod1 : match.pod2;
         }
   
         match.moves = { pod1: pod1Move, pod2: pod2Move };
         match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
-  
-        // Visually update for draw
-        if (!winner) {
-          const drawState = JSON.parse(JSON.stringify(currentTournamentState));
+        
+        if (!winner) { // Draw
+          const drawState = JSON.parse(JSON.stringify(tempTournamentState));
           setTournament(drawState);
           saveState(drawState);
           await new Promise(res => setTimeout(res, SIMULATION_DELAY_MS));
-          match.moves = undefined; // Reset for next attempt in simulation
+          match.moves = undefined;
         }
       } while (!winner);
   
       match.winner = winner;
       match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
       
-      const winnerState = JSON.parse(JSON.stringify(currentTournamentState));
+      const winnerState = JSON.parse(JSON.stringify(tempTournamentState));
       setTournament(winnerState);
       saveState(winnerState);
       await new Promise(res => setTimeout(res, SIMULATION_DELAY_MS));
   
-      currentTournamentState = advanceTournament(winnerState);
-      const finalState = JSON.parse(JSON.stringify(currentTournamentState));
+      tempTournamentState = advanceTournament(winnerState);
+      const finalState = JSON.parse(JSON.stringify(tempTournamentState));
       setTournament(finalState);
       saveState(finalState);
+      if(finalState.winner) break; // End simulation if winner is found
     }
   
     setIsProcessing(false);
-  
-  }, [tournament, advanceTournament]);
+  }, [tournament, isProcessing, advanceTournament]);
 
   const resetTournament = useCallback(() => {
     setIsProcessing(true);
