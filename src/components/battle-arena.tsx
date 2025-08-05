@@ -13,24 +13,17 @@ type BattleArenaProps = {
 
 export function BattleArena({ match, isProcessing }: BattleArenaProps) {
   const [reveal, setReveal] = useState(false);
-  const [showCommentary, setShowCommentary] = useState(false);
 
   useEffect(() => {
     setReveal(false);
-    setShowCommentary(false);
 
     if (match?.moves) {
       const revealTimer = setTimeout(() => {
         setReveal(true);
       }, 1000);
-      
-      const commentaryTimer = setTimeout(() => {
-          setShowCommentary(true);
-      }, 2000);
 
       return () => {
         clearTimeout(revealTimer);
-        clearTimeout(commentaryTimer);
       };
     }
   }, [match]);
@@ -51,7 +44,7 @@ export function BattleArena({ match, isProcessing }: BattleArenaProps) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-center justify-items-center">
         <PodCard
           pod={match.pod1}
           move={match.moves?.pod1}
@@ -59,8 +52,9 @@ export function BattleArena({ match, isProcessing }: BattleArenaProps) {
           isLoser={isWinner2}
           isDraw={isDraw}
           reveal={reveal}
+          className="md:justify-self-end"
         />
-        <div className="text-4xl md:text-6xl font-black text-center text-primary-foreground bg-primary rounded-full w-20 h-20 flex items-center justify-center my-4 md:my-0 shadow-lg">
+        <div className="text-4xl md:text-6xl font-black text-center text-primary-foreground bg-primary rounded-full w-20 h-20 flex items-center justify-center my-4 md:my-0 shadow-lg order-first md:order-none col-span-1 md:col-span-1">
           VS
         </div>
         <PodCard
@@ -70,21 +64,9 @@ export function BattleArena({ match, isProcessing }: BattleArenaProps) {
           isLoser={isWinner1}
           isDraw={isDraw}
           reveal={reveal}
-          className="md:col-start-3"
+          className="md:justify-self-start"
         />
       </div>
-      <Card className="min-h-[100px] flex items-center justify-center text-center p-4">
-        {showCommentary && match.commentary ? (
-          <p className="text-lg italic text-accent-foreground bg-accent p-4 rounded-md animate-in fade-in duration-500">
-            &ldquo;{match.commentary}&rdquo;
-          </p>
-        ) : (
-          <div className="w-full space-y-2">
-            <Skeleton className="h-4 w-3/4 mx-auto" />
-            <Skeleton className="h-4 w-1/2 mx-auto" />
-          </div>
-        )}
-      </Card>
     </div>
   );
 }

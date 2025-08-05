@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PODS, MOVES } from '@/lib/constants';
 import type { TournamentState, Pod, Round, Match, Move } from '@/lib/types';
-import { generateBattleCommentary } from '@/ai/flows/generate-battle-commentary';
 import { useToast } from '@/hooks/use-toast';
 
 const LOCAL_STORAGE_KEY = 'rps-pod-showdown-tournament';
@@ -203,30 +202,8 @@ export function useTournament() {
       }
     }
     
-    let commentary = `${match.pod1!.name} plays ${move1}, ${match.pod2!.name} plays ${move2}. ${outcome}.`;
-    
-    try {
-        const commentaryResult = await generateBattleCommentary({
-            pod1Name: match.pod1!.name,
-            pod1Manager: match.pod1!.manager,
-            pod1Move: move1,
-            pod2Name: match.pod2!.name,
-            pod2Manager: match.pod2!.manager,
-            pod2Move: move2,
-            outcome,
-        });
-        commentary = commentaryResult.commentary;
-    } catch(err) {
-        console.error("AI commentary failed", err);
-        toast({
-            title: "AI Commentary Error",
-            description: "Could not generate commentary. Using fallback.",
-            variant: "destructive",
-        })
-    }
-
     match.moves = { pod1: move1, pod2: move2 };
-    match.commentary = commentary;
+    match.commentary = `${match.pod1!.name} plays ${move1}, ${match.pod2!.name} plays ${move2}. ${outcome}.`;
 
     if (winner && loser) {
       match.winner = winner;
