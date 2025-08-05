@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
 
 export default function Home() {
@@ -25,11 +25,12 @@ export default function Home() {
         <main className="flex-grow flex items-center justify-center p-4">
           <Card className="w-full max-w-md text-center shadow-2xl bg-white/90 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold font-headline">Welcome to the Showdown!</CardTitle>
+              <CardTitle className="text-3xl font-bold font-headline">RPS Pod Battle</CardTitle>
+              <CardDescription className="text-lg">The ultimate rock, paper, scissors showdown</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-muted-foreground">
-                Eleven pods will battle in a Rock, Paper, Scissors tournament until only one remains.
+                LEI Monthly Meeting — 27th August 2025
               </p>
               <Button size="lg" onClick={startTournament} className="w-full text-lg" disabled={isProcessing}>
                 {isProcessing ? 'Setting Up...' : 'Start Tournament'}

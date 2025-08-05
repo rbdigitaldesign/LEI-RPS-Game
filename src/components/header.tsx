@@ -33,7 +33,7 @@ export function Header({ children }: { children?: ReactNode }) {
                 strokeWidth="16"
               />
             </svg>
-            <span className="font-bold font-headline">RPS Pod Showdown</span>
+            <span className="font-bold font-headline">RPS Pod Battle</span>
           </a>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">

@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'RPS Pod Showdown',
-  description: 'A Rock, Paper, Scissors knockout tournament between 11 pods.',
+  title: 'RPS Pod Battle',
+  description: 'The ultimate rock, paper, scissors showdown',
 };
 
 export default function RootLayout({
