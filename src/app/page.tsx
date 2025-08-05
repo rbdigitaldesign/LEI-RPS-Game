@@ -11,7 +11,7 @@ import { TournamentReport } from '@/components/tournament-report';
 import { TournamentBracket } from '@/components/tournament-bracket';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound, simulateTournament } = useTournament();
 
   const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
     if (currentMatch) {
@@ -47,6 +47,9 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={simulateTournament} disabled={isProcessing}>
+                Simulate
+            </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
