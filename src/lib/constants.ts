@@ -7,7 +7,7 @@ export const PODS: Omit<Pod, 'id'>[] = [
   { name: 'Octopus', manager: 'Paul', emoji: '🐙' },
   { name: 'Platypus', manager: 'Simon', emoji: '🦫' },
   { name: 'Dolphins', manager: 'Jamie', emoji: '🐬' },
-  { name: 'Orcas', manager: 'Tim', emoji: '🐋' },
+  { name: 'Orcas', manager: 'Tim', emoji: '🐳' },
   { name: 'Rakali', manager: 'Richard', emoji: '🐀' },
   { name: 'Capybara', manager: 'Laura', emoji: '🐹' },
   { name: 'Wombats', manager: 'Carina', emoji: '🐨' },

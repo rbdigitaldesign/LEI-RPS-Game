@@ -5,7 +5,6 @@ import { PodCard } from './pod-card';
 import type { Match, Move } from '@/lib/types';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
-import { MoveIcon } from './icons/move-icon';
 import { MOVES } from '@/lib/constants';
 
 type BattleArenaProps = {
@@ -29,6 +28,15 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
     if (pod1Move && pod2Move) {
       setReveal(true);
       onPlayMatch(pod1Move, pod2Move);
+    }
+  };
+
+  const getEmojiForMove = (move: Move) => {
+    switch (move) {
+      case 'rock': return '🪨';
+      case 'paper': return '📄';
+      case 'scissors': return '✂️';
+      default: return '';
     }
   };
 
@@ -81,8 +89,8 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
               <h3 className="font-bold text-lg">Choose {match.pod1.name}'s Move</h3>
               <div className="flex justify-center gap-2">
                 {MOVES.map((move) => (
-                  <Button key={move} variant={pod1Move === move ? 'default' : 'outline'} size="icon" onClick={() => setPod1Move(move)}>
-                    <MoveIcon move={move} className="w-5 h-5" />
+                  <Button key={move} variant={pod1Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-20 h-20" onClick={() => setPod1Move(move)}>
+                    {getEmojiForMove(move)}
                   </Button>
                 ))}
               </div>
@@ -91,8 +99,8 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
               <h3 className="font-bold text-lg">Choose {match.pod2.name}'s Move</h3>
               <div className="flex justify-center gap-2">
                 {MOVES.map((move) => (
-                  <Button key={move} variant={pod2Move === move ? 'default' : 'outline'} size="icon" onClick={() => setPod2Move(move)}>
-                    <MoveIcon move={move} className="w-5 h-5" />
+                  <Button key={move} variant={pod2Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-20 h-20" onClick={() => setPod2Move(move)}>
+                    {getEmojiForMove(move)}
                   </Button>
                 ))}
               </div>

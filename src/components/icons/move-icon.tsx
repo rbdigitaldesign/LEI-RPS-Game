@@ -1,15 +1,13 @@
 import type { Move } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { Hand, HandMetal, Scissors } from 'lucide-react';
 
-export function MoveIcon({ move, className }: { move: Move, className?: string }) {
+export function MoveIcon({ move }: { move: Move }) {
   switch (move) {
     case 'rock':
-      return <HandMetal className={cn('w-full h-full', className)} />;
+      return <span className="text-5xl">🪨</span>;
     case 'paper':
-      return <Hand className={cn('w-full h-full', className)} />;
+      return <span className="text-5xl">📄</span>;
     case 'scissors':
-      return <Scissors className={cn('w-full h-full', className)} />;
+      return <span className="text-5xl">✂️</span>;
     default:
       return null;
   }
