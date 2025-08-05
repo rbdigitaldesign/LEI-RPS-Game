@@ -16,19 +16,16 @@ type BattleArenaProps = {
 };
 
 export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaProps) {
-  const [reveal, setReveal] = useState(false);
   const [pod1Move, setPod1Move] = useState<Move | null>(null);
   const [pod2Move, setPod2Move] = useState<Move | null>(null);
 
   useEffect(() => {
-    setReveal(false);
     setPod1Move(null);
     setPod2Move(null);
   }, [match]);
 
   const handlePlay = () => {
     if (pod1Move && pod2Move) {
-      setReveal(true);
       onPlayMatch(pod1Move, pod2Move);
     }
   };
@@ -54,8 +51,9 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
     );
   }
 
+  const reveal = !!match.moves;
   const hasWinner = !!match.winner;
-  const isDraw = !!match.moves && !match.winner;
+  const isDraw = reveal && !hasWinner;
 
   return (
     <div className="space-y-4 relative">
