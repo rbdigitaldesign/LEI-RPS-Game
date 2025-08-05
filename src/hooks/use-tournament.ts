@@ -36,7 +36,6 @@ export function useTournament() {
     
     // The number of pods for a balanced bracket should be a power of two.
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(shuffledPods.length));
-    const byesNeeded = nextPowerOfTwo - shuffledPods.length;
     
     // Determine total rounds
     const totalRounds = Math.ceil(Math.log2(shuffledPods.length));
@@ -93,22 +92,19 @@ export function useTournament() {
   const advanceTournament = (currentState: TournamentState) => {
     setIsProcessing(true);
     
-    let { currentMatchId } = currentState;
+    const currentMatchId = currentState.currentMatchId;
     let currentRoundIndex = -1;
-    let currentMatchIndex = -1;
     let matchFromState: Match | null = null;
     
-    // Find current match from ID
-    if(currentMatchId) {
-        for(let r=0; r < currentState.rounds.length; r++) {
-            const matchIdx = currentState.rounds[r].matches.findIndex(m => m.id === currentMatchId);
-            if(matchIdx !== -1) {
-                currentRoundIndex = r;
-                currentMatchIndex = matchIdx;
-                matchFromState = currentState.rounds[r].matches[matchIdx];
-                break;
-            }
+    if (currentMatchId) {
+      for (let r = 0; r < currentState.rounds.length; r++) {
+        const matchIdx = currentState.rounds[r].matches.findIndex(m => m.id === currentMatchId);
+        if (matchIdx !== -1) {
+          currentRoundIndex = r;
+          matchFromState = currentState.rounds[r].matches[matchIdx];
+          break;
         }
+      }
     }
 
     if (currentRoundIndex === -1 || !matchFromState) {
@@ -116,16 +112,11 @@ export function useTournament() {
         return; 
     }
     
-    // Reset the winner of the match we just played to advance
-    if(matchFromState) matchFromState.winner = null;
-
-    // Advance winner to the next round
-    const winnerOfLastMatch = JSON.parse(JSON.stringify(matchFromState?.winner));
+    const winnerOfLastMatch = matchFromState.winner;
     
     const nextRoundIndex = currentRoundIndex + 1;
-    if (nextRoundIndex < currentState.rounds.length) {
+    if (winnerOfLastMatch && nextRoundIndex < currentState.rounds.length) {
       const allMatchesInRound = currentState.rounds[currentRoundIndex].matches;
-      // We need to re-find the index because the array might not be simple
       const trueMatchIndex = allMatchesInRound.findIndex(m => m.id === currentMatchId);
       const nextMatchIndex = Math.floor(trueMatchIndex / 2);
 
@@ -142,10 +133,9 @@ export function useTournament() {
 
     // Find next match to play
     let nextMatchId: string | null = null;
-    'outerLoop: for (let r = 0; r < currentState.rounds.length; r++) {
+    outerLoop: for (let r = 0; r < currentState.rounds.length; r++) {
       for (let m = 0; m < currentState.rounds[r].matches.length; m++) {
         const match = currentState.rounds[r].matches[m];
-        // It's a playable match if it's not a bye, has no winner yet, and has both pods ready
         if (!match.isBye && !match.winner && match.pod1 && match.pod2) {
           nextMatchId = match.id;
           break outerLoop;
@@ -155,7 +145,6 @@ export function useTournament() {
 
     currentState.currentMatchId = nextMatchId;
     
-    // Check for overall tournament winner
     if (!nextMatchId) {
        const lastRound = currentState.rounds[currentState.rounds.length - 1];
        if (lastRound.matches.length === 1 && lastRound.matches[0].winner) {
@@ -218,7 +207,6 @@ export function useTournament() {
         saveState(updatedTournament);
         setTimeout(() => advanceTournament(updatedTournament), 2500); // Increased delay for winner screen
     } else {
-        toast({ title: "It's a draw!", description: `Both played ${pod1Move}. Replay the match.`, variant: 'destructive' });
         const tempState = {...updatedTournament};
         setTournament(tempState); 
         saveState(tempState);
