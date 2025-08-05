@@ -3,6 +3,8 @@ import { cn } from '@/lib/utils';
 import type { Pod, Move } from '@/lib/types';
 import { MoveIcon } from './icons/move-icon';
 import { motion } from 'framer-motion';
+import { Button } from './ui/button';
+import { MOVES } from '@/lib/constants';
 
 type PodCardProps = {
   pod: Pod;
@@ -12,9 +14,21 @@ type PodCardProps = {
   isDraw?: boolean;
   reveal: boolean;
   className?: string;
+  onMoveSelect: (move: Move) => void;
+  selectedMove: Move | null;
+  disabled: boolean;
 };
 
-export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, className }: PodCardProps) {
+const getEmojiForMove = (move: Move) => {
+    switch (move) {
+      case 'rock': return '🪨';
+      case 'paper': return '📄';
+      case 'scissors': return '✂️';
+      default: return '';
+    }
+};
+
+export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, className, onMoveSelect, selectedMove, disabled }: PodCardProps) {
   return (
     <motion.div
       animate={isWinner && reveal ? { scale: 1.1, y: -10 } : isLoser && reveal ? { scale: 0.9, opacity: 0.6 } : {}}
@@ -36,7 +50,7 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
           <CardTitle className="font-headline text-primary">{pod.name}</CardTitle>
           <CardDescription>Managed by {pod.manager}</CardDescription>
         </CardHeader>
-        <CardContent className="h-28 flex flex-col items-center justify-center">
+        <CardContent className="h-40 flex flex-col items-center justify-center">
           {move ? (
             <motion.div 
               initial={{ scale: 0.5, opacity: 0 }}
@@ -51,7 +65,14 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
             </motion.div>
           ) : (
             <div className="space-y-2">
-              <p className="text-muted-foreground">Select move</p>
+              <h3 className="font-bold text-lg text-primary mb-2">Select Move</h3>
+              <div className="flex justify-center gap-2">
+                {MOVES.map((m) => (
+                  <Button key={m} variant={selectedMove === m ? 'default' : 'outline'} size="icon" className="text-2xl w-16 h-16" onClick={() => onMoveSelect(m)} disabled={disabled}>
+                    {getEmojiForMove(m)}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
         </CardContent>
