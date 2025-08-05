@@ -21,17 +21,18 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (index < trailerLines.length) {
-      const timer = setTimeout(() => {
-        setIndex(index + 1);
-      }, 2500);
-      return () => clearTimeout(timer);
-    } else {
+    if (index >= trailerLines.length) {
         const finishTimer = setTimeout(() => {
             onFinished();
-        }, 2500);
+        }, 1000);
         return () => clearTimeout(finishTimer);
     }
+    
+    const timer = setTimeout(() => {
+        setIndex(index + 1);
+    }, 2500);
+    return () => clearTimeout(timer);
+
   }, [index, onFinished]);
 
   return (
@@ -45,7 +46,7 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
                 transition={{ duration: 0.8 }}
                 className="text-4xl text-center font-headline p-8"
             >
-                {trailerLines[index] || trailerLines[trailerLines.length-1]}
+                {trailerLines[index]}
             </motion.p>
         </AnimatePresence>
     </div>
