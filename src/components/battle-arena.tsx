@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { PodCard } from './pod-card';
-import type { Match, Move, Pod } from '@/lib/types';
+import type { Match, Move, Pod, Round } from '@/lib/types';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { MOVES } from '@/lib/constants';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { MatchWinner } from './match-winner';
 
 type BattleArenaProps = {
   match: Match | null;
   isProcessing: boolean;
   onPlayMatch: (pod1Move: Move, pod2Move: Move) => void;
+  roundNumber: number | null;
 };
 
-export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaProps) {
+export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: BattleArenaProps) {
   const [pod1Move, setPod1Move] = useState<Move | null>(null);
   const [pod2Move, setPod2Move] = useState<Move | null>(null);
 
@@ -69,6 +70,12 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
                 <MatchWinner winner={match.winner as Pod} winningMove={winningMove} />
             )}
         </AnimatePresence>
+
+        {roundNumber && (
+            <h2 className="text-3xl font-bold text-center text-accent uppercase tracking-widest">
+                Round {roundNumber}
+            </h2>
+        )}
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-start justify-items-center">
         <PodCard

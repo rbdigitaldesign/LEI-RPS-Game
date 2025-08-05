@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Trophy } from 'lucide-react';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound } = useTournament();
 
   const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
     if (currentMatch) {
@@ -84,6 +84,7 @@ export default function Home() {
               match={currentMatch}
               isProcessing={isProcessing}
               onPlayMatch={handlePlayMatch}
+              roundNumber={currentRound}
             />
         )}
       </main>
