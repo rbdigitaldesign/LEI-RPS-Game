@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useTournament } from '@/hooks/use-tournament';
@@ -10,6 +11,7 @@ import { Trophy, Swords } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { MatchWinner } from '@/components/match-winner';
+import { IntroTrailer } from '@/components/intro-trailer';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner } = useTournament();
@@ -25,20 +27,7 @@ export default function Home() {
       <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
         <Header />
         <main className="flex-grow flex items-center justify-center p-4">
-          <Card className="w-full max-w-md text-center bg-black/80 backdrop-blur-sm border-2 border-primary">
-            <CardHeader>
-              <CardTitle className="text-3xl font-bold font-headline text-accent">RPS Pod Battle</CardTitle>
-              <CardDescription className="text-sm text-primary leading-relaxed">The ultimate rock, paper, scissors showdown</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-muted-foreground text-xs">
-                LEI Monthly Meeting — 27th August 2025
-              </p>
-              <Button size="lg" onClick={startTournament} className="w-full text-lg" disabled={isProcessing}>
-                {isProcessing ? 'Loading...' : 'Start Tournament'}
-              </Button>
-            </CardContent>
-          </Card>
+          <IntroTrailer onStartTournament={startTournament} isProcessing={isProcessing} />
         </main>
       </div>
     );
