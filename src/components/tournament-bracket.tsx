@@ -14,7 +14,7 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
   if (!tournament) return null;
 
   return (
-    <Card>
+    <Card className="bg-white/90 backdrop-blur-sm">
       <CardContent className="p-4">
         <h2 className="text-2xl font-bold mb-4 text-center font-headline">Tournament Bracket</h2>
         <ScrollArea className="w-full whitespace-nowrap">
@@ -29,7 +29,7 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                     <Card
                       key={match.id}
                       className={cn(
-                        'p-3 transition-all',
+                        'p-3 transition-all bg-card/80',
                         match.id === currentMatchId && 'ring-2 ring-accent shadow-lg'
                       )}
                     >
@@ -72,7 +72,7 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                     <h3 className="text-xl font-semibold text-center text-primary">
                         Winner
                     </h3>
-                    <Card className="p-4 ring-2 ring-primary bg-secondary">
+                    <Card className="p-4 ring-2 ring-primary bg-secondary/80">
                         <div className="flex flex-col items-center gap-2 text-center">
                            <Trophy className="w-10 h-10 text-primary" />
                            <p className="text-lg font-bold">{tournament.winner.name}</p>

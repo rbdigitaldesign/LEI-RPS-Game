@@ -23,7 +23,7 @@ export default function Home() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow flex items-center justify-center p-4">
-          <Card className="w-full max-w-md text-center shadow-2xl">
+          <Card className="w-full max-w-md text-center shadow-2xl bg-white/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-3xl font-bold font-headline">Welcome to the Showdown!</CardTitle>
             </CardHeader>
@@ -51,7 +51,7 @@ export default function Home() {
       <main className="flex-grow container mx-auto p-4 space-y-8">
         {winner ? (
           <div className="flex items-center justify-center py-16">
-            <Card className="w-full max-w-lg text-center shadow-2xl animate-in fade-in zoom-in-95">
+            <Card className="w-full max-w-lg text-center shadow-2xl animate-in fade-in zoom-in-95 bg-white/90 backdrop-blur-sm">
               <CardHeader>
                 <p className="text-sm font-medium text-primary">Tournament Winner</p>
                 <CardTitle className="text-5xl font-bold font-headline tracking-tighter">{winner.name}</CardTitle>

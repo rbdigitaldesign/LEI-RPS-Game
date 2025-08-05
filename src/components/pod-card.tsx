@@ -17,7 +17,7 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
   return (
     <Card
       className={cn(
-        'w-full max-w-sm text-center relative overflow-hidden transition-all duration-500 transform',
+        'w-full max-w-sm text-center relative overflow-hidden transition-all duration-500 transform bg-white/90 backdrop-blur-sm',
         isWinner && 'border-primary ring-2 ring-primary shadow-lg scale-105',
         isLoser && 'opacity-50 scale-95',
         className
