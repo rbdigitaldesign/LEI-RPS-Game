@@ -46,19 +46,20 @@ export function useTournament() {
     
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
     const byes = nextPowerOfTwo - numPods;
-    
-    let podsForRound = [...shuffledPods];
+    const numFirstRoundMatches = (numPods - byes) / 2;
+
     const rounds: Round[] = [];
     let roundNum = 1;
+    let podsForRound = [...shuffledPods];
 
-    // Create Round 1
+    // Round 1
     const round1: Round = { id: roundNum, matches: [] };
     const podsWithByes = podsForRound.slice(0, byes);
     const podsInFirstRound = podsForRound.slice(byes);
     
     podsWithByes.forEach((pod, index) => {
       round1.matches.push({
-        id: `r1-bye${index}`,
+        id: `r1-bye-${pod.id}`,
         pod1: pod,
         pod2: null,
         winner: pod,
@@ -68,11 +69,11 @@ export function useTournament() {
       });
     });
 
-    for (let i = 0; i < podsInFirstRound.length; i += 2) {
-        const pod1 = podsInFirstRound[i];
-        const pod2 = podsInFirstRound[i+1];
+    for (let i = 0; i < numFirstRoundMatches; i++) {
+        const pod1 = podsInFirstRound[i * 2];
+        const pod2 = podsInFirstRound[i * 2 + 1];
         round1.matches.push({
-            id: `r1-m${i/2}`,
+            id: `r1-m${i}`,
             pod1: pod1,
             pod2: pod2,
             winner: null,
@@ -82,26 +83,30 @@ export function useTournament() {
     }
     rounds.push(round1);
     
-    let numMatchesInPreviousRound = round1.matches.length;
-    roundNum++;
-
-    // Create subsequent rounds
-    while(numMatchesInPreviousRound > 1) {
+    let winnersFromPreviousRound: (Pod | null)[] = round1.matches.map(m => m.winner);
+    let numMatchesInRound = round1.matches.length;
+    
+    // Subsequent rounds
+    while(winnersFromPreviousRound.length > 1) {
+      roundNum++;
       const nextRound: Round = {id: roundNum, matches: []};
-      const numMatchesInNextRound = numMatchesInPreviousRound / 2;
+      const numMatchesInNextRound = Math.ceil(winnersFromPreviousRound.filter(w => w !== null).length / 2) + Math.floor(winnersFromPreviousRound.filter(w => w === null).length / 2);
+      
+      let podIndex = 0;
       for (let i=0; i < numMatchesInNextRound; i++) {
+        const pod1 = winnersFromPreviousRound[podIndex++];
+        const pod2 = winnersFromPreviousRound[podIndex++];
         nextRound.matches.push({
           id: `r${roundNum}-m${i}`,
-          pod1: null,
-          pod2: null,
+          pod1: pod1 || null,
+          pod2: pod2 || null,
           winner: null,
           loser: null,
           moveHistory: [],
         });
       }
       rounds.push(nextRound);
-      numMatchesInPreviousRound = numMatchesInNextRound;
-      roundNum++;
+      winnersFromPreviousRound = new Array(nextRound.matches.length).fill(null);
     }
 
     const firstPlayableMatch = rounds[0]?.matches.find(m => !m.isBye);
@@ -113,54 +118,63 @@ export function useTournament() {
         winner: null,
     };
   };
-
+  
   const advanceTournament = (currentState: TournamentState) => {
     setIsProcessing(true);
     
-    const { currentMatchId } = currentState;
+    const { currentMatchId, rounds } = currentState;
     if (!currentMatchId) {
         setIsProcessing(false);
         return;
     }
 
-    let lastWinner: Pod | null = null;
-    let lastMatchRoundIndex = -1;
-    let lastMatchIndexInRound = -1;
+    let currentRoundIndex = -1;
+    let currentMatchIndex = -1;
 
-    for (let r = 0; r < currentState.rounds.length; r++) {
-        const matchIndex = currentState.rounds[r].matches.findIndex(m => m.id === currentMatchId);
-        if (matchIndex > -1) {
-            lastWinner = currentState.rounds[r].matches[matchIndex].winner;
-            lastMatchRoundIndex = r;
-            lastMatchIndexInRound = matchIndex;
-            break;
-        }
+    for(let i = 0; i < rounds.length; i++) {
+      const matchIndex = rounds[i].matches.findIndex(m => m.id === currentMatchId);
+      if (matchIndex !== -1) {
+        currentRoundIndex = i;
+        currentMatchIndex = matchIndex;
+        break;
+      }
     }
-
-    if (lastWinner && lastMatchRoundIndex < currentState.rounds.length - 1) {
-        const nextRoundIndex = lastMatchRoundIndex + 1;
-        
-        const winnersFromLastRound = currentState.rounds[lastMatchRoundIndex].matches.map(m => m.winner);
-        const winnerIndexInRound = winnersFromLastRound.indexOf(lastWinner);
-
-        if (winnerIndexInRound !== -1) {
-            const nextMatchIndex = Math.floor(winnerIndexInRound / 2);
-            const nextMatch = currentState.rounds[nextRoundIndex].matches[nextMatchIndex];
     
-            if (nextMatch) {
-                if (winnerIndexInRound % 2 === 0) {
-                    nextMatch.pod1 = lastWinner;
-                } else {
-                    nextMatch.pod2 = lastWinner;
-                }
+    if (currentRoundIndex === -1) {
+      setIsProcessing(false);
+      return;
+    }
+    
+    const lastWinner = rounds[currentRoundIndex].matches[currentMatchIndex].winner;
+
+    // Advance winner to the next round's match
+    if (lastWinner && currentRoundIndex < rounds.length - 1) {
+        const allWinnersFromRound = rounds[currentRoundIndex].matches.map(m => m.winner);
+        let winnerCount = 0;
+        for(let i=0; i <= currentMatchIndex; i++) {
+            if (rounds[currentRoundIndex].matches[i].winner) {
+                winnerCount++;
+            }
+        }
+        
+        const nextRoundIndex = currentRoundIndex + 1;
+        const nextMatchIndex = Math.floor((winnerCount -1) / 2);
+        const nextMatch = rounds[nextRoundIndex].matches[nextMatchIndex];
+        
+        if (nextMatch) {
+            if ((winnerCount - 1) % 2 === 0) {
+                nextMatch.pod1 = lastWinner;
+            } else {
+                nextMatch.pod2 = lastWinner;
             }
         }
     }
     
+    // Find the next match to play
     let nextMatchId: string | null = null;
-    outerLoop: for (let r = 0; r < currentState.rounds.length; r++) {
-      for (let m = 0; m < currentState.rounds[r].matches.length; m++) {
-        const match = currentState.rounds[r].matches[m];
+    outerLoop: for (let r = 0; r < rounds.length; r++) {
+      for (let m = 0; m < rounds[r].matches.length; m++) {
+        const match = rounds[r].matches[m];
         if (!match.isBye && !match.winner && match.pod1 && match.pod2) {
           nextMatchId = match.id;
           break outerLoop;
@@ -170,8 +184,9 @@ export function useTournament() {
     
     currentState.currentMatchId = nextMatchId;
     
+    // If no next match, declare winner
     if (!nextMatchId && lastWinner) {
-       const lastRound = currentState.rounds[currentState.rounds.length - 1];
+       const lastRound = rounds[rounds.length - 1];
        if (lastRound && lastRound.matches.length === 1 && lastRound.matches[0].winner) {
            currentState.winner = lastRound.matches[0].winner;
        }
@@ -308,7 +323,7 @@ export function useTournament() {
     : null;
 
   const currentRound = tournament && tournament.currentMatchId
-    ? tournament.rounds.findIndex(r => r.matches.some(m => m.id === tournament.currentMatchId)) + 1
+    ? tournament.rounds.find(r => r.matches.some(m => m.id === tournament.currentMatchId))?.id ?? null
     : null;
 
   return {
