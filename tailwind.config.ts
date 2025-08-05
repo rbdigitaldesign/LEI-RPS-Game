@@ -20,8 +20,8 @@ export default {
         'hero-pattern': "url('https://i.imgur.com/CiAYPMY.jpeg')",
       },
       fontFamily: {
-        body: ['"Space Grotesk"', 'sans-serif'],
-        headline: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"Press Start 2P"', 'cursive'],
+        headline: ['"Press Start 2P"', 'cursive'],
         code: ['monospace'],
       },
       colors: {
