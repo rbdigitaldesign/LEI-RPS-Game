@@ -14,9 +14,9 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
   if (!tournament) return null;
 
   return (
-    <Card className="bg-white/90 backdrop-blur-sm">
+    <Card className="bg-card border-2">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center font-headline">Tournament Bracket</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center font-headline text-accent">Tournament Bracket</CardTitle>
       </CardHeader>
       <CardContent className="p-4 pt-0">
         <ScrollArea className="w-full whitespace-nowrap">
@@ -31,8 +31,8 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                     <Card
                       key={match.id}
                       className={cn(
-                        'p-3 transition-all bg-card/80',
-                        match.id === currentMatchId && 'ring-2 ring-accent shadow-lg'
+                        'p-3 transition-all bg-card/80 border',
+                        match.id === currentMatchId && 'ring-2 ring-accent'
                       )}
                     >
                       <div className="space-y-2">
@@ -43,7 +43,7 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                             match.loser?.id === match.pod1?.id && 'text-muted-foreground line-through opacity-70'
                           )}
                         >
-                          <span>{match.pod1?.name ?? 'TBD'}</span>
+                          <span>{match.pod1?.emoji} {match.pod1?.name ?? 'TBD'}</span>
                           {match.winner?.id === match.pod1?.id && <Check className="w-4 h-4 text-green-500" />}
                         </div>
                         
@@ -59,7 +59,7 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
                                 match.loser?.id === match.pod2?.id && 'text-muted-foreground line-through opacity-70'
                                 )}
                             >
-                                <span>{match.pod2?.name ?? 'TBD'}</span>
+                                <span>{match.pod2?.emoji} {match.pod2?.name ?? 'TBD'}</span>
                                 {match.winner?.id === match.pod2?.id && <Check className="w-4 h-4 text-green-500" />}
                             </div>
                         )}

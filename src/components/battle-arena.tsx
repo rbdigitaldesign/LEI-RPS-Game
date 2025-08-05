@@ -41,10 +41,10 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
 
   if (!match || !match.pod1 || !match.pod2) {
     return (
-      <Card className="text-center py-12 bg-white/90 backdrop-blur-sm">
+      <Card className="text-center py-12 bg-card">
         <CardContent>
           <p className="text-muted-foreground animate-pulse">
-            {isProcessing ? 'Advancing to next match...' : 'Tournament has ended. Reset to play again.'}
+            {isProcessing ? 'Next match...' : 'Tournament Ended'}
           </p>
         </CardContent>
       </Card>
@@ -80,7 +80,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
           reveal={reveal}
           className="md:justify-self-end"
         />
-        <div className="text-4xl md:text-6xl font-black text-center text-primary-foreground bg-primary rounded-full w-20 h-20 flex items-center justify-center my-4 md:my-0 shadow-lg order-first md:order-none col-span-1 md:col-span-1">
+        <div className="text-4xl md:text-6xl font-black text-center text-primary-foreground bg-primary w-20 h-20 flex items-center justify-center my-4 md:my-0 order-first md:order-none col-span-1 md:col-span-1 border-4 border-primary-foreground">
           VS
         </div>
         <PodCard
@@ -95,10 +95,10 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
       </div>
 
       {!reveal && (
-        <Card className="mt-8 p-6 bg-white/90 backdrop-blur-sm">
+        <Card className="mt-8 p-6 bg-card border-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div className="text-center space-y-3">
-              <h3 className="font-bold text-lg">Choose {match.pod1.name}'s Move</h3>
+              <h3 className="font-bold text-lg text-primary">{match.pod1.name}'s Move</h3>
               <div className="flex justify-center gap-2">
                 {MOVES.map((move) => (
                   <Button key={move} variant={pod1Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-24 h-24" onClick={() => setPod1Move(move)}>
@@ -108,7 +108,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
               </div>
             </div>
             <div className="text-center space-y-3">
-              <h3 className="font-bold text-lg">Choose {match.pod2.name}'s Move</h3>
+              <h3 className="font-bold text-lg text-primary">{match.pod2.name}'s Move</h3>
               <div className="flex justify-center gap-2">
                 {MOVES.map((move) => (
                   <Button key={move} variant={pod2Move === move ? 'default' : 'outline'} size="lg" className="text-4xl w-24 h-24" onClick={() => setPod2Move(move)}>
@@ -128,7 +128,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch }: BattleArenaPro
 
       {isDraw && reveal && (
         <div className="text-center mt-4">
-            <p className="text-xl font-bold text-destructive bg-white/90 backdrop-blur-sm p-2 rounded-md inline-block">It's a draw! Replay the match.</p>
+            <p className="text-xl font-bold text-destructive bg-black/80 p-2 inline-block border-2 border-destructive">It's a draw! Replay!</p>
         </div>
       )}
     </div>

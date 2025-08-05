@@ -24,17 +24,17 @@ export default function Home() {
       <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
         <Header />
         <main className="flex-grow flex items-center justify-center p-4">
-          <Card className="w-full max-w-md text-center shadow-2xl bg-white/90 backdrop-blur-sm">
+          <Card className="w-full max-w-md text-center bg-black/80 backdrop-blur-sm border-2 border-primary">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold font-headline">RPS Pod Battle</CardTitle>
-              <CardDescription className="text-lg">The ultimate rock, paper, scissors showdown</CardDescription>
+              <CardTitle className="text-3xl font-bold font-headline text-accent">RPS Pod Battle</CardTitle>
+              <CardDescription className="text-sm text-primary leading-relaxed">The ultimate rock, paper, scissors showdown</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 LEI Monthly Meeting — 27th August 2025
               </p>
               <Button size="lg" onClick={startTournament} className="w-full text-lg" disabled={isProcessing}>
-                {isProcessing ? 'Setting Up...' : 'Start Tournament'}
+                {isProcessing ? 'Loading...' : 'Start Tournament'}
               </Button>
             </CardContent>
           </Card>
@@ -44,28 +44,28 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary">
-                <Link href="/bracket">View Bracket</Link>
+                <Link href="/bracket">Bracket</Link>
             </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
-                Reset Tournament
+                Reset
             </Button>
         </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 space-y-8">
         {winner ? (
           <div className="flex items-center justify-center py-16">
-            <Card className="w-full max-w-lg text-center shadow-2xl animate-in fade-in zoom-in-95 bg-white/90 backdrop-blur-sm">
+            <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
               <CardHeader>
-                <p className="text-sm font-medium text-primary">Tournament Winner</p>
-                <CardTitle className="text-5xl font-bold font-headline tracking-tighter">{winner.name}</CardTitle>
+                <p className="text-sm font-medium text-accent">Tournament Winner</p>
+                <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
                 <p className="text-muted-foreground">Managed by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
-                <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-primary shadow-lg bg-secondary flex items-center justify-center">
+                <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">
                   <span className="text-8xl">{winner.emoji}</span>
                 </div>
                  <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
