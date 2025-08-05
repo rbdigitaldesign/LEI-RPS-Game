@@ -13,7 +13,6 @@ export type Match = {
   winner: Pod | null;
   loser: Pod | null;
   moves?: { pod1: Move; pod2: Move };
-  commentary?: string;
   isBye?: boolean;
 };
 
@@ -25,7 +24,6 @@ export type Round = {
 export type TournamentState = {
   pods: Pod[];
   rounds: Round[];
-  currentMatchIndex: number;
-  currentRoundIndex: number;
+  currentMatchId: string | null;
   winner: Pod | null;
 };

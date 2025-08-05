@@ -7,7 +7,7 @@ import { Skeleton } from './ui/skeleton';
 
 type PodCardProps = {
   pod: Pod;
-  move?: Move;
+  move?: Move | null;
   isWinner?: boolean;
   isLoser?: boolean;
   isDraw?: boolean;
@@ -33,8 +33,8 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
         <CardDescription>Managed by {pod.manager}</CardDescription>
       </CardHeader>
       <CardContent className="h-28 flex flex-col items-center justify-center">
-        {reveal && move ? (
-          <div className="space-y-2 animate-in fade-in zoom-in-50 duration-500">
+        {move ? (
+          <div className={cn("space-y-2", reveal ? "animate-in fade-in zoom-in-50 duration-500" : "")}>
             <div className="w-16 h-16 p-3 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center">
                 <MoveIcon move={move} />
             </div>
@@ -42,8 +42,7 @@ export function PodCard({ pod, move, isWinner, isLoser, isDraw, reveal, classNam
           </div>
         ) : (
           <div className="space-y-2">
-            <Skeleton className="w-16 h-16 rounded-full" />
-            <Skeleton className="w-24 h-6" />
+            <p className="text-muted-foreground">Make a selection</p>
           </div>
         )}
       </CardContent>

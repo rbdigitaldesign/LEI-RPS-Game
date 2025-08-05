@@ -7,9 +7,17 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
+import type { Move } from '@/lib/types';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch } = useTournament();
+
+  const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
+    if (currentMatch) {
+      playMatch(pod1Move, pod2Move);
+    }
+  };
+
 
   if (!tournament) {
     return (
@@ -63,7 +71,12 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <BattleArena key={currentMatch?.id} match={currentMatch} isProcessing={isProcessing} />
+            <BattleArena
+              key={currentMatch?.id}
+              match={currentMatch}
+              isProcessing={isProcessing}
+              onPlayMatch={handlePlayMatch}
+            />
             <TournamentBracket tournament={tournament} currentMatchId={currentMatch?.id} />
           </>
         )}
