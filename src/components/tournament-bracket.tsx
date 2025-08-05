@@ -42,12 +42,12 @@ const BracketPod = ({
   moveHistory?: Move[]
 }) => {
   if (!pod) {
-    return <div className="p-2 text-muted-foreground/50 text-xs">TBD</div>;
+    return <div className="p-2 text-muted-foreground/50 text-xs h-10 flex items-center justify-center">TBD</div>;
   }
   return (
     <div
       className={cn(
-        'flex flex-col items-center p-2 transition-all text-center text-xs w-full',
+        'flex flex-col items-center p-2 transition-all text-center text-xs w-full h-10',
         isWinner && 'font-bold text-primary',
         isLoser && 'text-muted-foreground line-through opacity-70'
       )}
@@ -75,7 +75,7 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent?: boolean 
                 moveHistory={pod1Moves}
             />
             {match.isBye ? (
-                <div className="text-center py-1 border-t-4 border-border">
+                <div className="text-center py-1 border-t-4 border-border h-10 flex items-center justify-center">
                     <Badge variant="secondary" className="text-xs">BYE</Badge>
                 </div>
             ) : (
@@ -105,43 +105,27 @@ export function TournamentBracket({ tournament, currentMatchId }: TournamentBrac
       </CardHeader>
       <CardContent className="p-0 md:p-2">
         <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex justify-center items-center p-4 gap-8">
+          <div className="flex justify-center items-start p-4 gap-2">
             {tournament.rounds.map((round, roundIndex) => (
-              <div key={round.id} className="flex flex-col items-center justify-around gap-16" style={{minWidth: 200}}>
-                <h3 className="text-lg font-semibold text-center text-primary -mb-8">
+              <div key={round.id} className="flex flex-col items-center justify-start gap-4" style={{minWidth: 180}}>
+                <h3 className="text-lg font-semibold text-center text-primary mb-4">
                   Round {roundIndex + 1}
                 </h3>
-                <div className="flex flex-col justify-around items-center gap-16 w-full h-full">
-                  {round.matches.map((match, matchIndex) => {
-                    const isFinalMatchOfRoundPair = matchIndex % 2 === 1;
-                    return (
-                        <div key={match.id} className="flex items-center justify-center relative w-full">
-                            <BracketMatch match={match} isCurrent={match.id === currentMatchId} />
-
-                            {/* Horizontal line out */}
-                            {roundIndex < tournament.rounds.length -1 && (
-                                <div className="absolute left-full top-1/2 w-4 h-1 bg-border -translate-y-1/2"></div>
-                            )}
-                            
-                            {/* Vertical connecting line */}
-                            {isFinalMatchOfRoundPair && tournament.rounds[roundIndex+1] && (
-                                <>
-                                  <div className="absolute left-full w-1 bg-border h-[calc(100%_+_4rem)] -translate-y-[calc(50%_+_2rem)]"></div>
-                                  <div className="absolute left-[calc(100%_+_1rem)] top-1/2 w-4 h-1 bg-border -translate-y-1/2"></div>
-                                </>
-                            )}
-                        </div>
-                    )
-                  })}
+                <div className="flex flex-col justify-around items-center gap-12 w-full h-full">
+                  {round.matches.map((match) => (
+                      <div key={match.id} className="flex items-center justify-center relative w-full">
+                          <BracketMatch match={match} isCurrent={match.id === currentMatchId} />
+                      </div>
+                  ))}
                 </div>
               </div>
             ))}
             {tournament.winner && (
-                 <div className="flex flex-col gap-4 min-w-[200px] items-center">
-                    <h3 className="text-lg font-semibold text-center text-primary">
+                 <div className="flex flex-col gap-4 items-center self-center" style={{minWidth: 180}}>
+                    <h3 className="text-lg font-semibold text-center text-primary mb-4">
                         Winner
                     </h3>
-                    <Card className="p-4 ring-2 ring-primary bg-secondary/80 w-full max-w-[200px]">
+                    <Card className="p-4 ring-2 ring-primary bg-secondary/80 w-full max-w-[180px]">
                         <div className="flex flex-col items-center gap-2 text-center">
                            <Trophy className="w-8 h-8 text-yellow-500" />
                            <p className="text-base font-bold">{tournament.winner.name}</p>
