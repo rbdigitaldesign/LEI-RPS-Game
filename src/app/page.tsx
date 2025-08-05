@@ -6,7 +6,8 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
-import { Trophy } from 'lucide-react';
+import { Trophy, Download } from 'lucide-react';
+import { TournamentReport } from '@/components/tournament-report';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, winner, isProcessing, playMatch, currentRound } = useTournament();
@@ -16,7 +17,6 @@ export default function Home() {
       playMatch(pod1Move, pod2Move);
     }
   };
-
 
   if (!tournament) {
     return (
@@ -46,6 +46,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
+            {winner && <TournamentReport tournament={tournament} />}
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
