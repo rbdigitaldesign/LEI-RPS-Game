@@ -12,9 +12,6 @@ export const PODS: Omit<Pod, 'id'>[] = [
   { name: 'Capybara', manager: 'Laura', emoji: '🐹' },
   { name: 'Wombats', manager: 'Carina', emoji: '🐨' },
   { name: 'Bees', manager: 'Evan', emoji: '🐝' },
-  { name: 'Portfolio Managers', manager: 'Management', emoji: '💼' },
-  { name: 'Seniors', manager: 'Leadership', emoji: '⭐' },
-  { name: 'Associate Directors', manager: 'Leadership', emoji: '🏅' },
 ];
 
 export const MOVES: Move[] = ['rock', 'paper', 'scissors'];
