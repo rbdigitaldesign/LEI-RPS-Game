@@ -19,7 +19,7 @@ const MatchCard = ({ match, isCurrent }: { match: Match, isCurrent: boolean }) =
   if (match.isBye) {
     return (
       <div className="flex flex-col justify-center min-h-[76px]">
-        <div className="relative w-48 bg-card border-2 border-primary/50 p-2 my-1">
+        <div className="relative w-full bg-card border-2 border-primary/50 p-2 my-1">
           <div className={cn("font-bold text-primary")}>
             <span>{pod1Name}</span>
           </div>
@@ -32,7 +32,7 @@ const MatchCard = ({ match, isCurrent }: { match: Match, isCurrent: boolean }) =
   return (
     <div className="flex flex-col justify-center min-h-[76px]">
       <div className={cn(
-        "relative w-48 bg-card border-2 border-primary/50 p-2 my-1 transition-all",
+        "relative w-full bg-card border-2 border-primary/50 p-2 my-1 transition-all",
         isCurrent && "border-accent ring-2 ring-accent shadow-lg"
       )}>
         <div className={cn("flex justify-between items-center", isPod1Winner && "font-bold text-primary")}>
@@ -53,7 +53,7 @@ export function TournamentBracket({ rounds, currentMatchId }: TournamentBracketP
   }
 
   return (
-    <Card className="mt-12 bg-card border-2">
+    <Card className="bg-card border-2 sticky top-20">
       <CardHeader>
         <CardTitle className="text-accent">Tournament Bracket</CardTitle>
       </CardHeader>
@@ -61,15 +61,15 @@ export function TournamentBracket({ rounds, currentMatchId }: TournamentBracketP
         <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex space-x-8 pb-4">
             {rounds.map((round, roundIndex) => (
-                <div key={round.id} className="flex flex-col space-y-4 items-center">
+                <div key={round.id} className="flex flex-col space-y-4 items-center min-w-[200px]">
                 <h3 className="text-xl font-bold text-primary uppercase tracking-wider">
-                    {roundIndex === rounds.length - 1 ? 'Final' : `Round ${round.id}`}
+                    {round.matches.length === 1 ? 'Final' : `Round ${round.id}`}
                 </h3>
-                <div className="flex flex-col justify-around h-full space-y-8">
+                <div className="flex flex-col justify-around h-full space-y-8 w-full">
                     {round.matches.map((match) => (
                         <div key={match.id} className="flex items-center">
                             <MatchCard match={match} isCurrent={match.id === currentMatchId} />
-                            {roundIndex < rounds.length - 1 && (
+                            {round.matches.length > 1 && roundIndex < rounds.length - 1 && (
                                 <div className="w-12 border-t-2 border-primary/50"></div>
                             )}
                         </div>

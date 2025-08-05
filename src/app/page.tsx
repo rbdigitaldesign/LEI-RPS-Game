@@ -75,15 +75,19 @@ export default function Home() {
             </Card>
           </div>
         ) : (
-          <div className="space-y-8">
-            <BattleArena
-              key={currentMatch?.id}
-              match={currentMatch}
-              isProcessing={isProcessing}
-              onPlayMatch={handlePlayMatch}
-              roundNumber={currentRound}
-            />
-            <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+            <div className="xl:col-span-2">
+              <BattleArena
+                key={currentMatch?.id}
+                match={currentMatch}
+                isProcessing={isProcessing}
+                onPlayMatch={handlePlayMatch}
+                roundNumber={currentRound}
+              />
+            </div>
+            <div className="row-start-1 xl:row-auto">
+              <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+            </div>
           </div>
         )}
       </main>
