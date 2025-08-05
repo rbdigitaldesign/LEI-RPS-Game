@@ -140,15 +140,12 @@ export function useTournament() {
     if (lastWinner && lastMatchRoundIndex < currentState.rounds.length - 1) {
         const nextRoundIndex = lastMatchRoundIndex + 1;
         
-        // Find all winners from the current round, including byes
-        const currentRoundWinners = currentState.rounds[lastMatchRoundIndex].matches
-            .map(match => match.winner)
-            .filter(Boolean);
-            
-        // Find the specific winner's new position
-        const winnerPodId = lastWinner.id;
         const winnerList = currentState.rounds[lastMatchRoundIndex].matches.map(m => m.winner);
-        const winnerIndexInRound = winnerList.findIndex(w => w?.id === winnerPodId);
+        
+        // Count how many winners are before this one to determine the position in the *original* list of pods for the round
+        const allPodsForRound = currentState.rounds[lastMatchRoundIndex].matches.flatMap(m => m.isBye ? [m.pod1] : [m.pod1, m.pod2]).filter(Boolean);
+        const winnersSoFar = currentState.rounds[lastMatchRoundIndex].matches.slice(0, lastMatchIndexInRound + 1).map(m => m.winner).filter(Boolean);
+        const winnerIndexInRound = currentState.rounds[lastMatchRoundIndex].matches.map(m => m.winner).filter(Boolean).findIndex(w => w!.id === lastWinner!.id);
 
         if (winnerIndexInRound !== -1) {
             const nextMatchIndex = Math.floor(winnerIndexInRound / 2);
