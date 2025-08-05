@@ -87,7 +87,7 @@ export default function Home() {
               onPlayMatch={handlePlayMatch}
               roundNumber={currentRound}
             />
-            {tournament && <TournamentBracket rounds={tournament.rounds} />}
+            {tournament && <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />}
           </div>
         )}
       </main>

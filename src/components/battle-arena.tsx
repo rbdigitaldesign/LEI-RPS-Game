@@ -75,7 +75,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
             </h2>
         )}
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-start justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-center justify-items-center">
         <PodCard
           pod={match.pod1}
           move={reveal ? match.moves?.pod1 : pod1Move}
@@ -88,12 +88,14 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           selectedMove={pod1Move}
           disabled={reveal}
         />
-        <div className="flex flex-col items-center justify-center order-first md:order-none col-span-1 md:col-span-1">
-            <div className="text-4xl md:text-6xl font-black text-center text-primary-foreground bg-primary w-20 h-20 flex items-center justify-center border-4 border-primary-foreground">
-                VS
+        <div className="flex flex-col items-center justify-center order-first md:order-none col-span-1 md:col-span-1 h-full">
+            <div className="flex-1 flex flex-col items-center justify-end">
+                <div className="text-4xl md:text-6xl font-black text-center text-primary-foreground bg-primary w-20 h-20 flex items-center justify-center border-4 border-primary-foreground">
+                    VS
+                </div>
             </div>
              {!reveal && (
-                <div className="mt-4">
+                <div className="flex-1 flex flex-col items-center justify-center py-4">
                     <Button 
                         size="lg" 
                         onClick={handlePlay} 

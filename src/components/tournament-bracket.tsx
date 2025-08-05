@@ -7,9 +7,10 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 type TournamentBracketProps = {
   rounds: Round[];
+  currentMatchId: string | null;
 };
 
-const MatchCard = ({ match }: { match: Match }) => {
+const MatchCard = ({ match, isCurrent }: { match: Match, isCurrent: boolean }) => {
   const pod1Name = match.pod1?.name ?? 'TBD';
   const pod2Name = match.pod2?.name ?? 'TBD';
   const isPod1Winner = match.winner?.id === match.pod1?.id;
@@ -30,7 +31,10 @@ const MatchCard = ({ match }: { match: Match }) => {
 
   return (
     <div className="flex flex-col justify-center min-h-[76px]">
-      <div className="relative w-48 bg-card border-2 border-primary/50 p-2 my-1">
+      <div className={cn(
+        "relative w-48 bg-card border-2 border-primary/50 p-2 my-1 transition-all",
+        isCurrent && "border-accent ring-2 ring-accent shadow-lg"
+      )}>
         <div className={cn("flex justify-between items-center", isPod1Winner && "font-bold text-primary")}>
           <span>{pod1Name}</span>
         </div>
@@ -43,7 +47,7 @@ const MatchCard = ({ match }: { match: Match }) => {
   );
 };
 
-export function TournamentBracket({ rounds }: TournamentBracketProps) {
+export function TournamentBracket({ rounds, currentMatchId }: TournamentBracketProps) {
   if (!rounds || rounds.length === 0) {
     return null;
   }
@@ -64,7 +68,7 @@ export function TournamentBracket({ rounds }: TournamentBracketProps) {
                 <div className="flex flex-col justify-around h-full space-y-8">
                     {round.matches.map((match) => (
                         <div key={match.id} className="flex items-center">
-                            <MatchCard match={match} />
+                            <MatchCard match={match} isCurrent={match.id === currentMatchId} />
                             {roundIndex < rounds.length - 1 && (
                                 <div className="w-12 border-t-2 border-primary/50"></div>
                             )}
