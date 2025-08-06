@@ -87,12 +87,6 @@ export default function Home() {
       </AnimatePresence>
       <Header>
         <div className="flex items-center gap-2">
-            {!gameWinner && !isFinalBoss && !winner && currentMatch && (
-                <Button variant="outline" size="sm" onClick={simulateTournament} disabled={isProcessing}>
-                    <Swords className="mr-2" />
-                    {isProcessing ? 'Simulating...' : 'Simulate All'}
-                </Button>
-            )}
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
