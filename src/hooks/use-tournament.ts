@@ -219,7 +219,6 @@ export function useTournament() {
             const drawState = {...updatedTournament, matchWinner: { isDraw: true }};
             setTournament(drawState);
             saveState(drawState);
-            toast({ title: "It's a draw!", description: "The boss is tough! Play again!" });
             
             setTimeout(() => {
                 match.moves = undefined;
@@ -314,7 +313,6 @@ export function useTournament() {
             drawState.matchWinner = { isDraw: true }
             setTournament(drawState);
             saveState(drawState);
-            toast({ title: "It's a draw!", description: "Play again to decide the winner." });
             
             setTimeout(() => {
                 match!.moves = undefined;
@@ -409,7 +407,28 @@ export function useTournament() {
 
     setTournament(simTournament);
     saveState(simTournament);
-    setIsProcessing(false);
+    
+    // Now handle the final boss setup
+     if (simTournament.winner) {
+        setTimeout(() => {
+            const finalState = JSON.parse(JSON.stringify(simTournament));
+            finalState.finalMatch = {
+                id: 'final-boss-match',
+                pod1: finalState.winner,
+                pod2: { ...FINAL_BOSS, id: 999 },
+                winner: null,
+                loser: null,
+                moveHistory: [],
+            };
+            finalState.currentMatchId = 'final-boss-match';
+            setTournament(finalState);
+            saveState(finalState);
+            setIsProcessing(false);
+        }, 4000); // Wait for the winner announcement
+    } else {
+        setIsProcessing(false);
+    }
+
   }, [tournament]);
 
   useEffect(() => {
