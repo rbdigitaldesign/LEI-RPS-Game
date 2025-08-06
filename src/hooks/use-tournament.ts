@@ -50,12 +50,21 @@ export function useTournament() {
   const createBracket = (initialPods: Pod[]): TournamentState => {
     const shuffledPods = shuffleArray(initialPods);
     const numPods = shuffledPods.length;
+    
+    // Find the next power of two for bracket size (e.g., 14 -> 16)
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
     const totalRounds = Math.log2(nextPowerOfTwo);
-    const matchesInFirstRound = numPods - (nextPowerOfTwo - numPods);
-    const byesCount = nextPowerOfTwo - numPods;
+    
+    // Number of matches in the first round (play-in round)
+    const numPlayInMatches = numPods - (nextPowerOfTwo / 2);
+    
+    // Pods that will participate in the play-in round
+    const playInPods = shuffledPods.slice(0, numPlayInMatches * 2);
+    // Pods that get a bye to the second round
+    const byePods = shuffledPods.slice(numPlayInMatches * 2);
 
     let rounds: Round[] = [];
+    // Create all rounds with empty matches
     for (let i = 0; i < totalRounds; i++) {
         const numMatchesInRound = (2 ** (totalRounds - (i + 1)));
         rounds.push({
@@ -71,31 +80,29 @@ export function useTournament() {
         });
     }
 
-    const podsInFirstRoundMatches = shuffledPods.slice(0, matchesInFirstRound);
-    const podsWithByes = shuffledPods.slice(matchesInFirstRound);
-
+    // Populate the first round with play-in matches
     let matchIndex = 0;
-    for (let i = 0; i < podsInFirstRoundMatches.length; i += 2) {
-        rounds[0].matches[matchIndex].pod1 = podsInFirstRoundMatches[i];
-        rounds[0].matches[matchIndex].pod2 = podsInFirstRoundMatches[i + 1];
+    for (let i = 0; i < playInPods.length; i += 2) {
+        rounds[0].matches[matchIndex].pod1 = playInPods[i];
+        rounds[0].matches[matchIndex].pod2 = playInPods[i + 1];
         matchIndex++;
     }
-
-    for (const pod of podsWithByes) {
-        rounds[0].matches[matchIndex].pod1 = pod;
-        rounds[0].matches[matchIndex].isBye = true;
-        rounds[0].matches[matchIndex].winner = pod;
-        matchIndex++;
+    
+    // The remaining matches in the first round are technically byes for the second-round pods.
+    // We'll mark them as such and pre-populate the second round.
+    let byeMatchIndex = 0;
+    for (let i = numPlayInMatches; i < rounds[0].matches.length; i++) {
+        const byePod = byePods[byeMatchIndex];
+        rounds[0].matches[i].isBye = true;
+        rounds[0].matches[i].pod1 = byePod;
+        rounds[0].matches[i].winner = byePod;
+        
+        // Directly advance the bye pod to the second round
+        advanceWinner(rounds[0].matches[i], 0, rounds);
+        byeMatchIndex++;
     }
-
-    // Now advance all the bye winners to the second round
-    rounds[0].matches.forEach((match) => {
-        if (match.isBye && match.winner) {
-            advanceWinner(match, 0, rounds);
-        }
-    });
-
-    const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye && m.pod1 && m.pod2);
+    
+    const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye);
 
     return {
       pods: initialPods,
@@ -458,5 +465,3 @@ export function useTournament() {
     currentRound
   };
 }
-
-    
