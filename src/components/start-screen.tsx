@@ -17,24 +17,24 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
       <Header />
       <main className="flex-grow flex items-center justify-center p-4">
         <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, type: 'spring' }}
             className="w-full"
         >
-            <Card className="w-full max-w-2xl text-center bg-black/80 backdrop-blur-sm border-2 border-primary min-h-[280px] flex flex-col justify-center mx-auto">
-                <CardHeader>
-                    <CardTitle className="text-3xl font-bold font-headline text-accent">RPS Pod Battle</CardTitle>
-                    <CardDescription className="text-sm text-primary leading-relaxed">The ultimate rock, paper, scissors showdown</CardDescription>
+            <Card className="w-full max-w-4xl text-center bg-black/80 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
+                <CardHeader className="p-4">
+                    <CardTitle className="text-5xl md:text-8xl font-black font-headline text-accent tracking-tighter">
+                        RPS Pod Battle
+                    </CardTitle>
+                    <CardDescription className="text-lg md:text-2xl text-primary leading-relaxed mt-2">
+                        The ultimate rock, paper, scissors showdown
+                    </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    <p className="text-muted-foreground text-xs">
-                        LEI Monthly Meeting — 27th August 2025
-                    </p>
+                <CardContent className="mt-8">
                     <Button 
-                      size="lg" 
                       onClick={onStartTournament} 
-                      className="w-full text-lg mt-4 font-body text-background bg-accent hover:bg-accent/90 border-4 border-b-8 border-accent-foreground/50 hover:border-b-4 active:border-b-0 active:mt-[10px] active:mb-[6px] transition-all duration-100" 
+                      className="w-48 h-48 rounded-full text-2xl font-black font-body text-white bg-red-600 hover:bg-red-700 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out"
                       disabled={isProcessing}
                     >
                         {isProcessing ? 'Loading...' : 'Press Start'}
