@@ -80,11 +80,11 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           pod={match.pod1}
           move={reveal ? match.moves?.pod1 : pod1Move}
           isWinner={reveal && match.winner?.id === match.pod1?.id}
-          isDraw={reveal && match.isDraw}
+          isDraw={reveal && !!match.isDraw}
           reveal={reveal}
           className="w-full"
         >
-         {!reveal && !match.isBye && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
+         {!reveal && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
 
         <div className="flex flex-col items-center justify-center gap-2 text-center my-0 mx-4">
@@ -92,7 +92,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
               "text-4xl font-black animate-pulse",
               isFinalBoss ? "text-destructive" : "text-accent"
           )}>VS</p>
-          {!reveal && !match.isBye && (
+          {!reveal && (
             <Button
               size="lg"
               onClick={handlePlay}
@@ -108,12 +108,12 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           pod={match.pod2}
           move={reveal ? match.moves?.pod2 : pod2Move}
           isWinner={reveal && match.winner?.id === match.pod2?.id}
-          isDraw={reveal && match.isDraw}
+          isDraw={reveal && !!match.isDraw}
           reveal={reveal}
           className="w-full"
           isBoss={isFinalBoss}
         >
-         {!reveal && !match.isBye && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
+         {!reveal && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
         </PodCard>
       </div>
     </div>

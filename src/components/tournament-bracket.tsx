@@ -25,7 +25,7 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
 const BracketMatch = ({ match }: { match: Match }) => {
     const hasWinner = !!match.winner;
     return (
-        <Card className="w-40 bg-card/50 border-primary/20">
+        <Card className="w-48 bg-card/50 border-primary/20">
             <CardContent className="p-0">
                 <BracketPod 
                     pod={match.pod1} 
@@ -57,18 +57,19 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                                 <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4">
                                     {round.name}
                                 </h3>
-                                <div className="flex flex-col gap-6 relative justify-around flex-grow">
-                                    {round.matches.map(match => (
-                                        <BracketMatch key={match.id} match={match} />
-                                    ))}
-                                    {/* Spacer for the lucky pod that gets a pass in round 2 */}
-                                    {round.id === 2 && (
-                                      <div className="w-40 p-0 text-center">
-                                        <div className="text-[10px] text-muted-foreground italic h-12 flex items-center justify-center">
-                                          (Winner awaiting)
+                                <div className="flex flex-col gap-8 relative justify-around flex-grow">
+                                    {round.matches.map((match, matchIndex) => (
+                                        <div key={match.id} className="relative">
+                                            <BracketMatch match={match} />
+                                            {/* Connecting lines */}
+                                            {round.id < rounds.length && (
+                                                <div className="absolute top-1/2 -right-4 h-px w-4 bg-border"></div>
+                                            )}
+                                            {round.id < rounds.length && matchIndex % 2 === 0 && (
+                                                 <div className="absolute top-1/2 -right-4 h-[calc(100%_+_2rem)] w-px bg-border"></div>
+                                            )}
                                         </div>
-                                      </div>
-                                    )}
+                                    ))}
                                 </div>
                             </div>
                         ))}

@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { PODS } from '@/lib/constants';
 import type { TournamentState, Pod, Round, Match, Move } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { shuffle } from '@/lib/utils';
 
 const LOCAL_STORAGE_KEY = 'rps-pod-showdown-tournament';
 
@@ -30,41 +29,57 @@ export function useTournament() {
   };
 
   const createBracket = (initialPods: Pod[]): TournamentState => {
-    const shuffledPods = shuffle(initialPods);
+    const pods = [...initialPods];
     const rounds: Round[] = [];
-    const numPods = shuffledPods.length;
-    const numRounds = Math.ceil(Math.log2(numPods));
+    const numPods = pods.length;
 
-    let currentPods = [...shuffledPods];
-    const roundNames = ['Round 1', 'Quarter-Finals', 'Semi-Finals', 'Final', 'Champion'];
+    if (numPods < 2) {
+      // Not enough pods for a tournament
+      return {
+        pods: initialPods,
+        rounds: [],
+        currentMatchId: null,
+        winner: numPods === 1 ? pods[0] : null,
+      };
+    }
+    
+    // Create Round 1
+    const round1: Round = { id: 1, name: 'Round 1', matches: [] };
+    for (let i = 0; i < 8; i++) {
+        round1.matches.push({
+            id: `r1-m${i}`,
+            pod1: pods[i * 2],
+            pod2: pods[i * 2 + 1],
+            winner: null,
+            loser: null,
+            moveHistory: [],
+        });
+    }
+    rounds.push(round1);
 
-    for (let i = 0; i < numRounds; i++) {
-        const round: Round = {
-            id: i + 1,
-            name: roundNames[i] || `Round ${i + 1}`,
-            matches: [],
-        };
-        const numMatches = currentPods.length / 2;
-        for (let j = 0; j < numMatches; j++) {
+    const roundNames = ['Quarter-Finals', 'Semi-Finals', 'Final'];
+    let numMatchesInRound = 4;
+
+    for (let i = 0; i < 3; i++) {
+        const round: Round = { id: i + 2, name: roundNames[i], matches: [] };
+        for (let j = 0; j < numMatchesInRound; j++) {
             round.matches.push({
-                id: `r${i + 1}-m${j}`,
-                pod1: currentPods[j * 2],
-                pod2: currentPods[j * 2 + 1],
+                id: `r${i+2}-m${j}`,
+                pod1: null,
+                pod2: null,
                 winner: null,
                 loser: null,
                 moveHistory: [],
             });
         }
         rounds.push(round);
-        currentPods = new Array(numMatches).fill(null);
+        numMatchesInRound /= 2;
     }
-
-    const firstPlayableMatch = rounds[0]?.matches[0];
 
     return {
       pods: initialPods,
       rounds: rounds,
-      currentMatchId: firstPlayableMatch?.id || null,
+      currentMatchId: rounds[0].matches[0].id,
       winner: null,
     };
   };

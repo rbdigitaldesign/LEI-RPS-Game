@@ -21,9 +21,10 @@ export default {
         'hero-pattern': "url('https://i.imgur.com/DoA6NkS.png')",
       },
       fontFamily: {
-        body: ['"Press Start 2P"', 'cursive'],
-        headline: ['"Press Start 2P"', 'cursive'],
+        body: ['"Anton"', 'sans-serif'],
+        headline: ['"Anton"', 'sans-serif'],
         code: ['monospace'],
+        sans: ['"Press Start 2P"', 'cursive'],
       },
       colors: {
         background: 'hsl(var(--background))',
