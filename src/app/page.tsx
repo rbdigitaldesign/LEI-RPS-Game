@@ -8,16 +8,14 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
-import { Trophy, Swords, Skull } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
-import { MatchWinner } from '@/components/match-winner';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
-import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, isProcessing, playMatch, currentRound, matchWinner, winner } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, isProcessing, playMatch, currentRound, winner } = useTournament();
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
@@ -44,11 +42,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <AnimatePresence>
-        {matchWinner && (
-          <MatchWinner winner={matchWinner.winner} winningMove={matchWinner.winningMove} isDraw={matchWinner.isDraw} />
-        )}
-      </AnimatePresence>
       <Header>
         <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>

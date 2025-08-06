@@ -68,43 +68,28 @@ export function useTournament() {
     }
     rounds.push(round1);
 
-    // Create subsequent empty rounds
-    let numMatchesInPreviousRound = round1.matches.length;
+    // Create subsequent empty rounds and populate them
+    let lastRoundMatches = round1.matches;
     for (let i = 2; i <= numRounds; i++) {
-        const numMatchesInCurrentRound = numMatchesInPreviousRound / 2;
-        const round: Round = { id: i, matches: [] };
-        for (let j = 0; j < numMatchesInCurrentRound; j++) {
-            round.matches.push({
-                id: `r${i}-m${j}`,
-                pod1: null,
-                pod2: null,
+        const currentRoundMatches: Match[] = [];
+        const winnersFromLastRound = lastRoundMatches.map(m => m.winner);
+
+        for (let j = 0; j < winnersFromLastRound.length; j += 2) {
+            currentRoundMatches.push({
+                id: `r${i}-m${j/2}`,
+                pod1: winnersFromLastRound[j],
+                pod2: winnersFromLastRound[j+1],
                 winner: null,
                 loser: null,
                 moveHistory: [],
             });
         }
-        rounds.push(round);
-        numMatchesInPreviousRound = numMatchesInCurrentRound;
+        rounds.push({ id: i, matches: currentRoundMatches });
+        lastRoundMatches = currentRoundMatches;
     }
 
-    // Populate Round 2 with winners from Round 1
-    const winnersFromRound1 = round1.matches.map(m => m.winner);
-    for (let i = 0; i < winnersFromRound1.length; i++) {
-        const winner = winnersFromRound1[i];
-        if (winner) {
-            const nextMatchIndex = Math.floor(i / 2);
-            const targetMatch = rounds[1].matches[nextMatchIndex];
-            if (targetMatch) {
-              if (i % 2 === 0) {
-                  targetMatch.pod1 = winner;
-              } else {
-                  targetMatch.pod2 = winner;
-              }
-            }
-        }
-    }
 
-    const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye && !m.winner);
+    const firstPlayableMatch = rounds.flatMap(r => r.matches).find(m => !m.isBye && !m.winner && m.pod1 && m.pod2);
 
     return {
       pods: initialPods,
@@ -148,9 +133,7 @@ export function useTournament() {
     // Advance winner to the next round
     const nextRoundIndex = currentRoundIndex + 1;
     if (winner && nextRoundIndex < rounds.length) {
-        const allMatchesInCurrentRound = rounds[currentRoundIndex].matches;
-        // Find the overall index of our match within the round
-        const overallMatchIndex = allMatchesInCurrentRound.findIndex(m => m.id === currentMatchId);
+        const overallMatchIndex = rounds[currentRoundIndex].matches.findIndex(m => m.id === currentMatchId);
         
         const nextMatchIndex = Math.floor(overallMatchIndex / 2);
         const targetMatch = rounds[nextRoundIndex].matches[nextMatchIndex];
@@ -197,8 +180,8 @@ export function useTournament() {
     
     let match: Match | undefined;
     
-    for (let i = 0; i < rounds.length; i++) {
-      const m = rounds[i].matches.find((m: Match) => m.id === currentMatchId);
+    for (const round of rounds) {
+      const m = round.matches.find((m: Match) => m.id === currentMatchId);
       if (m) {
         match = m;
         break;
@@ -213,6 +196,7 @@ export function useTournament() {
     let winner: Pod | null = null;
     let winningMove: Move | null = null;
     let loser: Pod | null = null;
+    let isDraw = false;
 
     if (pod1Move !== pod2Move) {
       if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
@@ -226,40 +210,39 @@ export function useTournament() {
         loser = match.pod1;
         winningMove = pod2Move;
       }
+    } else {
+        isDraw = true;
     }
 
     match.moves = { pod1: pod1Move, pod2: pod2Move };
     match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
-    
-    const revealState = {...updatedTournament, matchWinner: winner ? { winner, winningMove } : { isDraw: true }};
-    setTournament(revealState);
+    match.isDraw = isDraw;
 
+    setTournament({ ...updatedTournament });
+    
     setTimeout(() => {
         if (winner) {
             match!.winner = winner;
             match!.loser = loser;
+            match!.isDraw = false;
+            advanceTournament(updatedTournament);
+            setIsProcessing(false);
 
-            setTimeout(() => {
-                const stateAfterWinner = { ...updatedTournament, matchWinner: null };
-                advanceTournament(stateAfterWinner);
-                setIsProcessing(false);
-            }, 3000);
-
-        } else { 
-            match!.isDraw = true;
-            
-            setTimeout(() => {
-                match!.moves = undefined;
-                match!.isDraw = false;
-                const resetState = {...updatedTournament, matchWinner: null};
-                setTournament(resetState);
-                saveState(resetState);
-                setIsProcessing(false);
-            }, 2000);
+        } else { // It's a draw
+            match!.moves = undefined;
+            match!.isDraw = false;
+            const resetState = {...updatedTournament};
+            setTournament(resetState);
+            saveState(resetState);
+            setIsProcessing(false);
+            toast({
+                title: "It's a Draw!",
+                description: "The match was a draw. Play again!",
+            });
         }
-    }, 1000);
+    }, 2000);
 
-  }, [tournament]);
+  }, [tournament, toast]);
 
   const resetTournament = useCallback(() => {
     setTournament(null);
@@ -273,8 +256,6 @@ export function useTournament() {
         const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (savedState) {
           const parsedState = JSON.parse(savedState);
-          // Clear transient state on load
-          parsedState.matchWinner = null; 
           setTournament(parsedState);
         }
       } catch (error) {
@@ -290,7 +271,7 @@ export function useTournament() {
     : null;
 
   const currentRound = tournament && currentMatch
-    ? tournament.rounds.findIndex(r => r.matches.some(m => m.id === currentMatch.id)) + 1
+    ? tournament.rounds.find(r => r.matches.some(m => m.id === currentMatch.id))?.id ?? null
     : null;
 
 
@@ -301,7 +282,6 @@ export function useTournament() {
     playMatch,
     currentMatch,
     winner: tournament?.winner ?? null,
-    matchWinner: tournament?.matchWinner,
     isProcessing,
     currentRound
   };

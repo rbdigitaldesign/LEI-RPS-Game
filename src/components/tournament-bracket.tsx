@@ -27,11 +27,9 @@ const BracketMatch = ({ match }: { match: Match }) => {
         return (
              <Card className="w-28 bg-transparent border-0 shadow-none">
                 <CardContent className="p-0">
-                    <BracketPod 
-                        pod={match.pod1} 
-                        isWinner={true}
-                        isLoser={false}
-                    />
+                    <div className="flex items-center gap-1 p-0.5 text-[9px] h-5 font-bold italic">
+                        {match.pod1?.name} has a bye
+                    </div>
                 </CardContent>
             </Card>
         )
@@ -64,7 +62,7 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
         <Card className="w-full bg-card border-2 overflow-hidden">
             <CardContent className="p-2">
                 <ScrollArea className="w-full whitespace-nowrap">
-                    <div className="flex gap-4 items-center">
+                    <div className="flex gap-4 items-stretch">
                         {rounds.map((round, roundIndex) => (
                             <div key={round.id} className="flex flex-col h-full">
                                 <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-2">
