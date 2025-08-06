@@ -14,8 +14,10 @@ type TournamentBracketProps = {
 const MatchCard = ({ match, isCurrent }: { match: Match; isCurrent: boolean }) => {
   const pod1Name = match.pod1?.name ?? 'TBD';
   const pod2Name = match.pod2?.name ?? 'TBD';
-  const isPod1Winner = match.winner?.id === match.pod1?.id;
-  const isPod2Winner = match.winner?.id === match.pod2?.id;
+  
+  const hasWinner = !!match.winner;
+  const isPod1Winner = hasWinner && match.winner?.id === match.pod1?.id;
+  const isPod2Winner = hasWinner && match.winner?.id === match.pod2?.id;
 
   if (match.isBye && match.pod1) {
     return (
@@ -34,11 +36,19 @@ const MatchCard = ({ match, isCurrent }: { match: Match; isCurrent: boolean }) =
         "relative w-full bg-card border border-primary/50 p-1 text-[10px] h-10 flex flex-col justify-around transition-all",
         isCurrent && "border-accent ring-1 ring-accent shadow-md"
       )}>
-        <div className={cn("flex justify-between items-center truncate", isPod1Winner && "font-bold text-primary", !match.winner && !isPod1Winner && match.pod1 && "opacity-50")}>
+        <div className={cn("flex justify-between items-center truncate", 
+            isPod1Winner && "font-bold text-green-500",
+            hasWinner && !isPod1Winner && "line-through text-muted-foreground",
+            !hasWinner && match.pod1 && "opacity-50"
+        )}>
           <span className="truncate">{pod1Name}</span>
         </div>
         <hr className="my-px border-primary/20" />
-        <div className={cn("flex justify-between items-center", isPod2Winner && "font-bold text-primary", !match.winner && !isPod2Winner && match.pod2 && "opacity-50")}>
+        <div className={cn("flex justify-between items-center", 
+            isPod2Winner && "font-bold text-green-500",
+            hasWinner && !isPod2Winner && "line-through text-muted-foreground",
+            !hasWinner && match.pod2 && "opacity-50"
+        )}>
           <span className="truncate">{pod2Name}</span>
         </div>
       </div>
