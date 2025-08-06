@@ -22,7 +22,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             transition={{ duration: 0.8, type: 'spring' }}
             className="w-full"
         >
-            <Card className="w-full max-w-4xl text-center bg-black/80 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
+            <Card className="w-full max-w-4xl text-center bg-black/50 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
                 <CardHeader className="p-4">
                     <CardTitle className="text-5xl md:text-8xl font-black font-headline text-accent tracking-tighter">
                         RPS Pod Battle
