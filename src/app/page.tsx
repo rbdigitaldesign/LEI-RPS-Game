@@ -20,8 +20,13 @@ export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner, winner } = useTournament();
   const [introFinished, setIntroFinished] = useState(false);
   const [showTournamentWinner, setShowTournamentWinner] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
-  const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handlePlayMatch = (pod1Move: Move, pod2Move) => {
     if (currentMatch) {
       playMatch(pod1Move, pod2Move);
     }
@@ -35,8 +40,12 @@ export default function Home() {
         }, 3900); // slightly less than the hook timeout
         return () => clearTimeout(timer);
     }
-  }, [winner, tournament?.finalMatch]);
+  }, [winner, tournament?.finalMatch, showTournamentWinner]);
 
+
+  if (!isClient) {
+    return null; // Render nothing on the server to avoid hydration errors
+  }
 
   if (!tournament) {
     if (!introFinished) {
@@ -150,3 +159,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

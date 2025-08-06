@@ -351,8 +351,8 @@ export function useTournament() {
         : tournament.schedule.find(m => m.id === tournament.currentMatchId) ?? null
     : null;
 
-  const currentRound = tournament && tournament.currentMatchId
-    ? (tournament.standings.find(s => s.podId === currentMatch?.pod1?.id)?.gamesPlayed ?? 0) + 1
+  const currentRound = tournament && tournament.currentMatchId && currentMatch?.pod1
+    ? (tournament.standings.find(s => s.podId === currentMatch.pod1!.id)?.gamesPlayed ?? 0) + 1
     : null;
 
 
