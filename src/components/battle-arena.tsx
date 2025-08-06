@@ -96,7 +96,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
               size="lg"
               onClick={handlePlay}
               disabled={!pod1Move || !pod2Move || isProcessing}
-              className="w-24 h-24 rounded-full text-lg font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
+              className="w-24 h-24 rounded-full text-base font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
             >
               {isProcessing ? '...' : 'BATTLE'}
             </Button>
