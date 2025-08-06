@@ -5,12 +5,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { PODS, MOVES, FINAL_BOSS } from '@/lib/constants';
 import type { TournamentState, Pod, Match, Move, Standing } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { shuffleArray } from '@/lib/utils';
 
 const LOCAL_STORAGE_KEY = 'rps-pod-showdown-tournament';
-
-const shuffleArray = <T,>(array: T[]): T[] => {
-  return [...array].sort(() => Math.random() - 0.5);
-};
 
 export function useTournament() {
   const [tournament, setTournament] = useState<TournamentState | null>(null);
@@ -19,11 +16,13 @@ export function useTournament() {
 
   const saveState = (state: TournamentState | null) => {
     try {
-      if (state) {
-        const stateString = JSON.stringify(state);
-        localStorage.setItem(LOCAL_STORAGE_KEY, stateString);
-      } else {
-        localStorage.removeItem(LOCAL_STORAGE_KEY);
+      if (typeof window !== 'undefined') {
+        if (state) {
+          const stateString = JSON.stringify(state);
+          localStorage.setItem(LOCAL_STORAGE_KEY, stateString);
+        } else {
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+        }
       }
     } catch (error) {
       console.error("Could not save state to localStorage", error);
@@ -279,7 +278,7 @@ export function useTournament() {
         }
     }, 1000);
 
-  }, [tournament, toast]);
+  }, [tournament]);
   
   const simulateTournament = useCallback(async () => {
     if (!tournament) return;
@@ -352,10 +351,10 @@ export function useTournament() {
         : tournament.schedule.find(m => m.id === tournament.currentMatchId) ?? null
     : null;
 
-  // Round number is less relevant in round robin, but we can fake it
   const currentRound = tournament && tournament.currentMatchId
-    ? tournament.standings[0]?.gamesPlayed + 1
+    ? (tournament.standings.find(s => s.podId === currentMatch?.pod1?.id)?.gamesPlayed ?? 0) + 1
     : null;
+
 
   return {
     tournament,
@@ -371,3 +370,5 @@ export function useTournament() {
     currentRound
   };
 }
+
+    
