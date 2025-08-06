@@ -77,6 +77,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           move={reveal ? match.moves?.pod1 : pod1Move}
           isWinner={reveal && match.winner?.id === match.pod1?.id}
           reveal={reveal}
+          className="w-full"
         >
          {!reveal && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
@@ -100,7 +101,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           move={reveal ? match.moves?.pod2 : pod2Move}
           isWinner={reveal && match.winner?.id === match.pod2?.id}
           reveal={reveal}
-          className="md:col-start-3"
+          className="md:col-start-3 w-full"
         >
          {!reveal && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
         </PodCard>

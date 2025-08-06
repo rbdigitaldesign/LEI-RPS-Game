@@ -18,7 +18,7 @@ export function PodCard({ pod, move, isWinner, reveal, className, children }: Po
   if (!pod) {
     return (
       <Card className={cn(
-        'w-full max-w-xs text-center relative overflow-hidden transition-all duration-300 bg-card/50 border-2 border-dashed flex items-center justify-center min-h-[260px]',
+        'w-full text-center relative overflow-hidden transition-all duration-300 bg-card/50 border-2 border-dashed flex items-center justify-center min-h-[260px]',
         className
       )}>
         <p className="text-muted-foreground text-sm">Waiting for opponent...</p>
@@ -30,13 +30,13 @@ export function PodCard({ pod, move, isWinner, reveal, className, children }: Po
     <motion.div
       animate={isWinner ? { scale: 1.05 } : {}}
       transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+      className={className}
     >
       <Card
         className={cn(
-          'w-full max-w-xs text-center relative overflow-hidden transition-all duration-300 bg-card border-2',
+          'w-full text-center relative overflow-hidden transition-all duration-300 bg-card border-2',
           isWinner && 'border-accent ring-2 ring-accent shadow-lg shadow-accent/20',
-          !isWinner && reveal && 'opacity-50 scale-95',
-          className
+          !isWinner && reveal && 'opacity-50 scale-95'
         )}
       >
         <CardHeader className="p-4">
