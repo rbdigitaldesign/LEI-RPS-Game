@@ -23,20 +23,21 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
 );
 
 const BracketMatch = ({ match }: { match: Match }) => {
-    const isPlayed = !!match.winner;
+    // A match is considered "played" if it has a winner AND it was not a bye.
+    const hasPlayedAndWon = !!match.winner && !match.isBye;
     return (
         <Card className="w-36 bg-card/50 border-primary/20">
             <CardContent className="p-0.5">
                 <BracketPod 
                     pod={match.pod1} 
-                    isWinner={isPlayed && match.winner?.id === match.pod1?.id}
-                    isLoser={isPlayed && match.winner?.id !== match.pod1?.id}
+                    isWinner={hasPlayedAndWon && match.winner?.id === match.pod1?.id}
+                    isLoser={hasPlayedAndWon && match.winner?.id !== match.pod1?.id}
                 />
                 <div className="border-t border-border/50 my-0.5 mx-1"></div>
                 <BracketPod 
                     pod={match.pod2} 
-                    isWinner={isPlayed && match.winner?.id === match.pod2?.id}
-                    isLoser={isPlayed && match.winner?.id !== match.pod2?.id}
+                    isWinner={hasPlayedAndWon && match.winner?.id === match.pod2?.id}
+                    isLoser={hasPlayedAndWon && match.winner?.id !== match.pod2?.id}
                 />
             </CardContent>
         </Card>
