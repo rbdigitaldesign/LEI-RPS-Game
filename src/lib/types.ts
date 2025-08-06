@@ -32,7 +32,8 @@ export type TournamentState = {
   finalMatch: Match | null;
   gameWinner: Pod | null;
   matchWinner?: {
-    winner: Pod;
-    winningMove: Move;
+    winner?: Pod;
+    winningMove?: Move;
+    isDraw?: boolean;
   } | null;
 };

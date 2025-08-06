@@ -14,16 +14,27 @@ import { TournamentReport } from '@/components/tournament-report';
 import { MatchWinner } from '@/components/match-winner';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner, winner } = useTournament();
   const [introFinished, setIntroFinished] = useState(false);
+  const [showTournamentWinner, setShowTournamentWinner] = useState(false);
 
   const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
     if (currentMatch) {
       playMatch(pod1Move, pod2Move);
     }
   };
+  
+  // This effect will trigger the tournament winner announcement
+  // when a winner is decided but before the final boss match is set up.
+  if (winner && !showTournamentWinner && !tournament?.finalMatch) {
+      setShowTournamentWinner(true);
+      setTimeout(() => {
+          setShowTournamentWinner(false);
+      }, 4000);
+  }
 
   if (!tournament) {
     if (!introFinished) {
@@ -36,12 +47,34 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {matchWinner && matchWinner.winner && matchWinner.winningMove && (
-        <MatchWinner winner={matchWinner.winner} winningMove={matchWinner.winningMove} />
-      )}
+      <AnimatePresence>
+        {matchWinner && matchWinner.winner && matchWinner.winningMove && (
+          <MatchWinner winner={matchWinner.winner} winningMove={matchWinner.winningMove} isDraw={matchWinner.isDraw} />
+        )}
+        {showTournamentWinner && winner && (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            >
+                <Card className="w-full max-w-2xl text-center bg-card border-accent border-4">
+                    <CardHeader>
+                        <Trophy className="w-24 h-24 text-yellow-500 mx-auto" />
+                        <p className="text-2xl font-medium text-accent uppercase tracking-widest">Tournament Champion</p>
+                        <CardTitle className="text-7xl font-black font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-3xl text-muted-foreground animate-pulse">Prepare for the Final Challenge!</p>
+                    </CardContent>
+                </Card>
+            </motion.div>
+        )}
+      </AnimatePresence>
       <Header>
         <div className="flex items-center gap-2">
-            {!gameWinner && !isFinalBoss && (
+            {!gameWinner && !isFinalBoss && !winner && (
                 <Button variant="outline" size="sm" onClick={simulateTournament} disabled={isProcessing}>
                     <Swords className="mr-2" />
                     {isProcessing ? 'Simulating...' : 'Simulate'}
@@ -52,9 +85,9 @@ export default function Home() {
             </Button>
         </div>
       </Header>
-      <main className="flex-grow container mx-auto p-4 space-y-8">
+      <main className="flex-grow container mx-auto p-4 flex flex-col">
         {gameWinner ? (
-          <div className="flex items-center justify-center py-16">
+          <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
               <CardHeader>
                 <p className="text-sm font-medium text-accent">
@@ -90,8 +123,8 @@ export default function Home() {
             </Card>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
-             <div className="xl:col-span-2">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start flex-grow">
+             <div className="xl:col-span-2 h-full flex flex-col justify-center">
                 {isFinalBoss && (
                      <Card className="mb-4 text-center border-destructive border-2 bg-destructive/10 p-2 animate-pulse">
                         <CardTitle className="text-destructive text-lg font-headline">FINAL BOSS BATTLE</CardTitle>
@@ -106,7 +139,7 @@ export default function Home() {
                 roundNumber={currentRound}
               />
             </div>
-            <div className="row-start-1 xl:row-auto">
+            <div className="row-start-1 xl:row-auto h-full flex flex-col">
               <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
             </div>
           </div>
@@ -115,5 +148,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

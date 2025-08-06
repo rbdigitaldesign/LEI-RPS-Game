@@ -35,12 +35,14 @@ export function useTournament() {
           const currentMatchIndex = rounds[roundIndex].matches.findIndex(m => m.id === match.id);
           const nextRoundIndex = roundIndex + 1;
           const nextMatchIndex = Math.floor(currentMatchIndex / 2);
-          const nextMatch = rounds[nextRoundIndex].matches[nextMatchIndex];
-
-          if (currentMatchIndex % 2 === 0) {
-              nextMatch.pod1 = match.winner;
-          } else {
-              nextMatch.pod2 = match.winner;
+          
+          if(nextMatchIndex < rounds[nextRoundIndex].matches.length) {
+            const nextMatch = rounds[nextRoundIndex].matches[nextMatchIndex];
+            if (currentMatchIndex % 2 === 0) {
+                nextMatch.pod1 = match.winner;
+            } else {
+                nextMatch.pod2 = match.winner;
+            }
           }
       }
   }
@@ -70,52 +72,40 @@ export function useTournament() {
         });
     }
 
-    let podsForRound2 = [];
-    // Handle byes
-    for(let i=0; i < byesCount; i++) {
-        podsForRound2.push(shuffledPods[i]);
-    }
-    
-    // Handle first round matches
-    let podsForRound1 = shuffledPods.slice(byesCount);
-    let r1MatchIndex = 0;
-    for(let i=0; i < podsForRound1.length; i+=2) {
-        rounds[0].matches[r1MatchIndex].pod1 = podsForRound1[i];
-        rounds[0].matches[r1MatchIndex].pod2 = podsForRound1[i+1];
-        r1MatchIndex++;
-    }
-    
-    // Fill in winners for byes, advancing them to round 2
-    for(let i=0; i < byesCount; i++) {
-        const byeMatch = {
+    let firstRoundPods = [...shuffledPods];
+    let byeMatches: Match[] = [];
+    if(byesCount > 0){
+        const byePods = firstRoundPods.splice(0, byesCount);
+        byeMatches = byePods.map((pod, i) => ({
             id: `r1-bye${i}`,
-            pod1: shuffledPods[i],
+            pod1: pod,
             pod2: null,
-            winner: shuffledPods[i],
+            winner: pod,
             loser: null,
             isBye: true,
+            moveHistory: []
+        }));
+    }
+    
+    let firstRoundMatches: Match[] = [];
+    for(let i=0; i < firstRoundPods.length; i+=2){
+        firstRoundMatches.push({
+            id: `r1-m${i/2}`,
+            pod1: firstRoundPods[i],
+            pod2: firstRoundPods[i+1],
+            winner: null,
+            loser: null,
             moveHistory: [],
-        }
-        rounds[0].matches[r1MatchIndex] = byeMatch;
-        r1MatchIndex++;
+        });
     }
 
-    rounds[0].matches.sort((a,b) => a.id.localeCompare(b.id));
-
-    // Prepare Round 2
-    const r1Winners = rounds[0].matches.map(m => m.winner).filter(Boolean);
-    const r1NonByeMatches = rounds[0].matches.filter(m => !m.isBye);
-
-    let r2PodIndex = 0;
-    for(let i = 0; i < r1NonByeMatches.length; i++) {
-        const match = r1NonByeMatches[i];
-        if (i % 2 === 0) {
-            rounds[1].matches[r2PodIndex].pod1 = match.winner;
-        } else {
-            rounds[1].matches[r2PodIndex].pod2 = match.winner;
-            r2PodIndex++;
+    rounds[0].matches = [...firstRoundMatches, ...byeMatches];
+    
+    rounds[0].matches.forEach((match, index) => {
+        if(match.winner){
+            advanceWinner(match, 0, rounds);
         }
-    }
+    });
 
     const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye && m.pod1 && m.pod2);
 
@@ -155,20 +145,24 @@ export function useTournament() {
     const newState = { ...currentState, currentMatchId: nextMatchId };
 
     if (!nextMatchId) {
-        // No more playable matches, check for a tournament winner
         const lastRound = currentState.rounds[currentState.rounds.length - 1];
         if (lastRound.matches.length === 1 && lastRound.matches[0].winner) {
             newState.winner = lastRound.matches[0].winner;
-            // Set up final boss match
-            newState.finalMatch = {
-                id: 'final-boss-match',
-                pod1: newState.winner,
-                pod2: { ...FINAL_BOSS, id: 999 },
-                winner: null,
-                loser: null,
-                moveHistory: [],
-            };
-            newState.currentMatchId = 'final-boss-match';
+             // Delay setting up final boss match to show winner screen
+            setTimeout(() => {
+                const finalState = JSON.parse(JSON.stringify(newState));
+                finalState.finalMatch = {
+                    id: 'final-boss-match',
+                    pod1: finalState.winner,
+                    pod2: { ...FINAL_BOSS, id: 999 },
+                    winner: null,
+                    loser: null,
+                    moveHistory: [],
+                };
+                finalState.currentMatchId = 'final-boss-match';
+                setTournament(finalState);
+                saveState(finalState);
+            }, 4000); // 4 second delay
         }
     }
     
@@ -222,7 +216,7 @@ export function useTournament() {
             }, 3000);
         } else {
             match.isDraw = true;
-            const drawState = {...updatedTournament};
+            const drawState = {...updatedTournament, matchWinner: { isDraw: true }};
             setTournament(drawState);
             saveState(drawState);
             toast({ title: "It's a draw!", description: "The boss is tough! Play again!" });
@@ -230,8 +224,9 @@ export function useTournament() {
             setTimeout(() => {
                 match.moves = undefined;
                 match.isDraw = false;
-                setTournament({...drawState});
-                saveState(drawState);
+                const resetState = {...drawState, matchWinner: null};
+                setTournament(resetState);
+                saveState(resetState);
                 setIsProcessing(false);
             }, 2000);
         }
@@ -316,6 +311,7 @@ export function useTournament() {
         } else { 
             match!.isDraw = true;
             const drawState = JSON.parse(JSON.stringify(updatedTournament));
+            drawState.matchWinner = { isDraw: true }
             setTournament(drawState);
             saveState(drawState);
             toast({ title: "It's a draw!", description: "Play again to decide the winner." });
@@ -324,6 +320,7 @@ export function useTournament() {
                 match!.moves = undefined;
                 match!.isDraw = false;
                 const resetState = JSON.parse(JSON.stringify(drawState));
+                resetState.matchWinner = null;
                 setTournament(resetState);
                 saveState(resetState);
                 setIsProcessing(false);
@@ -359,10 +356,7 @@ export function useTournament() {
             }
         }
         
-        if (roundIndex === -1) {
-            // Should not happen, but as a safeguard
-            break;
-        }
+        if (roundIndex === -1) break;
 
         const match = simTournament.rounds[roundIndex].matches[matchIndex];
         
@@ -391,7 +385,6 @@ export function useTournament() {
             advanceWinner(match, roundIndex, simTournament.rounds);
         }
         
-        // Find next match or winner
         let nextMatchId = null;
         
         findNext:
@@ -412,19 +405,6 @@ export function useTournament() {
                 simTournament.winner = lastRound.matches[0].winner;
             }
         }
-    }
-    
-    // Setup final boss match
-    if (simTournament.winner) {
-        simTournament.finalMatch = {
-            id: 'final-boss-match',
-            pod1: simTournament.winner,
-            pod2: { ...FINAL_BOSS, id: 999 },
-            winner: null,
-            loser: null,
-            moveHistory: [],
-        };
-        simTournament.currentMatchId = 'final-boss-match';
     }
 
     setTournament(simTournament);
