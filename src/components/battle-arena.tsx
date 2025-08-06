@@ -30,7 +30,7 @@ const MoveSelector = ({ onSelect, selectedMove, disabled }: { onSelect: (move: M
           selectedMove && selectedMove !== move && "opacity-50 scale-90"
         )}
       >
-        <MoveIcon move={move} />
+        <MoveIcon move={move} className="text-2xl" />
       </button>
     ))}
   </div>

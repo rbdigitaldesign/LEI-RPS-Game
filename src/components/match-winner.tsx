@@ -43,8 +43,8 @@ export function MatchWinner({ winner, winningMove }: MatchWinnerProps) {
             </div>
             <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
                 <p className="text-2xl font-semibold capitalize text-primary">{winningMove}</p>
-                <div className="w-16 h-16 p-3 bg-background text-secondary-foreground flex items-center justify-center border-2">
-                  <MoveIcon move={winningMove} />
+                <div className="w-16 h-16 bg-background text-secondary-foreground flex items-center justify-center border-2">
+                  <MoveIcon move={winningMove} className="text-5xl" />
                 </div>
                 <p className="text-2xl font-semibold capitalize text-primary">Wins!</p>
             </div>
