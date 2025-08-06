@@ -70,10 +70,7 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                                 <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-2">
                                     {roundIndex === rounds.length -1 ? "Final" : `Round ${round.id}`}
                                 </h3>
-                                <div className={cn(
-                                    "flex flex-col gap-4 relative",
-                                     roundIndex > 0 && "justify-around flex-grow"
-                                )}>
+                                <div className="flex flex-col gap-4 relative justify-around flex-grow">
                                     {round.matches.map(match => (
                                         <BracketMatch key={match.id} match={match} />
                                     ))}
