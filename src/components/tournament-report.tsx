@@ -6,7 +6,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import type { TournamentState, Match } from '@/lib/types';
+import type { TournamentState, Match, Pod, Move } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Trophy, Skull } from 'lucide-react';
 
@@ -114,7 +114,7 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
                 Match Results
             </h2>
             <div className="space-y-4">
-                {tournament.rounds.flatMap(r => r.matches).filter(m => m.played).map((match: Match) => (
+                {tournament.rounds.flatMap(r => r.matches).filter(m => m.winner).map((match: Match) => (
                     <Card key={match.id} className="bg-card border-2 border-primary/50 p-4">
                         <div className="grid grid-cols-3 items-center text-center">
                             <div className="font-bold text-lg text-primary">{match.pod1?.name}</div>
@@ -125,7 +125,7 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
                               <div className="text-center mt-2">
                                 <p className="font-semibold text-accent">Winner: {match.winner.name}</p>
                                 <div className="flex justify-center items-center gap-4 mt-1">
-                                    {match.moveHistory?.map((moves, index) => (
+                                    {match.moveHistory?.map((moves: { pod1: Move; pod2: Move; }, index: number) => (
                                         <div key={index} className="flex gap-2 text-2xl">
                                             <span>{getEmojiForMove(moves.pod1)}</span>
                                             <span>vs</span>

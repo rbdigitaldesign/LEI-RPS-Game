@@ -18,7 +18,6 @@ export type Match = {
   moveHistory?: { pod1: Move; pod2: Move }[];
   isBye?: boolean;
   isDraw?: boolean;
-  played: boolean;
 };
 
 export type Round = {
