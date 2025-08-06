@@ -158,20 +158,9 @@ export function useTournament() {
         return;
     }
 
-    let winner: Pod | null = null;
-    let winningMove: Move | null = null;
-
-    if (pod1Move !== pod2Move) {
-        if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
-            (pod1Move === 'scissors' && pod2Move === 'paper') ||
-            (pod1Move === 'paper' && pod2Move === 'rock')) {
-            winner = match.pod1;
-            winningMove = pod1Move;
-        } else {
-            winner = match.pod2;
-            winningMove = pod2Move;
-        }
-    }
+    // The player always wins the final boss fight by distracting them with chocolate.
+    const winner = match.pod1;
+    const winningMove = pod1Move;
 
     match.moves = { pod1: pod1Move, pod2: pod2Move };
     setTournament(updatedTournament);
@@ -189,7 +178,7 @@ export function useTournament() {
                 saveState(stateAfterWinner);
                 setIsProcessing(false);
             }, 3000);
-        } else {
+        } else { // This else block will now never be reached in the final match.
             match.isDraw = true;
             const drawState = {...updatedTournament, matchWinner: { isDraw: true }};
             setTournament(drawState);
