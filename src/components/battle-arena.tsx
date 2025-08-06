@@ -25,7 +25,7 @@ const MoveSelector = ({ onSelect, selectedMove, disabled }: { onSelect: (move: M
         onClick={() => onSelect(move)}
         disabled={disabled}
         className={cn(
-          "w-12 h-12 bg-secondary border-2 border-primary/50 flex items-center justify-center transition-all duration-200 transform hover:scale-110 hover:border-accent disabled:opacity-50 disabled:transform-none",
+          "w-12 h-12 p-2 bg-secondary border-2 border-primary/50 flex items-center justify-center transition-all duration-200 transform hover:scale-110 hover:border-accent disabled:opacity-50 disabled:transform-none",
           selectedMove === move && "border-accent ring-2 ring-accent scale-110 bg-primary/20",
           selectedMove && selectedMove !== move && "opacity-50 scale-90"
         )}
