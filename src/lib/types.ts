@@ -1,3 +1,4 @@
+
 export type Pod = {
   id: number;
   name: string;
@@ -20,22 +21,16 @@ export type Match = {
   played: boolean;
 };
 
-export type Standing = {
-  podId: number;
-  name: string;
-  emoji: string;
-  wins: number;
-  losses: number;
-  draws: number;
-  gamesPlayed: number;
+export type Round = {
+    id: number;
+    matches: Match[];
 }
 
 export type TournamentState = {
   pods: Pod[];
-  schedule: Match[];
-  standings: Standing[];
+  rounds: Round[];
   currentMatchId: string | null;
-  winner: Pod | null; // Winner of the round robin part
+  winner: Pod | null; // Winner of the elimination tournament
   finalMatch: Match | null;
   gameWinner: Pod | null; // Overall game winner after final boss
   matchWinner?: {
@@ -44,3 +39,5 @@ export type TournamentState = {
     isDraw?: boolean;
   } | null;
 };
+
+    

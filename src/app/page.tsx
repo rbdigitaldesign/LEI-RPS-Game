@@ -9,16 +9,15 @@ import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
 import { Trophy, Swords, Skull } from 'lucide-react';
-import { TournamentStandings } from '@/components/tournament-standings';
+import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { MatchWinner } from '@/components/match-winner';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MatchResultsLog } from '@/components/match-results-log';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner, winner } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, matchWinner, winner } = useTournament();
   const [introFinished, setIntroFinished] = useState(false);
   const [showTournamentWinner, setShowTournamentWinner] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -56,7 +55,6 @@ export default function Home() {
   }
   
   const isFinalBoss = currentMatch?.id === 'final-boss-match';
-  const playedMatches = tournament.schedule?.filter(m => m.played) || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -75,7 +73,7 @@ export default function Home() {
                 <Card className="w-full max-w-2xl text-center bg-card border-accent border-4">
                     <CardHeader>
                         <Trophy className="w-24 h-24 text-yellow-500 mx-auto" />
-                        <p className="text-2xl font-medium text-accent uppercase tracking-widest">Round Robin Winner</p>
+                        <p className="text-2xl font-medium text-accent uppercase tracking-widest">Tournament Winner</p>
                         <CardTitle className="text-7xl font-black font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -130,8 +128,9 @@ export default function Home() {
             </Card>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start flex-grow">
-             <div className="xl:col-span-2 h-full flex flex-col gap-4">
+          <div className="flex flex-col gap-8 items-start flex-grow">
+            <TournamentBracket rounds={tournament.rounds} />
+             <div className="w-full flex flex-col gap-4">
                 {isFinalBoss && (
                      <Card className="text-center border-destructive border-2 bg-destructive/10 p-2 animate-pulse">
                         <CardTitle className="text-destructive text-lg font-headline">FINAL BOSS BATTLE</CardTitle>
@@ -145,10 +144,6 @@ export default function Home() {
                 onPlayMatch={handlePlayMatch}
                 roundNumber={currentRound}
               />
-               {playedMatches.length > 0 && <MatchResultsLog matches={playedMatches} />}
-            </div>
-            <div className="row-start-1 xl:row-auto h-full flex flex-col">
-              {tournament.standings && <TournamentStandings standings={tournament.standings} />}
             </div>
           </div>
         )}
@@ -156,3 +151,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

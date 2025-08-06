@@ -71,7 +71,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
             "text-xl font-bold text-center uppercase tracking-widest",
              isFinalBoss ? "text-destructive" : "text-accent"
         )}>
-          {roundNumber > 0 ? `Match ${roundNumber}` : isFinalBoss ? 'Final Boss' : 'Round Robin'}
+          {isFinalBoss ? 'Final Boss' : `Round ${roundNumber}`}
         </h2>
       )}
 
@@ -84,7 +84,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           reveal={reveal}
           className="w-full"
         >
-         {!reveal && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
+         {!reveal && !match.isBye && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
 
         <div className="flex flex-col items-center justify-center gap-2 text-center my-0">
@@ -92,7 +92,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
               "text-4xl font-black animate-pulse",
               isFinalBoss ? "text-destructive" : "text-accent"
           )}>VS</p>
-          {!reveal && (
+          {!reveal && !match.isBye && (
             <Button
               size="lg"
               onClick={handlePlay}
@@ -113,9 +113,11 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           className="w-full"
           isBoss={isFinalBoss}
         >
-         {!reveal && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
+         {!reveal && !match.isBye && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
         </PodCard>
       </div>
     </div>
   );
 }
+
+    

@@ -56,3 +56,5 @@ export function TournamentStandings({ standings }: TournamentStandingsProps) {
     </Card>
   );
 }
+
+    
