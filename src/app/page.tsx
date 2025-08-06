@@ -128,7 +128,7 @@ export default function Home() {
             </Card>
           </div>
         ) : (
-          <div className="flex flex-col gap-8 items-start flex-grow">
+          <div className="flex flex-col gap-4 items-start flex-grow">
             <TournamentBracket rounds={tournament.rounds} />
              <div className="w-full flex flex-col gap-4">
                 {isFinalBoss && (
@@ -151,5 +151,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
