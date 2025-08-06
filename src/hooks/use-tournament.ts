@@ -51,17 +51,21 @@ export function useTournament() {
     const shuffledPods = shuffleArray(initialPods);
     const numPods = shuffledPods.length;
     
-    // Find the next power of two for bracket size (e.g., 14 -> 16)
-    const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
-    const totalRounds = Math.log2(nextPowerOfTwo);
+    // For 14 pods, we need a 16-slot bracket.
+    const bracketSize = 16;
+    const totalRounds = Math.log2(bracketSize); // 4 rounds for 16 slots
+    
+    // Number of byes (pods that skip round 1)
+    const numByes = bracketSize - numPods; // 16 - 14 = 2 byes
     
     // Number of matches in the first round (play-in round)
-    const numPlayInMatches = numPods - (nextPowerOfTwo / 2);
+    const numPlayInMatches = (numPods - numByes) / 2; // (14 - 2) / 2 = 6 matches
     
-    // Pods that will participate in the play-in round
-    const playInPods = shuffledPods.slice(0, numPlayInMatches * 2);
     // Pods that get a bye to the second round
-    const byePods = shuffledPods.slice(numPlayInMatches * 2);
+    const byePods = shuffledPods.slice(0, numByes);
+    // Pods that will participate in the play-in round
+    const playInPods = shuffledPods.slice(numByes);
+
 
     let rounds: Round[] = [];
     // Create all rounds with empty matches
@@ -81,11 +85,11 @@ export function useTournament() {
     }
 
     // Populate the first round with play-in matches
-    let matchIndex = 0;
+    let playInMatchIndex = 0;
     for (let i = 0; i < playInPods.length; i += 2) {
-        rounds[0].matches[matchIndex].pod1 = playInPods[i];
-        rounds[0].matches[matchIndex].pod2 = playInPods[i + 1];
-        matchIndex++;
+        rounds[0].matches[playInMatchIndex].pod1 = playInPods[i];
+        rounds[0].matches[playInMatchIndex].pod2 = playInPods[i + 1];
+        playInMatchIndex++;
     }
     
     // The remaining matches in the first round are technically byes for the second-round pods.
