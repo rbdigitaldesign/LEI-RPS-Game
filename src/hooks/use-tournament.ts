@@ -75,6 +75,11 @@ export function useTournament() {
     for (let i = 1; i < totalRounds; i++) {
         const previousRoundMatches = rounds[i - 1].matches;
         const nextRoundMatches: Match[] = [];
+        let nextPods: (Pod | null)[] = new Array(previousRoundMatches.length).fill(null);
+        
+        // This part seems complex, let's simplify.
+        // The winners from the previous round should populate the pods for this round's matches.
+        
         for (let j = 0; j < previousRoundMatches.length / 2; j++) {
             nextRoundMatches.push({
                 id: `r${i + 2}-m${j}`,
@@ -126,7 +131,29 @@ export function useTournament() {
         }
     }
 
-    if (currentRoundIndex === -1 || currentMatchIndex === -1) return;
+    if (currentRoundIndex === -1 || currentMatchIndex === -1) {
+        // This case can happen if the last match was played
+        const lastRound = rounds[rounds.length - 1];
+        if(lastRound.matches.length === 1 && lastRound.matches[0].winner) {
+            currentState.winner = lastRound.matches[0].winner;
+            setTimeout(() => {
+                const finalState = JSON.parse(JSON.stringify(currentState));
+                finalState.finalMatch = {
+                    id: 'final-boss-match',
+                    pod1: finalState.winner,
+                    pod2: { ...FINAL_BOSS, id: 999 },
+                    winner: null,
+                    loser: null,
+                    played: false,
+                    moveHistory: [],
+                };
+                finalState.currentMatchId = 'final-boss-match';
+                setTournament(finalState);
+                saveState(finalState);
+            }, 4000);
+        }
+        return;
+    }
     
     const winner = rounds[currentRoundIndex].matches[currentMatchIndex].winner;
 
@@ -335,9 +362,11 @@ export function useTournament() {
   useEffect(() => {
     const loadState = () => {
       try {
+        if (typeof window === 'undefined') return;
         const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (savedState) {
           const parsedState = JSON.parse(savedState);
+          // Clear transient state on load
           parsedState.matchWinner = null; 
           setTournament(parsedState);
         }
@@ -373,3 +402,5 @@ export function useTournament() {
     currentRound
   };
 }
+
+    
