@@ -212,9 +212,21 @@ export function useTournament() {
         setIsProcessing(false);
         return;
     }
+    
+    let winner: Pod | null = null;
+    let winningMove: Move | null = null;
 
-    const winner = match.pod1;
-    const winningMove = pod1Move;
+     if (pod1Move !== pod2Move) {
+      if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
+          (pod1Move === 'scissors' && pod2Move === 'paper') ||
+          (pod1Move === 'paper' && pod2Move === 'rock')) {
+        winner = match.pod1;
+        winningMove = pod1Move;
+      } else {
+        winner = match.pod2;
+        winningMove = pod2Move;
+      }
+    }
 
     match.moves = { pod1: pod1Move, pod2: pod2Move };
     setTournament(updatedTournament);
@@ -359,7 +371,7 @@ export function useTournament() {
         : tournament.rounds.flatMap(r => r.matches).find(m => m.id === tournament.currentMatchId) ?? null
     : null;
 
-  const currentRound = tournament && currentMatch && tournament.rounds
+  const currentRound = tournament && currentMatch && tournament.rounds && currentMatch.id !== 'final-boss-match'
     ? tournament.rounds.findIndex(r => r.matches.some(m => m.id === currentMatch.id)) + 1
     : null;
 
@@ -377,5 +389,3 @@ export function useTournament() {
     currentRound
   };
 }
-
-    

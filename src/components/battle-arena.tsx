@@ -119,5 +119,3 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
     </div>
   );
 }
-
-    

@@ -39,5 +39,3 @@ export type TournamentState = {
     isDraw?: boolean;
   } | null;
 };
-
-    
