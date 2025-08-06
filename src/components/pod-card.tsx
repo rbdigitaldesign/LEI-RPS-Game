@@ -41,6 +41,16 @@ export function PodCard({ pod, move, isWinner, reveal, isBoss, className, childr
           isBoss && 'border-destructive'
         )}
       >
+        {isWinner && reveal && (
+          <motion.div 
+            className="absolute inset-0 bg-accent/90 flex items-center justify-center z-10"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
+          >
+            <p className="text-4xl font-black text-accent-foreground tracking-tighter -rotate-12">WINS!</p>
+          </motion.div>
+        )}
         <CardHeader className="p-2">
           <div className="w-16 h-16 mx-auto bg-secondary flex items-center justify-center border-2 border-border mb-1 relative">
             <span className="text-4xl">{pod.emoji}</span>
@@ -56,7 +66,7 @@ export function PodCard({ pod, move, isWinner, reveal, isBoss, className, childr
               transition={{ delay: 0.2 }}
               className="space-y-1"
             >
-              <div className="w-12 h-12 bg-secondary text-secondary-foreground flex items-center justify-center border-2">
+              <div className="w-12 h-12 bg-background text-secondary-foreground flex items-center justify-center border-2">
                   <MoveIcon move={move} className="text-3xl" />
               </div>
               <p className="font-bold text-sm capitalize">{move}</p>
