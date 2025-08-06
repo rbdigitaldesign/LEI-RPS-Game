@@ -87,7 +87,11 @@ export function useTournament() {
       // All matches played, determine winner
       currentState.currentMatchId = null;
       
-      const sortedStandings = [...currentState.standings].sort((a, b) => b.wins - a.wins);
+      const sortedStandings = [...currentState.standings].sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        return a.losses - b.losses;
+      });
+
       const topPod = sortedStandings[0];
       const winner = currentState.pods.find(p => p.id === topPod.podId) || null;
       currentState.winner = winner;
@@ -351,7 +355,7 @@ export function useTournament() {
         : tournament.schedule.find(m => m.id === tournament.currentMatchId) ?? null
     : null;
 
-  const currentRound = tournament && tournament.currentMatchId && currentMatch?.pod1
+  const currentRound = tournament && tournament.currentMatchId && currentMatch?.pod1 && tournament.standings
     ? (tournament.standings.find(s => s.podId === currentMatch.pod1!.id)?.gamesPlayed ?? 0) + 1
     : null;
 
@@ -370,5 +374,3 @@ export function useTournament() {
     currentRound
   };
 }
-
-    

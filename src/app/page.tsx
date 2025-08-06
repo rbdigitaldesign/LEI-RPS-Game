@@ -151,7 +151,7 @@ export default function Home() {
               />
             </div>
             <div className="row-start-1 xl:row-auto h-full flex flex-col">
-              <TournamentStandings standings={tournament.standings} />
+              {tournament.standings && <TournamentStandings standings={tournament.standings} />}
             </div>
           </div>
         )}
