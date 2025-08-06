@@ -51,13 +51,12 @@ export function useTournament() {
     const shuffledPods = shuffleArray(initialPods);
     const numPods = shuffledPods.length;
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
-    const byesCount = nextPowerOfTwo - numPods;
     const totalRounds = Math.log2(nextPowerOfTwo);
+    const matchesInFirstRound = numPods - (nextPowerOfTwo - numPods);
+    const byesCount = nextPowerOfTwo - numPods;
 
     let rounds: Round[] = [];
-    
-    // Initialize all rounds and matches
-    for(let i=0; i < totalRounds; i++) {
+    for (let i = 0; i < totalRounds; i++) {
         const numMatchesInRound = (2 ** (totalRounds - (i + 1)));
         rounds.push({
             id: i + 1,
@@ -72,37 +71,26 @@ export function useTournament() {
         });
     }
 
-    let firstRoundPods = [...shuffledPods];
-    let byeMatches: Match[] = [];
-    if(byesCount > 0){
-        const byePods = firstRoundPods.splice(0, byesCount);
-        byeMatches = byePods.map((pod, i) => ({
-            id: `r1-bye${i}`,
-            pod1: pod,
-            pod2: null,
-            winner: pod,
-            loser: null,
-            isBye: true,
-            moveHistory: []
-        }));
-    }
-    
-    let firstRoundMatches: Match[] = [];
-    for(let i=0; i < firstRoundPods.length; i+=2){
-        firstRoundMatches.push({
-            id: `r1-m${i/2}`,
-            pod1: firstRoundPods[i],
-            pod2: firstRoundPods[i+1],
-            winner: null,
-            loser: null,
-            moveHistory: [],
-        });
+    const podsInFirstRoundMatches = shuffledPods.slice(0, matchesInFirstRound);
+    const podsWithByes = shuffledPods.slice(matchesInFirstRound);
+
+    let matchIndex = 0;
+    for (let i = 0; i < podsInFirstRoundMatches.length; i += 2) {
+        rounds[0].matches[matchIndex].pod1 = podsInFirstRoundMatches[i];
+        rounds[0].matches[matchIndex].pod2 = podsInFirstRoundMatches[i + 1];
+        matchIndex++;
     }
 
-    rounds[0].matches = [...firstRoundMatches, ...byeMatches];
-    
+    for (const pod of podsWithByes) {
+        rounds[0].matches[matchIndex].pod1 = pod;
+        rounds[0].matches[matchIndex].isBye = true;
+        rounds[0].matches[matchIndex].winner = pod;
+        matchIndex++;
+    }
+
+    // Now advance all the bye winners to the second round
     rounds[0].matches.forEach((match) => {
-        if(match.winner){
+        if (match.isBye && match.winner) {
             advanceWinner(match, 0, rounds);
         }
     });
@@ -339,34 +327,61 @@ export function useTournament() {
     let simTournament = JSON.parse(JSON.stringify(tournament));
 
     // Simulate all rounds
-    simTournament.rounds.forEach((round: Round, roundIndex: number) => {
-        round.matches.forEach(match => {
-            if (!match.winner && !match.isBye && match.pod1 && match.pod2) {
-                let pod1Move, pod2Move, winner;
-                do {
-                    pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
-                    pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
-                    
-                    if (pod1Move === pod2Move) {
-                        winner = null;
-                    } else if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
-                               (pod1Move === 'scissors' && pod2Move === 'paper') ||
-                               (pod1Move === 'paper' && pod2Move === 'rock')) {
-                        winner = match.pod1;
-                    } else {
-                        winner = match.pod2;
-                    }
-                } while(!winner);
-                
-                match.winner = winner;
-                match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
-                match.moves = { pod1: pod1Move, pod2: pod2Move };
-                match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
+    while(simTournament.currentMatchId) {
+        let currentMatch: Match | undefined;
+        let currentRoundIndex: number = -1;
 
-                advanceWinner(match, roundIndex, simTournament.rounds);
+        for (let i = 0; i < simTournament.rounds.length; i++) {
+            const match = simTournament.rounds[i].matches.find((m: Match) => m.id === simTournament.currentMatchId);
+            if (match) {
+                currentMatch = match;
+                currentRoundIndex = i;
+                break;
             }
-        });
-    });
+        }
+        
+        if (currentMatch && !currentMatch.isBye && currentMatch.pod1 && currentMatch.pod2) {
+            let pod1Move, pod2Move, winner;
+            do {
+                pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+                pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+                
+                if (pod1Move === pod2Move) {
+                    winner = null;
+                } else if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
+                           (pod1Move === 'scissors' && pod2Move === 'paper') ||
+                           (pod1Move === 'paper' && pod2Move === 'rock')) {
+                    winner = currentMatch.pod1;
+                } else {
+                    winner = currentMatch.pod2;
+                }
+            } while(!winner);
+            
+            currentMatch.winner = winner;
+            currentMatch.loser = winner.id === currentMatch.pod1.id ? currentMatch.pod2 : currentMatch.pod1;
+            currentMatch.moves = { pod1: pod1Move, pod2: pod2Move };
+            currentMatch.moveHistory = [...(currentMatch.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
+
+            advanceWinner(currentMatch, currentRoundIndex, simTournament.rounds);
+
+            let nextMatchId: string | null = null;
+            for (const round of simTournament.rounds) {
+                for (const match of round.matches) {
+                    if (!match.winner && match.pod1 && match.pod2) {
+                        nextMatchId = match.id;
+                        break;
+                    }
+                }
+                if (nextMatchId) break;
+            }
+            simTournament.currentMatchId = nextMatchId;
+
+        } else {
+            // Should not happen in a well-formed bracket, but as a safeguard
+            simTournament.currentMatchId = null;
+        }
+    }
+
 
     const lastRound = simTournament.rounds[simTournament.rounds.length - 1];
     if (lastRound.matches.length === 1 && lastRound.matches[0].winner) {
@@ -443,3 +458,5 @@ export function useTournament() {
     currentRound
   };
 }
+
+    
