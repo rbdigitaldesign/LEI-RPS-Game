@@ -48,7 +48,7 @@ export function PodCard({ pod, move, isWinner, reveal, isBoss, className, childr
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
           >
-            <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6">{pod.name} WINS!</p>
+            <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6">{pod.name} WIN!</p>
           </motion.div>
         )}
         <CardHeader className="p-2">
