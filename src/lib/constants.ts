@@ -11,7 +11,7 @@ export const PODS: Omit<Pod, 'id'>[] = [
   { name: 'Capybaras', manager: 'Laura', emoji: '🐹' },
   { name: 'Wombats', manager: 'Carina', emoji: '🐨' },
   { name: 'Bees', manager: 'Evan', emoji: '🐝' },
-  { name: 'Senior Staff', manager: 'Leadership', emoji: '👑' },
+  { name: 'Senior Staff', manager: 'Mark C and Andrew B.', emoji: '👑' },
   { name: 'Associate Directors', manager: 'Management', emoji: '🧑‍💼' },
   { name: 'Portfolio Managers', manager: 'Strategy', emoji: '📈' },
   { name: 'Pandas', manager: 'Leila', emoji: '🐼' },
