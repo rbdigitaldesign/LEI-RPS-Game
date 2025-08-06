@@ -87,7 +87,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
          {!reveal && !match.isBye && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
 
-        <div className="flex flex-col items-center justify-center gap-2 text-center my-0">
+        <div className="flex flex-col items-center justify-center gap-2 text-center my-0 mx-4">
           <p className={cn(
               "text-4xl font-black animate-pulse",
               isFinalBoss ? "text-destructive" : "text-accent"
