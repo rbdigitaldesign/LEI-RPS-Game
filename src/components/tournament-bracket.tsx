@@ -23,7 +23,19 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
 );
 
 const BracketMatch = ({ match }: { match: Match }) => {
-    // A match is considered "played" if it has a winner AND it was not a bye.
+    if (match.isBye) {
+        return (
+             <Card className="w-28 bg-transparent border-0 shadow-none">
+                <CardContent className="p-0">
+                    <BracketPod 
+                        pod={match.pod1} 
+                        isWinner={true}
+                        isLoser={false}
+                    />
+                </CardContent>
+            </Card>
+        )
+    }
     const hasPlayedAndWon = !!match.winner && !match.isBye;
     return (
         <Card className="w-28 bg-card/50 border-primary/20">
@@ -54,12 +66,12 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                 <ScrollArea className="w-full whitespace-nowrap">
                     <div className="flex gap-4 items-center">
                         {rounds.map((round, roundIndex) => (
-                            <div key={round.id} className="flex flex-col justify-around gap-1 h-full">
-                                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-1">
-                                    {roundIndex === rounds.length -1 ? "Final" : `R${round.id}`}
+                            <div key={round.id} className="flex flex-col h-full">
+                                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-2">
+                                    {roundIndex === rounds.length -1 ? "Final" : `Round ${round.id}`}
                                 </h3>
                                 <div className={cn(
-                                    "flex flex-col gap-1 relative",
+                                    "flex flex-col gap-4 relative",
                                      roundIndex > 0 && "justify-around flex-grow"
                                 )}>
                                     {round.matches.map(match => (
