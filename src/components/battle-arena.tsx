@@ -81,8 +81,18 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
          {!reveal && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
 
-        <div className="text-center my-2 md:my-0">
+        <div className="flex flex-col items-center justify-center gap-4 text-center my-2 md:my-0">
           <p className="text-4xl font-black text-destructive animate-pulse">VS</p>
+          {!reveal && (
+            <Button
+              size="lg"
+              onClick={handlePlay}
+              disabled={!pod1Move || !pod2Move || isProcessing}
+              className="w-32 h-32 rounded-full text-2xl font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
+            >
+              {isProcessing ? '...' : 'BATTLE'}
+            </Button>
+          )}
         </div>
 
         <PodCard
@@ -95,19 +105,6 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
          {!reveal && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
         </PodCard>
       </div>
-
-      {!reveal && (
-        <div className="flex justify-center pt-4">
-          <Button
-            size="lg"
-            onClick={handlePlay}
-            disabled={!pod1Move || !pod2Move || isProcessing}
-            className="w-32 h-32 rounded-full text-2xl font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
-          >
-            {isProcessing ? '...' : 'BATTLE'}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
