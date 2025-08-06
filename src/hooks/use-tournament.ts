@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PODS } from '@/lib/constants';
 import type { TournamentState, Pod, Round, Match, Move } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { shuffle } from '@/lib/utils';
 
 const LOCAL_STORAGE_KEY = 'rps-pod-showdown-tournament';
 
@@ -29,61 +30,36 @@ export function useTournament() {
   };
 
   const createBracket = (initialPods: Pod[]): TournamentState => {
-    const pods = [...initialPods];
-    const rounds: Round[] = [
-        { id: 1, name: 'Round 1', matches: [] },
-        { id: 2, name: 'Quarter-Finals', matches: [] },
-        { id: 3, name: 'Semi-Finals', matches: [] },
-        { id: 4, name: 'Final', matches: [] },
-    ];
+    const shuffledPods = shuffle(initialPods);
+    const rounds: Round[] = [];
+    const numPods = shuffledPods.length;
+    const numRounds = Math.ceil(Math.log2(numPods));
 
-    // Round 1: 7 matches
-    for (let i = 0; i < 7; i++) {
-        rounds[0].matches.push({
-            id: `r1-m${i}`,
-            pod1: pods[i * 2],
-            pod2: pods[i * 2 + 1],
-            winner: null,
-            loser: null,
-            moveHistory: [],
-        });
+    let currentPods = [...shuffledPods];
+    const roundNames = ['Round 1', 'Quarter-Finals', 'Semi-Finals', 'Final', 'Champion'];
+
+    for (let i = 0; i < numRounds; i++) {
+        const round: Round = {
+            id: i + 1,
+            name: roundNames[i] || `Round ${i + 1}`,
+            matches: [],
+        };
+        const numMatches = currentPods.length / 2;
+        for (let j = 0; j < numMatches; j++) {
+            round.matches.push({
+                id: `r${i + 1}-m${j}`,
+                pod1: currentPods[j * 2],
+                pod2: currentPods[j * 2 + 1],
+                winner: null,
+                loser: null,
+                moveHistory: [],
+            });
+        }
+        rounds.push(round);
+        currentPods = new Array(numMatches).fill(null);
     }
 
-    // Round 2: 3 matches (one winner from R1 gets a pass)
-    for (let i = 0; i < 3; i++) {
-        rounds[1].matches.push({
-            id: `r2-m${i}`,
-            pod1: null,
-            pod2: null,
-            winner: null,
-            loser: null,
-            moveHistory: [],
-        });
-    }
-
-    // Round 3: 2 matches
-    for (let i = 0; i < 2; i++) {
-        rounds[2].matches.push({
-            id: `r3-m${i}`,
-            pod1: null,
-            pod2: null,
-            winner: null,
-            loser: null,
-            moveHistory: [],
-        });
-    }
-    
-    // Round 4: 1 match
-    rounds[3].matches.push({
-        id: 'r4-m0',
-        pod1: null,
-        pod2: null,
-        winner: null,
-        loser: null,
-        moveHistory: [],
-    });
-
-    const firstPlayableMatch = rounds[0].matches[0];
+    const firstPlayableMatch = rounds[0]?.matches[0];
 
     return {
       pods: initialPods,
@@ -124,35 +100,15 @@ export function useTournament() {
     const nextRoundIndex = currentRoundIndex + 1;
 
     if (winner && nextRoundIndex < rounds.length) {
-      if (currentRoundIndex === 0) { // From Round 1 to Quarter-Finals
-        const round1Winners = rounds[0].matches.filter(m => m.winner).map(m => m.winner);
-        
-        if (round1Winners.length === 7) {
-            // First winner gets a pass to semis
-            const semiFinalist = round1Winners[0];
-            const semiFinalMatch = rounds[2].matches[0];
-            if (semiFinalMatch) semiFinalMatch.pod1 = semiFinalist;
-
-            const remainingWinners = round1Winners.slice(1); // 6 pods remain
-            for(let i=0; i<3; i++) {
-                const qfMatch = rounds[1].matches[i];
-                if(qfMatch) {
-                    qfMatch.pod1 = remainingWinners[i*2];
-                    qfMatch.pod2 = remainingWinners[i*2+1];
-                }
+        const nextMatchIndex = Math.floor(currentMatchIndex / 2);
+        const nextMatch = rounds[nextRoundIndex].matches[nextMatchIndex];
+        if (nextMatch) {
+            if (currentMatchIndex % 2 === 0) {
+                nextMatch.pod1 = winner;
+            } else {
+                nextMatch.pod2 = winner;
             }
         }
-      } else { // Generic progression for other rounds
-        const targetMatchIndex = Math.floor(currentMatchIndex / 2);
-        const targetMatch = rounds[nextRoundIndex].matches[targetMatchIndex];
-        if (targetMatch) {
-          if (!targetMatch.pod1) {
-            targetMatch.pod1 = winner;
-          } else {
-            targetMatch.pod2 = winner;
-          }
-        }
-      }
     }
 
     // Find next match to play
