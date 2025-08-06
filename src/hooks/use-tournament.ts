@@ -310,7 +310,6 @@ export function useTournament() {
         } else { 
             match!.isDraw = true;
             const drawState = JSON.parse(JSON.stringify(updatedTournament));
-            drawState.matchWinner = { isDraw: true }
             setTournament(drawState);
             saveState(drawState);
             
@@ -318,7 +317,6 @@ export function useTournament() {
                 match!.moves = undefined;
                 match!.isDraw = false;
                 const resetState = JSON.parse(JSON.stringify(drawState));
-                resetState.matchWinner = null;
                 setTournament(resetState);
                 saveState(resetState);
                 setIsProcessing(false);
