@@ -8,7 +8,7 @@ import { Button } from './ui/button';
 const trailerLines = [
   "In a world of part 3 course development and change  proposals...",
   "...one decision rises above them all.",
-  "The greatest show of tactical prowess LEI has ever seen...",
+  "The greatest tactical showdown LEI has ever seen...",
   "Stretch your phalanges.",
   "Flex your metacarpals.",
   "Are you ready to claim victory for your pod?",
