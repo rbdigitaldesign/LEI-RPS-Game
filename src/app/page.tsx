@@ -15,6 +15,7 @@ import { MatchWinner } from '@/components/match-winner';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
 import { AnimatePresence, motion } from 'framer-motion';
+import { MatchResultsLog } from '@/components/match-results-log';
 
 export default function Home() {
   const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, simulateTournament, matchWinner, winner } = useTournament();
@@ -26,7 +27,7 @@ export default function Home() {
     setIsClient(true);
   }, []);
 
-  const handlePlayMatch = (pod1Move: Move, pod2Move) => {
+  const handlePlayMatch = (pod1Move: Move, pod2Move: Move) => {
     if (currentMatch) {
       playMatch(pod1Move, pod2Move);
     }
@@ -55,6 +56,7 @@ export default function Home() {
   }
   
   const isFinalBoss = currentMatch?.id === 'final-boss-match';
+  const playedMatches = tournament.schedule.filter(m => m.played);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -135,9 +137,9 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start flex-grow">
-             <div className="xl:col-span-2 h-full flex flex-col justify-center">
+             <div className="xl:col-span-2 h-full flex flex-col gap-4">
                 {isFinalBoss && (
-                     <Card className="mb-4 text-center border-destructive border-2 bg-destructive/10 p-2 animate-pulse">
+                     <Card className="text-center border-destructive border-2 bg-destructive/10 p-2 animate-pulse">
                         <CardTitle className="text-destructive text-lg font-headline">FINAL BOSS BATTLE</CardTitle>
                         <CardDescription className="text-destructive/80">The Tournament Winner must face the ultimate challenge!</CardDescription>
                     </Card>
@@ -149,6 +151,7 @@ export default function Home() {
                 onPlayMatch={handlePlayMatch}
                 roundNumber={currentRound}
               />
+               {playedMatches.length > 0 && <MatchResultsLog matches={playedMatches} />}
             </div>
             <div className="row-start-1 xl:row-auto h-full flex flex-col">
               {tournament.standings && <TournamentStandings standings={tournament.standings} />}
