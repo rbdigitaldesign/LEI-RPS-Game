@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -358,11 +359,28 @@ export function useTournament() {
                 simTournament.winner = lastRound.matches[0].winner;
             }
         }
-
-        setTournament({ ...simTournament });
-        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // This visual update is very fast, so batching them up
+        // by removing the state update from the loop.
     }
     
+    // One final update to show the final state before the boss
+    setTournament({ ...simTournament });
+    
+    // Now trigger the final boss setup
+    if (simTournament.winner) {
+        simTournament.finalMatch = {
+            id: 'final-boss-match',
+            pod1: simTournament.winner,
+            pod2: { ...FINAL_BOSS, id: 999 },
+            winner: null,
+            loser: null,
+            moveHistory: [],
+        };
+        simTournament.currentMatchId = 'final-boss-match';
+    }
+
+    setTournament(simTournament);
     saveState(simTournament);
     setIsProcessing(false);
   }, [tournament]);
@@ -406,7 +424,9 @@ export function useTournament() {
     winner: tournament?.winner ?? null,
     matchWinner: tournament?.matchWinner,
     gameWinner: tournament?.gameWinner ?? null,
-    isProcessing,
+isProcessing,
     currentRound
   };
 }
+
+    
