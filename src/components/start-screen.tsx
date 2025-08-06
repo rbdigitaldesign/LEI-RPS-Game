@@ -22,12 +22,18 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             transition={{ duration: 0.8, type: 'spring' }}
             className="w-full"
         >
-            <Card className="w-full max-w-4xl text-center bg-black/50 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
+            <Card className="w-full max-w-4xl text-center bg-black/70 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
                 <CardHeader className="p-4">
-                    <CardTitle className="text-5xl md:text-8xl font-black font-headline text-accent tracking-wider uppercase">
+                    <CardTitle 
+                        className="text-5xl md:text-8xl font-black font-headline text-accent tracking-wider uppercase"
+                        style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}
+                    >
                         RPS Pod Battle
                     </CardTitle>
-                    <CardDescription className="text-lg md:text-2xl text-primary leading-relaxed mt-2 font-sans">
+                    <CardDescription 
+                        className="text-lg md:text-2xl text-primary leading-relaxed mt-2 font-sans"
+                        style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}
+                    >
                         The ultimate rock, paper, scissors showdown
                     </CardDescription>
                 </CardHeader>
