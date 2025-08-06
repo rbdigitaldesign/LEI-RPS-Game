@@ -56,7 +56,7 @@ export function PodCard({ pod, move, isWinner, reveal, isBoss, className, childr
               transition={{ delay: 0.2 }}
               className="space-y-1"
             >
-              <div className="w-16 h-16 p-2 bg-secondary text-secondary-foreground flex items-center justify-center border-2">
+              <div className="w-12 h-12 p-1 bg-secondary text-secondary-foreground flex items-center justify-center border-2">
                   <MoveIcon move={move} />
               </div>
               <p className="font-bold text-sm capitalize">{move}</p>
