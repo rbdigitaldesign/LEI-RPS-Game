@@ -66,7 +66,7 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
     setIsGenerating(false);
   };
   
-  if (!tournament || !tournament.gameWinner) {
+  if (!tournament || !tournament.winner) {
     return null;
   }
 
@@ -88,21 +88,21 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
             <p className="text-lg text-primary">Tournament Report</p>
         </div>
 
-        {tournament.gameWinner && (
+        {tournament.winner && (
              <div className="mb-12">
                 <Card className="w-full max-w-lg mx-auto text-center bg-card border-4 border-accent">
                     <CardHeader>
-                        <p className="text-sm font-medium text-accent">{tournament.gameWinner.id === 999 ? "The Boss Remains Undefeated" : "Ultimate Pod Champion"}</p>
-                        <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{tournament.gameWinner.name}</CardTitle>
-                        <p className="text-muted-foreground">Managed by {tournament.gameWinner.manager}</p>
+                        <p className="text-sm font-medium text-accent">Ultimate Pod Champion</p>
+                        <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{tournament.winner.name}</CardTitle>
+                        <p className="text-muted-foreground">Managed by {tournament.winner.manager}</p>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center space-y-4">
                         <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">
-                            <span className="text-8xl">{tournament.gameWinner.emoji}</span>
+                            <span className="text-8xl">{tournament.winner.emoji}</span>
                         </div>
                         <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
-                            {tournament.gameWinner.id === 999 ? <Skull className="w-8 h-8"/> : <Trophy className="w-8 h-8"/>}
-                            <span>{tournament.gameWinner.id === 999 ? "Better Luck Next Time!" : "Absolute Victory!"}</span>
+                            <Trophy className="w-8 h-8"/>
+                            <span>Absolute Victory!</span>
                         </div>
                     </CardContent>
                 </Card>
@@ -114,7 +114,7 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
                 Match Results
             </h2>
             <div className="space-y-4">
-                {tournament.schedule.filter(m => m.played).map((match: Match) => (
+                {tournament.rounds.flatMap(r => r.matches).filter(m => m.played).map((match: Match) => (
                     <Card key={match.id} className="bg-card border-2 border-primary/50 p-4">
                         <div className="grid grid-cols-3 items-center text-center">
                             <div className="font-bold text-lg text-primary">{match.pod1?.name}</div>
@@ -143,23 +143,6 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
                     </Card>
                 ))}
             </div>
-            {tournament.finalMatch && tournament.finalMatch.winner && (
-                 <div>
-                    <h2 className="text-3xl font-bold text-center text-destructive uppercase tracking-widest mb-4">
-                        Final Boss Battle
-                    </h2>
-                     <Card className="bg-card border-2 border-destructive/50 p-4">
-                        <div className="grid grid-cols-3 items-center text-center">
-                            <div className="font-bold text-lg text-primary">{tournament.finalMatch.pod1?.name}</div>
-                            <div className="text-xl font-bold text-destructive">VS</div>
-                            <div className="font-bold text-lg text-primary">{tournament.finalMatch.pod2?.name}</div>
-                        </div>
-                        <div className="text-center mt-2">
-                            <p className="font-semibold text-destructive">Winner: {tournament.finalMatch.winner.name}</p>
-                        </div>
-                    </Card>
-                </div>
-            )}
         </div>
       </div>
     </>

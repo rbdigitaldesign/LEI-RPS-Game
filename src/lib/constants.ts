@@ -18,10 +18,4 @@ export const PODS: Omit<Pod, 'id'>[] = [
   { name: 'Portfolio Managers', manager: 'Strategy', emoji: '📈' },
 ];
 
-export const FINAL_BOSS: Omit<Pod, 'id'> = {
-    name: 'Cox Travis',
-    manager: 'The Mastermind',
-    emoji: '😈'
-}
-
 export const MOVES: Move[] = ['rock', 'paper', 'scissors'];

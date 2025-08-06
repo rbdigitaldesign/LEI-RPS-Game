@@ -30,9 +30,7 @@ export type TournamentState = {
   pods: Pod[];
   rounds: Round[];
   currentMatchId: string | null;
-  winner: Pod | null; // Winner of the elimination tournament
-  finalMatch: Match | null;
-  gameWinner: Pod | null; // Overall game winner after final boss
+  winner: Pod | null;
   matchWinner?: {
     winner?: Pod;
     winningMove?: Move;

@@ -17,9 +17,8 @@ import { StartScreen } from '@/components/start-screen';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Home() {
-  const { tournament, startTournament, resetTournament, currentMatch, gameWinner, isProcessing, playMatch, currentRound, matchWinner, winner } = useTournament();
+  const { tournament, startTournament, resetTournament, currentMatch, isProcessing, playMatch, currentRound, matchWinner, winner } = useTournament();
   const [introFinished, setIntroFinished] = useState(false);
-  const [showTournamentWinner, setShowTournamentWinner] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -32,17 +31,6 @@ export default function Home() {
     }
   };
   
-  useEffect(() => {
-    if (winner && !showTournamentWinner && !tournament?.finalMatch) {
-        setShowTournamentWinner(true);
-        const timer = setTimeout(() => {
-            setShowTournamentWinner(false);
-        }, 3900); // slightly less than the hook timeout
-        return () => clearTimeout(timer);
-    }
-  }, [winner, tournament?.finalMatch, showTournamentWinner]);
-
-
   if (!isClient) {
     return null; // Render nothing on the server to avoid hydration errors
   }
@@ -53,34 +41,12 @@ export default function Home() {
     }
     return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
   }
-  
-  const isFinalBoss = currentMatch?.id === 'final-boss-match';
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AnimatePresence>
         {matchWinner && (
           <MatchWinner winner={matchWinner.winner} winningMove={matchWinner.winningMove} isDraw={matchWinner.isDraw} />
-        )}
-        {showTournamentWinner && winner && (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            >
-                <Card className="w-full max-w-2xl text-center bg-card border-accent border-4">
-                    <CardHeader>
-                        <Trophy className="w-24 h-24 text-yellow-500 mx-auto" />
-                        <p className="text-2xl font-medium text-accent uppercase tracking-widest">Tournament Winner</p>
-                        <CardTitle className="text-7xl font-black font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-3xl text-muted-foreground animate-pulse">Prepare for the Final Challenge!</p>
-                    </CardContent>
-                </Card>
-            </motion.div>
         )}
       </AnimatePresence>
       <Header>
@@ -91,32 +57,23 @@ export default function Home() {
         </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 flex flex-col">
-        {gameWinner ? (
+        {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
               <CardHeader>
                 <p className="text-sm font-medium text-accent">
-                    {gameWinner.id === 999 ? "The Boss Remains Undefeated" : "Ultimate Pod Champion"}
+                    Ultimate Pod Champion
                 </p>
-                <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{gameWinner.name}</CardTitle>
-                <p className="text-muted-foreground">Managed by {gameWinner.manager}</p>
+                <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
+                <p className="text-muted-foreground">Managed by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
                 <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">
-                  <span className="text-8xl">{gameWinner.emoji}</span>
+                  <span className="text-8xl">{winner.emoji}</span>
                 </div>
                  <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
-                    {gameWinner.id === 999 ? (
-                        <>
-                            <Skull className="w-8 h-8" />
-                            <span>Better Luck Next Time!</span>
-                        </>
-                    ) : (
-                        <>
-                            <Trophy className="w-8 h-8"/>
-                            <span>Absolute Victory!</span>
-                        </>
-                    )}
+                    <Trophy className="w-8 h-8"/>
+                    <span>Absolute Victory!</span>
                 </div>
                 <div className="flex w-full gap-4 mt-4">
                     <TournamentReport tournament={tournament} />
@@ -131,12 +88,6 @@ export default function Home() {
           <div className="flex flex-col gap-4 items-start flex-grow">
             <TournamentBracket rounds={tournament.rounds} />
              <div className="w-full flex flex-col gap-4">
-                {isFinalBoss && (
-                     <Card className="text-center border-destructive border-2 bg-destructive/10 p-2 animate-pulse">
-                        <CardTitle className="text-destructive text-lg font-headline">FINAL BOSS BATTLE</CardTitle>
-                        <CardDescription className="text-destructive/80">The Tournament Winner must face the ultimate challenge!</CardDescription>
-                    </Card>
-                )}
               <BattleArena
                 key={currentMatch?.id}
                 match={currentMatch}
