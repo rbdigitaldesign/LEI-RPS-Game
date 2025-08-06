@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -17,7 +18,7 @@ export default {
     },
     extend: {
       backgroundImage: {
-        'hero-pattern': "url('https://i.imgur.com/CiAYPMY.jpeg')",
+        'hero-pattern': "url('https://i.imgur.com/DoA6NkS.png')",
       },
       fontFamily: {
         body: ['"Press Start 2P"', 'cursive'],
