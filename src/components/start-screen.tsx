@@ -24,10 +24,10 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
         >
             <Card className="w-full max-w-4xl text-center bg-black/50 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
                 <CardHeader className="p-4">
-                    <CardTitle className="text-5xl md:text-8xl font-black font-headline text-accent tracking-tighter">
+                    <CardTitle className="text-5xl md:text-8xl font-black font-headline text-accent tracking-wider uppercase">
                         RPS Pod Battle
                     </CardTitle>
-                    <CardDescription className="text-lg md:text-2xl text-primary leading-relaxed mt-2">
+                    <CardDescription className="text-lg md:text-2xl text-primary leading-relaxed mt-2 font-sans">
                         The ultimate rock, paper, scissors showdown
                     </CardDescription>
                 </CardHeader>
