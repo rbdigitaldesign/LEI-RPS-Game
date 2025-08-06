@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Round, Match } from '@/lib/types';
@@ -19,11 +20,11 @@ const MatchCard = ({ match, isCurrent }: { match: Match; isCurrent: boolean }) =
   if (match.isBye) {
     return (
       <div className="flex items-center w-full">
-        <div className="relative w-full bg-card/50 border border-dashed border-primary/50 p-1 text-xs h-12 flex items-center">
+        <div className="relative w-full bg-card/50 border border-dashed border-primary/50 p-1 text-[10px] h-10 flex items-center">
             <div className={cn('font-bold text-primary', !match.winner && 'opacity-50')}>{pod1Name}</div>
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-xs font-bold uppercase tracking-widest text-white/70">BYE</div>
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-white/70">BYE</div>
         </div>
-        <div className="w-4 border-b-2 border-primary/50"></div>
+        <div className="w-2 border-b border-primary/50"></div>
       </div>
     );
   }
@@ -31,15 +32,15 @@ const MatchCard = ({ match, isCurrent }: { match: Match; isCurrent: boolean }) =
   return (
     <div className="relative flex flex-col justify-center w-full">
       <div className={cn(
-        "relative w-full bg-card border-2 border-primary/50 p-1 my-1 text-xs h-12 flex flex-col justify-around transition-all",
-        isCurrent && "border-accent ring-2 ring-accent shadow-lg"
+        "relative w-full bg-card border border-primary/50 p-1 my-0.5 text-[10px] h-10 flex flex-col justify-around transition-all",
+        isCurrent && "border-accent ring-1 ring-accent shadow-md"
       )}>
-        <div className={cn("flex justify-between items-center", isPod1Winner && "font-bold text-primary")}>
-          <span>{pod1Name}</span>
+        <div className={cn("flex justify-between items-center truncate", isPod1Winner && "font-bold text-primary")}>
+          <span className="truncate">{pod1Name}</span>
         </div>
         <hr className="my-px border-primary/20" />
         <div className={cn("flex justify-between items-center", isPod2Winner && "font-bold text-primary")}>
-          <span>{pod2Name}</span>
+          <span className="truncate">{pod2Name}</span>
         </div>
       </div>
     </div>
@@ -53,31 +54,31 @@ export function TournamentBracket({ rounds, currentMatchId }: TournamentBracketP
 
   return (
     <Card className="bg-card border-2 sticky top-20 overflow-x-auto">
-      <CardHeader className="p-4">
-        <CardTitle className="text-accent text-lg">Tournament Bracket</CardTitle>
+      <CardHeader className="p-2">
+        <CardTitle className="text-accent text-base text-center">Tournament Bracket</CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="grid" style={{ gridTemplateColumns: `repeat(${rounds.length}, 1fr)`}}>
+      <CardContent className="p-2">
+        <div className="grid gap-x-2" style={{ gridTemplateColumns: `repeat(${rounds.length}, minmax(100px, 1fr))`}}>
           {rounds.map((round, roundIndex) => (
             <div key={round.id} className="flex flex-col items-center">
-              <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-4 truncate">
+              <h3 className="text-[10px] font-bold text-primary uppercase tracking-wider mb-2 truncate">
                 {round.matches.length === 1 ? 'Final' : `Round ${round.id}`}
               </h3>
-              <div className="flex flex-col justify-around w-full h-full" style={{ rowGap: `${(2 ** roundIndex -1) * 0.5}rem`}}>
+              <div className="flex flex-col justify-around w-full h-full space-y-1">
                 {round.matches.map((match) => (
                   <div key={match.id} className="relative flex items-center">
                     <MatchCard match={match} isCurrent={match.id === currentMatchId} />
-                    {round.matches.length > 1 && roundIndex < rounds.length - 1 && (
+                     {roundIndex < rounds.length - 1 && (
                       <>
-                        <div className="w-4 border-b-2 border-primary/50"></div>
+                        <div className="w-2 border-b border-primary/50"></div>
                         <div 
-                          className="absolute right-0 h-full w-4"
+                          className="absolute right-0 h-full w-2"
                           style={{
                             top: '50%',
-                            height: `calc(100% * ${2 ** roundIndex} + ${(2 ** roundIndex -1) * 1}rem)`,
+                            height: `calc(100% + 0.25rem)`,
                           }}
                         >
-                           <div className="h-full w-full border-r-2 border-b-2 border-primary/50 rounded-br-lg"></div>
+                           <div className="h-full w-full border-r border-b border-primary/50 rounded-br-sm"></div>
                         </div>
                       </>
                     )}

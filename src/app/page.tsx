@@ -75,7 +75,7 @@ export default function Home() {
             </Card>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
             <div className="xl:col-span-2">
               <BattleArena
                 key={currentMatch?.id}

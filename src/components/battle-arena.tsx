@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,15 +18,15 @@ type BattleArenaProps = {
 };
 
 const MoveSelector = ({ onSelect, selectedMove, disabled }: { onSelect: (move: Move) => void, selectedMove: Move | null, disabled: boolean }) => (
-  <div className="flex justify-center gap-2 sm:gap-4 mt-4">
+  <div className="flex justify-center gap-2 mt-2">
     {MOVES.map((move) => (
       <button
         key={move}
         onClick={() => onSelect(move)}
         disabled={disabled}
         className={cn(
-          "w-16 h-16 sm:w-20 sm:h-20 bg-secondary border-2 border-primary/50 flex items-center justify-center transition-all duration-200 transform hover:scale-110 hover:border-accent disabled:opacity-50 disabled:transform-none",
-          selectedMove === move && "border-accent ring-4 ring-accent scale-110 bg-primary/20",
+          "w-12 h-12 sm:w-16 sm:h-16 bg-secondary border-2 border-primary/50 flex items-center justify-center transition-all duration-200 transform hover:scale-110 hover:border-accent disabled:opacity-50 disabled:transform-none",
+          selectedMove === move && "border-accent ring-2 ring-accent scale-110 bg-primary/20",
           selectedMove && selectedMove !== move && "opacity-50 scale-90"
         )}
       >
@@ -53,7 +54,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
   if (!match) {
     return (
        <Card className="text-center py-24 bg-card">
-        <p className="text-muted-foreground animate-pulse text-xl">
+        <p className="text-muted-foreground animate-pulse text-lg">
           Loading tournament...
         </p>
       </Card>
@@ -63,14 +64,14 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
   const reveal = !!match.moves;
 
   return (
-    <div className="space-y-4 relative">
+    <div className="space-y-2 relative">
       {roundNumber && (
-        <h2 className="text-3xl font-bold text-center text-accent uppercase tracking-widest">
+        <h2 className="text-xl font-bold text-center text-accent uppercase tracking-widest">
           {roundNumber > 0 ? `Round ${roundNumber}` : 'Finals'}
         </h2>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4 md:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
         <PodCard
           pod={match.pod1}
           move={reveal ? match.moves?.pod1 : pod1Move}
@@ -80,8 +81,8 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
          {!reveal && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
 
-        <div className="text-center my-4 md:my-0">
-          <p className="text-5xl font-black text-destructive animate-pulse">VS</p>
+        <div className="text-center my-2 md:my-0">
+          <p className="text-4xl font-black text-destructive animate-pulse">VS</p>
         </div>
 
         <PodCard
@@ -96,12 +97,12 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
       </div>
 
       {!reveal && (
-        <div className="flex justify-center pt-8">
+        <div className="flex justify-center pt-4">
           <Button
             size="lg"
             onClick={handlePlay}
             disabled={!pod1Move || !pod2Move || isProcessing}
-            className="w-48 h-48 rounded-full text-4xl font-black tracking-tighter border-8 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
+            className="w-32 h-32 rounded-full text-2xl font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
           >
             {isProcessing ? '...' : 'BATTLE'}
           </Button>
