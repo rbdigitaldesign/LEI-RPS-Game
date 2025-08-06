@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTournament } from '@/hooks/use-tournament';
 import { Button } from '@/components/ui/button';
 import { BattleArena } from '@/components/battle-arena';
@@ -29,12 +29,16 @@ export default function Home() {
   
   // This effect will trigger the tournament winner announcement
   // when a winner is decided but before the final boss match is set up.
-  if (winner && !showTournamentWinner && !tournament?.finalMatch) {
-      setShowTournamentWinner(true);
-      setTimeout(() => {
-          setShowTournamentWinner(false);
-      }, 4000);
-  }
+  useEffect(() => {
+    if (winner && !showTournamentWinner && !tournament?.finalMatch) {
+        setShowTournamentWinner(true);
+        const timer = setTimeout(() => {
+            setShowTournamentWinner(false);
+        }, 3900); // slightly less than the hook timeout
+        return () => clearTimeout(timer);
+    }
+  }, [winner, tournament?.finalMatch]);
+
 
   if (!tournament) {
     if (!introFinished) {
@@ -48,7 +52,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AnimatePresence>
-        {matchWinner && matchWinner.winner && matchWinner.winningMove && (
+        {matchWinner && (
           <MatchWinner winner={matchWinner.winner} winningMove={matchWinner.winningMove} isDraw={matchWinner.isDraw} />
         )}
         {showTournamentWinner && winner && (
@@ -74,7 +78,7 @@ export default function Home() {
       </AnimatePresence>
       <Header>
         <div className="flex items-center gap-2">
-            {!gameWinner && !isFinalBoss && !winner && (
+            {!gameWinner && !isFinalBoss && !winner && currentMatch && (
                 <Button variant="outline" size="sm" onClick={simulateTournament} disabled={isProcessing}>
                     <Swords className="mr-2" />
                     {isProcessing ? 'Simulating...' : 'Simulate'}

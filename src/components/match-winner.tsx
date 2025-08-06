@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import type { Pod, Move } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -87,7 +88,6 @@ export function MatchWinner({ winner, winningMove, isDraw }: MatchWinnerProps) {
                 </div>
                 <p className="text-2xl font-semibold capitalize text-primary">Wins!</p>
             </div>
-            <p className="text-2xl text-muted-foreground">Advances!</p>
           </CardContent>
         </Card>
       </motion.div>

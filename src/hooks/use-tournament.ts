@@ -101,7 +101,7 @@ export function useTournament() {
 
     rounds[0].matches = [...firstRoundMatches, ...byeMatches];
     
-    rounds[0].matches.forEach((match, index) => {
+    rounds[0].matches.forEach((match) => {
         if(match.winner){
             advanceWinner(match, 0, rounds);
         }
@@ -309,14 +309,14 @@ export function useTournament() {
 
         } else { 
             match!.isDraw = true;
-            const drawState = JSON.parse(JSON.stringify(updatedTournament));
+            const drawState = {...JSON.parse(JSON.stringify(updatedTournament)), matchWinner: { isDraw: true }};
             setTournament(drawState);
             saveState(drawState);
             
             setTimeout(() => {
                 match!.moves = undefined;
                 match!.isDraw = false;
-                const resetState = JSON.parse(JSON.stringify(drawState));
+                const resetState = {...drawState, matchWinner: null};
                 setTournament(resetState);
                 saveState(resetState);
                 setIsProcessing(false);
@@ -338,71 +338,42 @@ export function useTournament() {
 
     let simTournament = JSON.parse(JSON.stringify(tournament));
 
-    while(!simTournament.winner && simTournament.currentMatchId) {
-        let currentMatchId = simTournament.currentMatchId;
-        let roundIndex = -1;
-        let matchIndex = -1;
-        
-        for(let r=0; r < simTournament.rounds.length; r++) {
-            const mIdx = simTournament.rounds[r].matches.findIndex(m => m.id === currentMatchId);
-            if (mIdx !== -1) {
-                roundIndex = r;
-                matchIndex = mIdx;
-                break;
-            }
-        }
-        
-        if (roundIndex === -1) break;
-
-        const match = simTournament.rounds[roundIndex].matches[matchIndex];
-        
-        if (!match.winner && !match.isBye && match.pod1 && match.pod2) {
-            let pod1Move, pod2Move, winner;
-            do {
-                pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
-                pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+    // Simulate all rounds
+    simTournament.rounds.forEach((round: Round, roundIndex: number) => {
+        round.matches.forEach(match => {
+            if (!match.winner && !match.isBye && match.pod1 && match.pod2) {
+                let pod1Move, pod2Move, winner;
+                do {
+                    pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+                    pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+                    
+                    if (pod1Move === pod2Move) {
+                        winner = null;
+                    } else if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
+                               (pod1Move === 'scissors' && pod2Move === 'paper') ||
+                               (pod1Move === 'paper' && pod2Move === 'rock')) {
+                        winner = match.pod1;
+                    } else {
+                        winner = match.pod2;
+                    }
+                } while(!winner);
                 
-                if (pod1Move === pod2Move) {
-                    winner = null;
-                } else if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
-                           (pod1Move === 'scissors' && pod2Move === 'paper') ||
-                           (pod1Move === 'paper' && pod2Move === 'rock')) {
-                    winner = match.pod1;
-                } else {
-                    winner = match.pod2;
-                }
-            } while(!winner);
-            
-            match.winner = winner;
-            match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
-            match.moves = { pod1: pod1Move, pod2: pod2Move };
-            match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
+                match.winner = winner;
+                match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
+                match.moves = { pod1: pod1Move, pod2: pod2Move };
+                match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
 
-            advanceWinner(match, roundIndex, simTournament.rounds);
-        }
-        
-        let nextMatchId = null;
-        
-        findNext:
-        for (const round of simTournament.rounds) {
-            for (const m of round.matches) {
-                if (!m.winner && m.pod1 && m.pod2) {
-                    nextMatchId = m.id;
-                    break findNext;
-                }
+                advanceWinner(match, roundIndex, simTournament.rounds);
             }
-        }
-        
-        simTournament.currentMatchId = nextMatchId;
+        });
+    });
 
-        if (!nextMatchId) {
-            const lastRound = simTournament.rounds[simTournament.rounds.length - 1];
-            if (lastRound.matches.length === 1 && lastRound.matches[0].winner) {
-                simTournament.winner = lastRound.matches[0].winner;
-            }
-        }
+    const lastRound = simTournament.rounds[simTournament.rounds.length - 1];
+    if (lastRound.matches.length === 1 && lastRound.matches[0].winner) {
+        simTournament.winner = lastRound.matches[0].winner;
     }
-
+    
+    simTournament.currentMatchId = null; // Simulation done
     setTournament(simTournament);
     saveState(simTournament);
     
