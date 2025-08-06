@@ -18,14 +18,14 @@ type BattleArenaProps = {
 };
 
 const MoveSelector = ({ onSelect, selectedMove, disabled }: { onSelect: (move: Move) => void, selectedMove: Move | null, disabled: boolean }) => (
-  <div className="flex justify-center gap-2 mt-2">
+  <div className="flex justify-center gap-1 mt-1">
     {MOVES.map((move) => (
       <button
         key={move}
         onClick={() => onSelect(move)}
         disabled={disabled}
         className={cn(
-          "w-12 h-12 sm:w-16 sm:h-16 bg-secondary border-2 border-primary/50 flex items-center justify-center transition-all duration-200 transform hover:scale-110 hover:border-accent disabled:opacity-50 disabled:transform-none",
+          "w-12 h-12 bg-secondary border-2 border-primary/50 flex items-center justify-center transition-all duration-200 transform hover:scale-110 hover:border-accent disabled:opacity-50 disabled:transform-none",
           selectedMove === move && "border-accent ring-2 ring-accent scale-110 bg-primary/20",
           selectedMove && selectedMove !== move && "opacity-50 scale-90"
         )}
@@ -55,23 +55,27 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
     return (
        <Card className="text-center py-24 bg-card">
         <p className="text-muted-foreground animate-pulse text-lg">
-          Loading tournament...
+          Loading next match...
         </p>
       </Card>
     );
   }
   
   const reveal = !!match.moves;
+  const isFinalBoss = match.id === 'final-boss-match';
 
   return (
     <div className="space-y-2 relative">
-      {roundNumber && (
-        <h2 className="text-xl font-bold text-center text-accent uppercase tracking-widest">
-          {roundNumber > 0 ? `Round ${roundNumber}` : 'Finals'}
+      {roundNumber !== null && (
+        <h2 className={cn(
+            "text-xl font-bold text-center uppercase tracking-widest",
+             isFinalBoss ? "text-destructive" : "text-accent"
+        )}>
+          {roundNumber > 0 ? `Round ${roundNumber}` : isFinalBoss ? 'Final Boss' : 'Tournament Finals'}
         </h2>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <PodCard
           pod={match.pod1}
           move={reveal ? match.moves?.pod1 : pod1Move}
@@ -82,14 +86,17 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
          {!reveal && <MoveSelector onSelect={setPod1Move} selectedMove={pod1Move} disabled={isProcessing} />}
         </PodCard>
 
-        <div className="flex flex-col items-center justify-center gap-4 text-center my-2 md:my-0">
-          <p className="text-4xl font-black text-destructive animate-pulse">VS</p>
+        <div className="flex flex-col items-center justify-center gap-2 text-center my-0">
+          <p className={cn(
+              "text-4xl font-black animate-pulse",
+              isFinalBoss ? "text-destructive" : "text-accent"
+          )}>VS</p>
           {!reveal && (
             <Button
               size="lg"
               onClick={handlePlay}
               disabled={!pod1Move || !pod2Move || isProcessing}
-              className="w-32 h-32 rounded-full text-2xl font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
+              className="w-24 h-24 rounded-full text-lg font-black tracking-tighter border-4 border-primary-foreground animate-pulse hover:animate-none disabled:animate-none"
             >
               {isProcessing ? '...' : 'BATTLE'}
             </Button>
@@ -101,7 +108,8 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           move={reveal ? match.moves?.pod2 : pod2Move}
           isWinner={reveal && match.winner?.id === match.pod2?.id}
           reveal={reveal}
-          className="md:col-start-3 w-full"
+          className="w-full"
+          isBoss={isFinalBoss}
         >
          {!reveal && <MoveSelector onSelect={setPod2Move} selectedMove={pod2Move} disabled={isProcessing} />}
         </PodCard>

@@ -28,6 +28,8 @@ export type TournamentState = {
   rounds: Round[];
   currentMatchId: string | null;
   winner: Pod | null;
+  finalMatch: Match | null;
+  gameWinner: Pod | null;
   matchWinner?: {
     winner: Pod;
     winningMove: Move;
