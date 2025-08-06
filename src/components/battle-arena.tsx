@@ -55,7 +55,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
     return (
        <Card className="text-center py-24 bg-card">
         <p className="text-muted-foreground animate-pulse text-lg">
-          Loading next match...
+          Tournament Over! Determining winner...
         </p>
       </Card>
     );
@@ -71,7 +71,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
             "text-xl font-bold text-center uppercase tracking-widest",
              isFinalBoss ? "text-destructive" : "text-accent"
         )}>
-          {roundNumber > 0 ? `Round ${roundNumber}` : isFinalBoss ? 'Final Boss' : 'Tournament Finals'}
+          {roundNumber > 0 ? `Match ${roundNumber}` : isFinalBoss ? 'Final Boss' : 'Round Robin'}
         </h2>
       )}
 

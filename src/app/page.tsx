@@ -8,8 +8,8 @@ import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
-import { Trophy, Swords, Shield, Skull } from 'lucide-react';
-import { TournamentBracket } from '@/components/tournament-bracket';
+import { Trophy, Swords, Skull } from 'lucide-react';
+import { TournamentStandings } from '@/components/tournament-standings';
 import { TournamentReport } from '@/components/tournament-report';
 import { MatchWinner } from '@/components/match-winner';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -27,8 +27,6 @@ export default function Home() {
     }
   };
   
-  // This effect will trigger the tournament winner announcement
-  // when a winner is decided but before the final boss match is set up.
   useEffect(() => {
     if (winner && !showTournamentWinner && !tournament?.finalMatch) {
         setShowTournamentWinner(true);
@@ -66,7 +64,7 @@ export default function Home() {
                 <Card className="w-full max-w-2xl text-center bg-card border-accent border-4">
                     <CardHeader>
                         <Trophy className="w-24 h-24 text-yellow-500 mx-auto" />
-                        <p className="text-2xl font-medium text-accent uppercase tracking-widest">Tournament Champion</p>
+                        <p className="text-2xl font-medium text-accent uppercase tracking-widest">Round Robin Winner</p>
                         <CardTitle className="text-7xl font-black font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -81,7 +79,7 @@ export default function Home() {
             {!gameWinner && !isFinalBoss && !winner && currentMatch && (
                 <Button variant="outline" size="sm" onClick={simulateTournament} disabled={isProcessing}>
                     <Swords className="mr-2" />
-                    {isProcessing ? 'Simulating...' : 'Simulate'}
+                    {isProcessing ? 'Simulating...' : 'Simulate All'}
                 </Button>
             )}
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
@@ -144,7 +142,7 @@ export default function Home() {
               />
             </div>
             <div className="row-start-1 xl:row-auto h-full flex flex-col">
-              <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+              <TournamentStandings standings={tournament.standings} />
             </div>
           </div>
         )}

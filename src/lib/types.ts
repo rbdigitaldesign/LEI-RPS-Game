@@ -17,20 +17,27 @@ export type Match = {
   moveHistory?: { pod1: Move; pod2: Move }[];
   isBye?: boolean;
   isDraw?: boolean;
+  played: boolean;
 };
 
-export type Round = {
-  id: number;
-  matches: Match[];
-};
+export type Standing = {
+  podId: number;
+  name: string;
+  emoji: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  gamesPlayed: number;
+}
 
 export type TournamentState = {
   pods: Pod[];
-  rounds: Round[];
+  schedule: Match[];
+  standings: Standing[];
   currentMatchId: string | null;
-  winner: Pod | null;
+  winner: Pod | null; // Winner of the round robin part
   finalMatch: Match | null;
-  gameWinner: Pod | null;
+  gameWinner: Pod | null; // Overall game winner after final boss
   matchWinner?: {
     winner?: Pod;
     winningMove?: Move;

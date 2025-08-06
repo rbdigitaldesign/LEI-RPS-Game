@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRef, useState } from 'react';
@@ -5,8 +6,8 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import type { TournamentState, Round, Match } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import type { TournamentState, Match } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Trophy, Skull } from 'lucide-react';
 
 type TournamentReportProps = {
@@ -109,44 +110,39 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
         )}
 
         <div className="space-y-8">
-            {tournament.rounds.map((round: Round) => (
-                <div key={round.id}>
-                    <h2 className="text-3xl font-bold text-center text-accent uppercase tracking-widest mb-4">
-                        Round {round.id}
-                    </h2>
-                    <div className="space-y-4">
-                        {round.matches.filter(m => !m.isBye).map((match: Match) => (
-                            <Card key={match.id} className="bg-card border-2 border-primary/50 p-4">
-                                <div className="grid grid-cols-3 items-center text-center">
-                                    <div className="font-bold text-lg text-primary">{match.pod1?.name}</div>
-                                    <div className="text-xl font-bold text-accent">VS</div>
-                                    <div className="font-bold text-lg text-primary">{match.pod2?.name}</div>
-                                </div>
-                                {match.winner && (
-                                     <div className="text-center mt-2">
-                                        <p className="font-semibold text-accent">Winner: {match.winner.name}</p>
-                                        <div className="flex justify-center items-center gap-4 mt-1">
-                                            {match.moveHistory?.map((moves, index) => (
-                                                <div key={index} className="flex gap-2 text-2xl">
-                                                    <span>{getEmojiForMove(moves.pod1)}</span>
-                                                    <span>vs</span>
-                                                    <span>{getEmojiForMove(moves.pod2)}</span>
-                                                </div>
-                                            ))}
+            <h2 className="text-3xl font-bold text-center text-accent uppercase tracking-widest mb-4">
+                Match Results
+            </h2>
+            <div className="space-y-4">
+                {tournament.schedule.filter(m => m.played).map((match: Match) => (
+                    <Card key={match.id} className="bg-card border-2 border-primary/50 p-4">
+                        <div className="grid grid-cols-3 items-center text-center">
+                            <div className="font-bold text-lg text-primary">{match.pod1?.name}</div>
+                            <div className="text-xl font-bold text-accent">VS</div>
+                            <div className="font-bold text-lg text-primary">{match.pod2?.name}</div>
+                        </div>
+                        {match.winner && (
+                              <div className="text-center mt-2">
+                                <p className="font-semibold text-accent">Winner: {match.winner.name}</p>
+                                <div className="flex justify-center items-center gap-4 mt-1">
+                                    {match.moveHistory?.map((moves, index) => (
+                                        <div key={index} className="flex gap-2 text-2xl">
+                                            <span>{getEmojiForMove(moves.pod1)}</span>
+                                            <span>vs</span>
+                                            <span>{getEmojiForMove(moves.pod2)}</span>
                                         </div>
-                                     </div>
-                                )}
-                                {!match.winner && match.moves && (
-                                    <div className="text-center mt-2">
-                                        <p className="font-semibold text-yellow-500">Draw</p>
-
-                                    </div>
-                                )}
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            ))}
+                                    ))}
+                                </div>
+                              </div>
+                        )}
+                        {match.isDraw && (
+                            <div className="text-center mt-2">
+                                <p className="font-semibold text-yellow-500">Draw</p>
+                            </div>
+                        )}
+                    </Card>
+                ))}
+            </div>
             {tournament.finalMatch && tournament.finalMatch.winner && (
                  <div>
                     <h2 className="text-3xl font-bold text-center text-destructive uppercase tracking-widest mb-4">
