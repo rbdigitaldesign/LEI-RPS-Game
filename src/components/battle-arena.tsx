@@ -80,6 +80,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           pod={match.pod1}
           move={reveal ? match.moves?.pod1 : pod1Move}
           isWinner={reveal && match.winner?.id === match.pod1?.id}
+          isDraw={reveal && match.isDraw}
           reveal={reveal}
           className="w-full"
         >
@@ -107,6 +108,7 @@ export function BattleArena({ match, isProcessing, onPlayMatch, roundNumber }: B
           pod={match.pod2}
           move={reveal ? match.moves?.pod2 : pod2Move}
           isWinner={reveal && match.winner?.id === match.pod2?.id}
+          isDraw={reveal && match.isDraw}
           reveal={reveal}
           className="w-full"
           isBoss={isFinalBoss}

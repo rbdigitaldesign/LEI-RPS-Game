@@ -50,11 +50,7 @@ export function useTournament() {
     const numPods = shuffledPods.length;
     const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(numPods));
     const byesCount = nextPowerOfTwo - numPods;
-    const firstRoundMatchesCount = (numPods - byesCount) / 2;
     const totalRounds = Math.log2(nextPowerOfTwo);
-
-    let podsWithByes = shuffledPods.slice(0, byesCount);
-    let podsInFirstRound = shuffledPods.slice(byesCount);
 
     let rounds: Round[] = [];
     
@@ -74,40 +70,53 @@ export function useTournament() {
         });
     }
 
-    // Place pods with byes directly into round 2
-    podsWithByes.forEach((pod, index) => {
-        const matchIndexInRound2 = Math.floor(index / 2);
-        const podPositionInMatch = index % 2;
-        if (podPositionInMatch === 0) {
-            rounds[1].matches[matchIndexInRound2].pod1 = pod;
-        } else {
-            rounds[1].matches[matchIndexInRound2].pod2 = pod;
-        }
-        // Find corresponding R1 match and mark as bye
-        const r1MatchIndex1 = matchIndexInRound2 * 2;
-        const r1MatchIndex2 = r1MatchIndex1 + 1;
-        if(podPositionInMatch === 0) {
-            rounds[0].matches[r1MatchIndex1].isBye = true;
-            rounds[0].matches[r1MatchIndex1].pod1 = pod;
-            rounds[0].matches[r1MatchIndex1].winner = pod;
-        } else {
-            rounds[0].matches[r1MatchIndex2].isBye = true;
-            rounds[0].matches[r1MatchIndex2].pod1 = pod;
-            rounds[0].matches[r1MatchIndex2].winner = pod;
-        }
-    });
-
-    // Place pods for the first round
-    let regularMatchIndex = 0;
-    for(let i=0; i<podsInFirstRound.length; i+=2) {
-        while(rounds[0].matches[regularMatchIndex].isBye) {
-            regularMatchIndex++;
-        }
-        rounds[0].matches[regularMatchIndex].pod1 = podsInFirstRound[i];
-        rounds[0].matches[regularMatchIndex].pod2 = podsInFirstRound[i+1];
-        regularMatchIndex++;
+    let podsForRound2 = [];
+    // Handle byes
+    for(let i=0; i < byesCount; i++) {
+        podsForRound2.push(shuffledPods[i]);
     }
     
+    // Handle first round matches
+    let podsForRound1 = shuffledPods.slice(byesCount);
+    let r1MatchIndex = 0;
+    for(let i=0; i < podsForRound1.length; i+=2) {
+        rounds[0].matches[r1MatchIndex].pod1 = podsForRound1[i];
+        rounds[0].matches[r1MatchIndex].pod2 = podsForRound1[i+1];
+        r1MatchIndex++;
+    }
+    
+    // Fill in winners for byes, advancing them to round 2
+    for(let i=0; i < byesCount; i++) {
+        const byeMatch = {
+            id: `r1-bye${i}`,
+            pod1: shuffledPods[i],
+            pod2: null,
+            winner: shuffledPods[i],
+            loser: null,
+            isBye: true,
+            moveHistory: [],
+        }
+        rounds[0].matches[r1MatchIndex] = byeMatch;
+        r1MatchIndex++;
+    }
+
+    rounds[0].matches.sort((a,b) => a.id.localeCompare(b.id));
+
+    // Prepare Round 2
+    const r1Winners = rounds[0].matches.map(m => m.winner).filter(Boolean);
+    const r1NonByeMatches = rounds[0].matches.filter(m => !m.isBye);
+
+    let r2PodIndex = 0;
+    for(let i = 0; i < r1NonByeMatches.length; i++) {
+        const match = r1NonByeMatches[i];
+        if (i % 2 === 0) {
+            rounds[1].matches[r2PodIndex].pod1 = match.winner;
+        } else {
+            rounds[1].matches[r2PodIndex].pod2 = match.winner;
+            r2PodIndex++;
+        }
+    }
+
     const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye && m.pod1 && m.pod2);
 
     return {
@@ -212,11 +221,19 @@ export function useTournament() {
                 setIsProcessing(false);
             }, 3000);
         } else {
-            match.moves = undefined;
-            setTournament({...updatedTournament});
-            saveState(updatedTournament);
-            setIsProcessing(false);
+            match.isDraw = true;
+            const drawState = {...updatedTournament};
+            setTournament(drawState);
+            saveState(drawState);
             toast({ title: "It's a draw!", description: "The boss is tough! Play again!" });
+            
+            setTimeout(() => {
+                match.moves = undefined;
+                match.isDraw = false;
+                setTournament({...drawState});
+                saveState(drawState);
+                setIsProcessing(false);
+            }, 2000);
         }
     }, 1000);
   };
@@ -297,12 +314,20 @@ export function useTournament() {
             }, 3000);
 
         } else { 
-            match!.moves = undefined;
+            match!.isDraw = true;
             const drawState = JSON.parse(JSON.stringify(updatedTournament));
             setTournament(drawState);
             saveState(drawState);
-            setIsProcessing(false);
             toast({ title: "It's a draw!", description: "Play again to decide the winner." });
+            
+            setTimeout(() => {
+                match!.moves = undefined;
+                match!.isDraw = false;
+                const resetState = JSON.parse(JSON.stringify(drawState));
+                setTournament(resetState);
+                saveState(resetState);
+                setIsProcessing(false);
+            }, 2000);
         }
     }, 1000);
 
@@ -368,7 +393,6 @@ export function useTournament() {
         
         // Find next match or winner
         let nextMatchId = null;
-        let foundWinner = false;
         
         findNext:
         for (const round of simTournament.rounds) {
@@ -447,9 +471,7 @@ export function useTournament() {
     winner: tournament?.winner ?? null,
     matchWinner: tournament?.matchWinner,
     gameWinner: tournament?.gameWinner ?? null,
-isProcessing,
+    isProcessing,
     currentRound
   };
 }
-
-    

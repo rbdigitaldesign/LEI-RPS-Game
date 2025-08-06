@@ -9,13 +9,14 @@ type PodCardProps = {
   pod: Pod | null;
   move?: Move | null;
   isWinner?: boolean;
+  isDraw?: boolean;
   reveal: boolean;
   isBoss?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
 
-export function PodCard({ pod, move, isWinner, reveal, isBoss, className, children }: PodCardProps) {
+export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className, children }: PodCardProps) {
   if (!pod) {
     return (
       <Card className={cn(
@@ -38,6 +39,7 @@ export function PodCard({ pod, move, isWinner, reveal, isBoss, className, childr
           'w-full text-center relative overflow-hidden transition-all duration-300 bg-card border-2',
           isWinner && 'border-accent ring-2 ring-accent shadow-lg shadow-accent/20',
           !isWinner && reveal && 'opacity-50 scale-95',
+          isDraw && 'border-yellow-500',
           isBoss && 'border-destructive'
         )}
       >
@@ -49,6 +51,16 @@ export function PodCard({ pod, move, isWinner, reveal, isBoss, className, childr
             transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
           >
             <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6">{pod.name} WIN!</p>
+          </motion.div>
+        )}
+        {isDraw && reveal && (
+          <motion.div 
+            className="absolute inset-0 bg-yellow-500/90 flex items-center justify-center z-10 p-2"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
+          >
+            <p className="text-2xl lg:text-3xl font-black text-yellow-950 tracking-tighter">DRAW</p>
           </motion.div>
         )}
         <CardHeader className="p-2">
