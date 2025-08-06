@@ -302,66 +302,47 @@ export function useTournament() {
     let simTournament = JSON.parse(JSON.stringify(tournament));
 
     while(!simTournament.winner) {
-        const currentMatchId = simTournament.currentMatchId;
-        if (!currentMatchId) break;
+        let playableMatchesFound = false;
+        for (let roundIndex = 0; roundIndex < simTournament.rounds.length; roundIndex++) {
+            const round = simTournament.rounds[roundIndex];
+            for (const match of round.matches) {
+                if (!match.winner && !match.isBye && match.pod1 && match.pod2) {
+                    playableMatchesFound = true;
+                    let pod1Move, pod2Move, winner;
+                    do {
+                        pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+                        pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
+                        
+                        if (pod1Move === pod2Move) {
+                            winner = null;
+                        } else if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
+                                   (pod1Move === 'scissors' && pod2Move === 'paper') ||
+                                   (pod1Move === 'paper' && pod2Move === 'rock')) {
+                            winner = match.pod1;
+                        } else {
+                            winner = match.pod2;
+                        }
+                    } while(!winner);
+                    
+                    match.winner = winner;
+                    match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
+                    match.moves = { pod1: pod1Move, pod2: pod2Move };
+                    match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
 
-        let match: Match | undefined;
-        let roundIndex: number = -1;
-        for (let i = 0; i < simTournament.rounds.length; i++) {
-            const m = simTournament.rounds[i].matches.find((m: Match) => m.id === currentMatchId);
-            if (m) {
-                match = m;
-                roundIndex = i;
-                break;
-            }
-        }
-
-        if (!match || !match.pod1 || !match.pod2) break;
-
-        let pod1Move, pod2Move, winner;
-        do {
-            pod1Move = MOVES[Math.floor(Math.random() * MOVES.length)];
-            pod2Move = MOVES[Math.floor(Math.random() * MOVES.length)];
-            
-            if (pod1Move === pod2Move) {
-                winner = null;
-            } else if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
-                       (pod1Move === 'scissors' && pod2Move === 'paper') ||
-                       (pod1Move === 'paper' && pod2Move === 'rock')) {
-                winner = match.pod1;
-            } else {
-                winner = match.pod2;
-            }
-        } while(!winner);
-        
-        match.winner = winner;
-        match.loser = winner.id === match.pod1.id ? match.pod2 : match.pod1;
-        match.moves = { pod1: pod1Move, pod2: pod2Move };
-        match.moveHistory = [...(match.moveHistory || []), { pod1: pod1Move, pod2: pod2Move }];
-
-        advanceWinner(match, roundIndex, simTournament.rounds);
-
-        let nextMatchId: string | null = null;
-        for (const r of simTournament.rounds) {
-            for (const m of r.matches) {
-                if (!m.winner && m.pod1 && m.pod2) {
-                    nextMatchId = m.id;
-                    break;
+                    advanceWinner(match, roundIndex, simTournament.rounds);
                 }
             }
-            if (nextMatchId) break;
         }
-        simTournament.currentMatchId = nextMatchId;
 
-        if (!nextMatchId) {
+        if (!playableMatchesFound) {
             const lastRound = simTournament.rounds[simTournament.rounds.length - 1];
             if (lastRound.matches.length === 1 && lastRound.matches[0].winner) {
                 simTournament.winner = lastRound.matches[0].winner;
+            } else {
+                // Break if no playable matches found and no winner, to prevent infinite loop
+                break;
             }
         }
-        
-        // This visual update is very fast, so batching them up
-        // by removing the state update from the loop.
     }
     
     // One final update to show the final state before the boss
@@ -428,5 +409,3 @@ isProcessing,
     currentRound
   };
 }
-
-    
