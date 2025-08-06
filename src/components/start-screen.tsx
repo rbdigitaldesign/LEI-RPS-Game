@@ -34,7 +34,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                 <CardContent className="mt-8">
                     <Button 
                       onClick={onStartTournament} 
-                      className="w-48 h-48 rounded-full text-2xl font-black font-body text-white bg-red-600 hover:bg-red-700 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out"
+                      className="w-48 h-48 rounded-full text-xl font-black font-body text-white bg-red-600 hover:bg-red-700 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out"
                       disabled={isProcessing}
                     >
                         {isProcessing ? 'Loading...' : 'Press Start'}
