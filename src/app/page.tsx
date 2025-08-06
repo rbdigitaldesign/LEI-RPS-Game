@@ -56,7 +56,7 @@ export default function Home() {
   }
   
   const isFinalBoss = currentMatch?.id === 'final-boss-match';
-  const playedMatches = tournament.schedule.filter(m => m.played);
+  const playedMatches = tournament.schedule?.filter(m => m.played) || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
