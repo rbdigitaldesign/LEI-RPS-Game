@@ -16,12 +16,12 @@ export type Match = {
   loser: Pod | null;
   moves?: { pod1: Move; pod2: Move };
   moveHistory?: { pod1: Move; pod2: Move }[];
-  isBye?: boolean;
   isDraw?: boolean;
 };
 
 export type Round = {
     id: number;
+    name: string;
     matches: Match[];
 }
 

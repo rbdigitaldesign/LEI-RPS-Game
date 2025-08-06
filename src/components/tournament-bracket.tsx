@@ -23,27 +23,9 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
 );
 
 const BracketMatch = ({ match }: { match: Match }) => {
-    if (match.isBye) {
-        return (
-             <Card className="w-36 bg-transparent border-0 shadow-none">
-                <CardContent className="p-0">
-                    <div className="flex flex-col justify-center h-full">
-                        <BracketPod 
-                            pod={match.pod1} 
-                            isWinner={true}
-                            isLoser={false}
-                        />
-                         <div className="text-center text-[9px] italic text-muted-foreground">
-                            (Bye)
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        )
-    }
-    const hasWinner = !!match.winner && !match.isBye;
+    const hasWinner = !!match.winner;
     return (
-        <Card className="w-36 bg-card/50 border-primary/20">
+        <Card className="w-40 bg-card/50 border-primary/20">
             <CardContent className="p-0">
                 <BracketPod 
                     pod={match.pod1} 
@@ -70,15 +52,23 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
             <CardContent className="p-4">
                 <ScrollArea className="w-full whitespace-nowrap">
                     <div className="flex gap-8 items-stretch">
-                        {rounds.map((round, roundIndex) => (
+                        {rounds.map((round) => (
                             <div key={round.id} className="flex flex-col h-full">
                                 <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4">
-                                    {roundIndex === rounds.length -1 ? "Final" : `Round ${round.id}`}
+                                    {round.name}
                                 </h3>
                                 <div className="flex flex-col gap-6 relative justify-around flex-grow">
                                     {round.matches.map(match => (
                                         <BracketMatch key={match.id} match={match} />
                                     ))}
+                                    {/* Spacer for the lucky pod that gets a pass in round 2 */}
+                                    {round.id === 2 && (
+                                      <div className="w-40 p-0 text-center">
+                                        <div className="text-[10px] text-muted-foreground italic h-12 flex items-center justify-center">
+                                          (Winner awaiting)
+                                        </div>
+                                      </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
