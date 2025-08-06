@@ -6,7 +6,7 @@ import { useTournament } from '@/hooks/use-tournament';
 import { Button } from '@/components/ui/button';
 import { BattleArena } from '@/components/battle-arena';
 import { Header } from '@/components/header';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Move } from '@/lib/types';
 import { Trophy } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
