@@ -12,7 +12,6 @@ import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
-import { useToast } from '@/hooks/use-toast';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -21,70 +20,10 @@ export function MainPageContent() {
   const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [lastTournamentState, setLastTournamentState] = useState<any>(null);
-  const [lastCompletedMatches, setLastCompletedMatches] = useState<Set<string>>(new Set());
-  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // Detect ties and match results
-  useEffect(() => {
-    if (tournament && lastTournamentState) {
-      // Check for new completed matches
-      const allMatches = tournament.rounds.flatMap((r: any) => r.matches);
-      const completedMatches = allMatches.filter((m: any) => m.winner && !m.isBye);
-      
-      completedMatches.forEach((match: any) => {
-        if (!lastCompletedMatches.has(match.id)) {
-          // New match completed
-          toast({
-            title: "Match Complete! 🏆",
-            description: `${match.winner.name} defeated ${match.loser?.name || 'opponent'}`,
-            duration: 4000,
-          });
-          
-          // Show elimination notification if there's a loser
-          if (match.loser) {
-            setTimeout(() => {
-              toast({
-                title: "Team Eliminated 😔",
-                description: `${match.loser.name} has been eliminated from the tournament`,
-                duration: 4000,
-              });
-            }, 1000);
-          }
-          
-          setLastCompletedMatches(prev => new Set([...prev, match.id]));
-        }
-      });
-
-      // Check for ties in current match
-      if (currentMatch && lastTournamentState) {
-        const previousMatch = lastTournamentState.rounds
-          ?.flatMap((r: any) => r.matches)
-          ?.find((m: any) => m.id === currentMatch.id);
-        
-        if (previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
-          // Check if a new tie occurred
-          if (currentMatch.moveHistory.length > previousMatch.moveHistory.length) {
-            const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
-            if (latestRound.pod1 === latestRound.pod2) {
-              toast({
-                title: "Tie in Current Match! 🤝",
-                description: `${currentMatch.pod1?.name} vs ${currentMatch.pod2?.name} - both chose ${latestRound.pod1}. They must play again!`,
-                duration: 5000,
-              });
-            }
-          }
-        }
-      }
-    }
-    if (tournament) {
-      setLastTournamentState(JSON.parse(JSON.stringify(tournament)));
-    }
-  }, [tournament, currentMatch, toast, lastCompletedMatches, lastTournamentState]);
 
   // Redirect to team page if team parameter is present
   useEffect(() => {
@@ -201,13 +140,13 @@ export function MainPageContent() {
                     
                     if (eliminatedTeams.length > 0) {
                       return (
-                        <div className="mt-4 p-3 bg-red-50 rounded border border-red-200">
-                          <h4 className="font-medium text-red-800 mb-2">Eliminated Teams:</h4>
+                        <div className="mt-4 p-3 bg-red-50 rounded border border-red-200 dark:bg-red-900/20 dark:border-red-500/30">
+                          <h4 className="font-medium text-red-800 dark:text-red-200 mb-2">Eliminated Teams:</h4>
                           <div className="flex flex-wrap gap-2">
                             {eliminatedTeams.map((team: any) => (
                               <span 
                                 key={team.name} 
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-sm"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-sm dark:bg-red-500/10 dark:text-red-300"
                               >
                                 <span className="grayscale">{team.emoji}</span>
                                 {team.name}
