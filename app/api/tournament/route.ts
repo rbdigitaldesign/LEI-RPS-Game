@@ -23,30 +23,24 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 const createBracket = (initialPods: Pod[]): TournamentState => {
-  let shuffledPods = shuffleArray(initialPods);
-  const numPods = shuffledPods.length;
+  let allPods = [...initialPods];
   
-  // Handle odd number of teams by adding the AI opponent
-  if (numPods % 2 !== 0) {
-      const aiPod: Pod = {
-          id: 99,
-          name: 'Cox Travis',
-          manager: 'The AI',
-          emoji: '🤖',
-      };
-      shuffledPods.push(aiPod);
-  }
-
-  const nextPowerOfTwo = 2 ** Math.ceil(Math.log2(shuffledPods.length));
-  const totalRounds = Math.log2(nextPowerOfTwo);
+  // Always add the AI opponent to make it an even 16
+  const aiPod: Pod = {
+      id: 99,
+      name: 'Cox Travis',
+      manager: 'The AI',
+      emoji: '🤖',
+  };
+  allPods.push(aiPod);
+  
+  let shuffledPods = shuffleArray(allPods);
+  
+  const numPods = shuffledPods.length;
+  const totalRounds = Math.log2(numPods);
   
   let rounds: Round[] = [];
   let currentPods: (Pod | null)[] = [...shuffledPods];
-
-  // Pad with nulls if not a power of two
-  while (currentPods.length < nextPowerOfTwo) {
-    currentPods.push(null);
-  }
   
   // Create Round 1
   const round1Matches: Match[] = [];
@@ -57,18 +51,10 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
       pod2: currentPods[i+1],
       winner: null,
       loser: null,
-      isBye: !currentPods[i] || !currentPods[i+1],
       moveHistory: [],
     });
   }
   
-  // Auto-resolve bye matches
-  round1Matches.forEach(match => {
-      if (match.isBye) {
-          match.winner = match.pod1 || match.pod2;
-      }
-  });
-
   rounds.push({ id: 1, name: 'Round 1', matches: round1Matches });
   
   // Create subsequent rounds
@@ -76,14 +62,12 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
     const previousRoundMatches = rounds[i - 1].matches;
     const nextRoundMatches: Match[] = [];
     
-    // Get winners from the previous round
-    const winners = previousRoundMatches.map(m => m.winner);
-    
-    for (let j = 0; j < winners.length; j += 2) {
+    // Create placeholders for the next round
+    for (let j = 0; j < previousRoundMatches.length / 2; j++) {
       nextRoundMatches.push({
-        id: `r${i + 1}-m${j/2}`,
-        pod1: winners[j],
-        pod2: winners[j+1],
+        id: `r${i + 1}-m${j}`,
+        pod1: null,
+        pod2: null,
         winner: null,
         loser: null,
         moveHistory: [],
@@ -98,10 +82,10 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
     rounds.push({ id: i + 1, name: roundName, matches: nextRoundMatches });
   }
 
-  const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye && m.pod1 && m.pod2);
+  const firstPlayableMatch = rounds[0].matches.find(m => m.pod1 && m.pod2);
 
   return {
-    pods: initialPods,
+    pods: initialPods, // Return original human pods
     rounds: rounds,
     currentMatchId: firstPlayableMatch?.id || null,
     winner: null,
@@ -143,8 +127,18 @@ const advanceTournament = (state: TournamentState) => {
     const lastMatchId = state.currentMatchId;
     if(!lastMatchId) return;
 
-    const currentRoundIndex = state.rounds.findIndex(r => r.matches.some(m => m.id === lastMatchId));
-    const currentMatchIndex = state.rounds[currentRoundIndex].matches.findIndex(m => m.id === lastMatchId);
+    let currentRoundIndex = -1, currentMatchIndex = -1;
+    for(let i=0; i<state.rounds.length; i++){
+        const matchIdx = state.rounds[i].matches.findIndex(m => m.id === lastMatchId);
+        if(matchIdx !== -1) {
+            currentRoundIndex = i;
+            currentMatchIndex = matchIdx;
+            break;
+        }
+    }
+    
+    if(currentRoundIndex === -1) return;
+
     const winner = state.rounds[currentRoundIndex].matches[currentMatchIndex].winner;
 
     const nextRoundIndex = currentRoundIndex + 1;
@@ -165,7 +159,7 @@ const advanceTournament = (state: TournamentState) => {
     outerLoop: for (let r = 0; r < state.rounds.length; r++) {
         for (let m = 0; m < state.rounds[r].matches.length; m++) {
             const match = state.rounds[r].matches[m];
-            if (!match.isBye && !match.winner && match.pod1 && match.pod2) {
+            if (!match.winner && match.pod1 && match.pod2) {
                 nextMatchId = match.id;
                 break outerLoop;
             }
@@ -212,7 +206,6 @@ export async function POST(request: NextRequest) {
         .flatMap(r => r.matches)
         .find(m => 
           m.id === tournamentState?.currentMatchId && 
-          !m.isBye && 
           (m.pod1?.name === data.teamName || m.pod2?.name === data.teamName)
         );
 

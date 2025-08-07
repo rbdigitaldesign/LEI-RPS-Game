@@ -85,7 +85,6 @@ export default function TeamsPage() {
       .flatMap(r => r.matches)
       .find(m => 
         m.id === tournament.currentMatchId && 
-        !m.isBye && 
         (m.pod1?.name === teamName || m.pod2?.name === teamName)
       );
 
