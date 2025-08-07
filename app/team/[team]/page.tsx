@@ -82,10 +82,12 @@ export default function TeamPage() {
           // Find opponent
           const opponent = match.pod1?.name === teamName ? match.pod2 : match.pod1;
           setOpponentPod(opponent);
+          const isOpponentAI = opponent?.name === 'Cox Travis';
 
           // Check if this team has already submitted a move
           const teamIsPod1 = match.pod1?.name === teamName;
           const teamMove = teamIsPod1 ? match.moves?.pod1 : match.moves?.pod2;
+          const opponentMove = teamIsPod1 ? match.moves?.pod2 : match.moves?.pod1;
           setHasSubmittedMove(!!teamMove);
 
           // Check for ties and match results
@@ -104,7 +106,6 @@ export default function TeamPage() {
           // Check for match completion and show result notification
           if (match.winner && match.winner !== lastMatchWinner) {
             const isWinner = match.winner.name === teamName;
-            const opponent = match.pod1?.name === teamName ? match.pod2 : match.pod1;
             
             if (isWinner) {
               toast({
@@ -127,16 +128,11 @@ export default function TeamPage() {
         }
 
         // Check if team is eliminated (lost a match and not advancing)
-        const teamMatches = tournament.rounds
-          .flatMap(r => r.matches)
-          .filter(m => 
-            (m.pod1?.name === teamName || m.pod2?.name === teamName) && 
-            m.winner && 
-            m.winner.name !== teamName
-          );
+        const isEliminated = tournament.rounds
+            .flatMap(r => r.matches)
+            .some(m => m.loser?.name === teamName);
         
-        const isCurrentlyEliminated = teamMatches.length > 0 && !tournament.winner;
-        setIsEliminated(isCurrentlyEliminated);
+        setIsEliminated(isEliminated);
       }
     }
   }, [tournament, teamName, lastMoveHistory.length, toast]);
@@ -317,6 +313,8 @@ export default function TeamPage() {
     );
   }
 
+  const teamIsPod1 = currentMatch.pod1?.name === teamName;
+  const opponentIsAI = opponentPod?.name === 'Cox Travis';
   const bothMovesSubmitted = currentMatch.moves?.pod1 && currentMatch.moves?.pod2;
   const currentRound = tournament.rounds.find(r => 
     r.matches.some(m => m.id === tournament.currentMatchId)
@@ -355,8 +353,11 @@ export default function TeamPage() {
                   <div className="font-bold text-lg">{opponentPod?.name}</div>
                   <div className="text-sm text-muted-foreground">{opponentPod?.manager}</div>
                 </div>
-                {currentMatch.moves?.pod1 && currentMatch.moves?.pod2 && (
+                {bothMovesSubmitted && !opponentIsAI && (
                   <Badge variant="secondary">Move Submitted</Badge>
+                )}
+                {opponentIsAI && (
+                  <Badge variant="destructive">AI Player</Badge>
                 )}
               </div>
             </div>
@@ -449,7 +450,7 @@ export default function TeamPage() {
             )}
 
             {/* Waiting State */}
-            {hasSubmittedMove && !bothMovesSubmitted && (
+            {hasSubmittedMove && !bothMovesSubmitted && !opponentIsAI && (
               <div className="text-center space-y-4 p-4 bg-muted rounded-lg">
                 <div className="flex items-center justify-center gap-2">
                   <Clock className="w-5 h-5 animate-pulse"/>

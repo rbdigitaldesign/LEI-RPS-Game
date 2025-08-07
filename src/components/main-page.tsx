@@ -15,12 +15,14 @@ import { StartScreen } from '@/components/start-screen';
 import { useToast } from '@/hooks/use-toast';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
+import { PreIntroScreen } from './pre-intro-screen';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
   const teamParam = searchParams?.get('team');
   
   const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
+  const [preIntroFinished, setPreIntroFinished] = useState(false);
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const lastTournamentState = useRef<TournamentState | null>(null);
@@ -118,10 +120,15 @@ export function MainPageContent() {
     );
   }
 
+  if (!preIntroFinished) {
+    return <PreIntroScreen onStart={() => setPreIntroFinished(true)} />;
+  }
+  
+  if (!introFinished) {
+    return <IntroTrailer onFinished={() => setIntroFinished(true)} />;
+  }
+
   if (!tournament) {
-    if (!introFinished) {
-        return <IntroTrailer onFinished={() => setIntroFinished(true)} />;
-    }
     return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
   }
 
@@ -146,7 +153,7 @@ export function MainPageContent() {
                     Ultimate Pod Champion
                 </p>
                 <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
-                <p className="text-muted-foreground">Managed by {winner.manager}</p>
+                <p className="text-muted-foreground">Represented by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
                 <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">
