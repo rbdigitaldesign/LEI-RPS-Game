@@ -30,6 +30,10 @@ export function MainPageContent() {
 
   useEffect(() => {
     setIsClient(true);
+    if (sessionStorage.getItem('introSeen')) {
+      setPreIntroFinished(true);
+      setIntroFinished(true);
+    }
   }, []);
 
   // Detect ties and match results to show notifications
@@ -121,11 +125,16 @@ export function MainPageContent() {
   }
 
   if (!preIntroFinished) {
-    return <PreIntroScreen onStart={() => setPreIntroFinished(true)} />;
+    return <PreIntroScreen onStart={() => {
+        setPreIntroFinished(true);
+        sessionStorage.setItem('introSeen', 'true');
+    }} />;
   }
   
   if (!introFinished) {
-    return <IntroTrailer onFinished={() => setIntroFinished(true)} />;
+    return <IntroTrailer onFinished={() => {
+        setIntroFinished(true);
+    }} />;
   }
 
   if (!tournament) {
