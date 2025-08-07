@@ -48,11 +48,11 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
     let isBye = false;
 
     // Auto-resolve matches against "ghost" teams
-    if (pod1 && (pod1.name === 'Team Go' || pod1.name === 'Team Rocket')) {
+    if (pod1 && (pod1.name === 'Team Travis Cox' || pod1.name === 'Cox Travis')) {
       winner = pod2;
       loser = pod1;
       isBye = true;
-    } else if (pod2 && (pod2.name === 'Team Go' || pod2.name === 'Team Rocket')) {
+    } else if (pod2 && (pod2.name === 'Team Travis Cox' || pod2.name === 'Cox Travis')) {
       winner = pod1;
       loser = pod2;
       isBye = true;
