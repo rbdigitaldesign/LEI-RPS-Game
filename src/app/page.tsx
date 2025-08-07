@@ -45,7 +45,7 @@ export default function Home() {
       <Header>
         <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
-                Reset
+                Reset tournament
             </Button>
         </div>
       </Header>
