@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
-import { Play } from 'lucide-react';
 
 const trailerLines = [
   "In a world of part 3 course development and change  proposals...",
@@ -21,15 +20,13 @@ type IntroTrailerProps = {
 
 export function IntroTrailer({ onFinished }: IntroTrailerProps) {
   const [index, setIndex] = useState(0);
-  const [showPlayButton, setShowPlayButton] = useState(false);
 
   useEffect(() => {
-    if (index >= trailerLines.length - 1) {
-      // When the last line is shown, show the play button
-      setTimeout(() => {
-        setShowPlayButton(true);
-      }, 2500); // Wait for the line to be visible for a moment
-      return;
+    if (index >= trailerLines.length) {
+        const finishTimer = setTimeout(() => {
+            onFinished();
+        }, 1000);
+        return () => clearTimeout(finishTimer);
     }
     
     const timer = setTimeout(() => {
@@ -56,15 +53,8 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
         </AnimatePresence>
         
         <div className="absolute bottom-8 right-8">
-            {showPlayButton ? (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                    <Button variant="outline" size="lg" onClick={onFinished} className="bg-background/20 hover:bg-background/50 border-foreground/50">
-                        <Play className="mr-2"/>
-                        Play
-                    </Button>
-                </motion.div>
-            ) : (
-                 <Button variant="ghost" onClick={onFinished}>Skip</Button>
+            {index < (trailerLines.length -1) && (
+                <Button variant="ghost" onClick={onFinished}>Skip</Button>
             )}
         </div>
     </div>
