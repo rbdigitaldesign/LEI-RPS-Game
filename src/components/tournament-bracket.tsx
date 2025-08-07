@@ -94,9 +94,10 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                                                             top: '50%',
                                                         }}
                                                     />
-                                                     <div className="absolute w-4 h-px bg-border -right-1"
+                                                     <div className="absolute w-4 h-px bg-border"
                                                         style={{
                                                             top: `calc(50% + ((100% + 2.5rem) / 2))`,
+                                                            right: '-2rem'
                                                         }}
                                                     />
                                                 </>
@@ -113,4 +114,3 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
         </Card>
     );
 }
-

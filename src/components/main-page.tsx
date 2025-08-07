@@ -93,6 +93,15 @@ export function MainPageContent() {
     }
   }, [isClient, teamParam]);
   
+  const handleReset = () => {
+    const password = prompt('Enter password to reset tournament:', '');
+    if (password === 'orcas2025') {
+      resetTournament();
+    } else if (password !== null) {
+      alert('Incorrect password.');
+    }
+  };
+
   if (!isClient) {
     return null; // Render nothing on the server to avoid hydration errors
   }
@@ -141,7 +150,7 @@ export function MainPageContent() {
             <Button asChild variant="secondary" size="sm">
               <Link href="/teams">View Pods</Link>
             </Button>
-            <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
+            <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
                 Reset
             </Button>
         </div>
@@ -173,7 +182,7 @@ export function MainPageContent() {
                 </div>
                 <div className="flex w-full gap-4 mt-4">
                     <TournamentReport tournament={tournament} />
-                    <Button size="lg" onClick={resetTournament} className="w-full">
+                    <Button size="lg" onClick={handleReset} className="w-full">
                         Play Again
                     </Button>
                 </div>
@@ -247,4 +256,3 @@ export function MainPageContent() {
     </div>
   );
 }
-
