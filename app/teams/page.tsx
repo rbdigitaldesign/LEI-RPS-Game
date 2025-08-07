@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PODS } from '@/lib/constants';
-import { Users, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft, Bot } from 'lucide-react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import Link from 'next/link';
 
@@ -186,6 +186,29 @@ export default function TeamsPage() {
               </Card>
             );
           })}
+          {/* Special card for the AI bot */}
+          <Card className="transition-all hover:shadow-lg border-dashed">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-4">
+                <span className="text-4xl">🤖</span>
+                <div>
+                  <CardTitle className="text-lg">Cox Travis</CardTitle>
+                  <p className="text-sm text-muted-foreground">Represented by The AI</p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0 flex items-center justify-between">
+              {getStatusBadge(getTeamStatus('Cox Travis'))}
+              <Button 
+                variant="secondary"
+                size="sm"
+                disabled
+              >
+                <Bot className="mr-2 h-4 w-4" />
+                Bot
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
