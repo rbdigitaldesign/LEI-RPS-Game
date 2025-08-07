@@ -128,14 +128,31 @@ export default function TeamPage() {
         }
 
         // Check if team is eliminated (lost a match and not advancing)
-        const isEliminated = tournament.rounds
+        const isTeamEliminated = tournament.rounds
             .flatMap(r => r.matches)
             .some(m => m.loser?.name === teamName);
         
-        setIsEliminated(isEliminated);
+        setIsEliminated(isTeamEliminated);
       }
     }
   }, [tournament, teamName, lastMoveHistory.length, toast]);
+
+  useEffect(() => {
+    if (isEliminated) {
+      toast({
+        title: "You've been eliminated!",
+        description: "Redirecting to the tournament overview in 4 seconds...",
+        duration: 4000,
+        variant: "destructive",
+      });
+      const redirectTimer = setTimeout(() => {
+        window.location.href = '/';
+      }, 4000);
+
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [isEliminated, toast]);
+
 
   if (!teamName) {
     return (
