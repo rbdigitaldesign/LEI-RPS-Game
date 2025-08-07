@@ -1,3 +1,5 @@
+
+import { appRoute } from '@genkit-ai/next';
 import {getGcpCredentials} from 'common-server';
 import {google} from 'googleapis';
-export {GET, POST} from '@genkit-ai/next';
+export const { GET, POST } = appRoute();
