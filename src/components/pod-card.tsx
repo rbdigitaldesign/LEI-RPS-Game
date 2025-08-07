@@ -20,7 +20,7 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
   if (!pod) {
     return (
       <Card className={cn(
-        'w-full text-center relative overflow-hidden transition-all duration-300 bg-card/50 border-2 border-dashed flex items-center justify-center min-h-[240px]',
+        'w-full text-center relative overflow-hidden transition-all duration-300 bg-card/50 border-2 border-dashed flex items-center justify-center min-h-[148px]',
         className
       )}>
         <p className="text-muted-foreground text-sm">Waiting for opponent...</p>
