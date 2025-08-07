@@ -130,7 +130,7 @@ export function MainPageContent() {
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
-              <Link href="/teams">View Teams</Link>
+              <Link href="/teams">View Pods</Link>
             </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
@@ -170,10 +170,10 @@ export function MainPageContent() {
             <TournamentBracket rounds={tournament.rounds} />
             <div className="w-full flex flex-col gap-4">
               <Card className="p-6">
-                <CardHeader>
+                <CardHeader className="pt-0 pl-0">
                   <CardTitle>Tournament in Progress</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                   <p className="text-muted-foreground">
                     Teams are currently playing their matches. View the bracket above to see the current status.
                     {currentMatch && (
@@ -204,13 +204,13 @@ export function MainPageContent() {
                     
                     if (eliminatedTeams.length > 0) {
                       return (
-                        <div className="mt-4 p-3 bg-red-50 rounded border border-red-200 dark:bg-red-900/20 dark:border-red-500/30">
-                          <h4 className="font-medium text-red-800 dark:text-red-200 mb-2">Eliminated Teams:</h4>
+                        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                          <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
                           <div className="flex flex-wrap gap-2">
                             {eliminatedTeams.map((team: any) => (
                               <span 
                                 key={team.name} 
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-sm dark:bg-red-500/10 dark:text-red-300"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-300 rounded text-sm"
                               >
                                 <span className="grayscale">{team.emoji}</span>
                                 {team.name}

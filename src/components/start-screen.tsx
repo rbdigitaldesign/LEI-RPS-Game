@@ -17,7 +17,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
       <Header>
         <Button asChild variant="secondary" size="sm">
-          <Link href="/teams">View Teams</Link>
+          <Link href="/teams">View Pods</Link>
         </Button>
       </Header>
       <main className="flex-grow flex items-center justify-center p-4">

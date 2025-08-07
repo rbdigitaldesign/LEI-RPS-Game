@@ -114,17 +114,17 @@ export default function TeamsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'playing':
-        return <span className="bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">🎮 Playing Now</span>;
+        return <span className="bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🎮 Playing Now</span>;
       case 'waiting-opponent':
-        return <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium">⏳ Move Submitted</span>;
+        return <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Move Submitted</span>;
       case 'waiting-turn':
-        return <span className="bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium">⏰ Waiting Turn</span>;
+        return <span className="bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏰ Waiting Turn</span>;
       case 'eliminated':
-        return <span className="bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300 px-2 py-1 rounded-full text-xs font-medium">❌ Eliminated</span>;
+        return <span className="bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">❌ Eliminated</span>;
       case 'winner':
-        return <span className="bg-yellow-400 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium">🏆 Champion</span>;
+        return <span className="bg-yellow-400 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🏆 Champion</span>;
       default:
-        return <span className="bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium">⏳ Not Started</span>;
+        return <span className="bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Not Started</span>;
     }
   };
 
@@ -149,9 +149,9 @@ export default function TeamsPage() {
       
       <main className="flex-grow container mx-auto p-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3"><Users/> Team Directory</h1>
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3"><Users/> Pod Directory</h1>
           <p className="text-muted-foreground">
-            Select a team below to access their match interface, or view the tournament overview.
+            Select a pod below to access their match interface, or view the tournament overview.
           </p>
         </div>
 
@@ -162,30 +162,26 @@ export default function TeamsPage() {
             
             return (
               <Card key={pod.name} className={`transition-all hover:shadow-lg ${canPlay ? 'ring-2 ring-primary' : ''}`}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{pod.emoji}</span>
-                      <div>
-                        <CardTitle className="text-lg">{pod.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">Managed by {pod.manager}</p>
-                      </div>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-4xl">{pod.emoji}</span>
+                    <div>
+                      <CardTitle className="text-lg">{pod.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">Managed by {pod.manager}</p>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between">
-                    {getStatusBadge(status)}
-                    <Button 
-                      asChild
-                      variant={canPlay ? "default" : "outline"}
-                      size="sm"
-                    >
-                      <a href={`/team/${encodeURIComponent(pod.name)}`} target="_blank" rel="noopener noreferrer">
-                        {canPlay ? 'Play Now!' : 'Team Page'}
-                      </a>
-                    </Button>
-                  </div>
+                <CardContent className="pt-0 flex items-center justify-between">
+                  {getStatusBadge(status)}
+                  <Button 
+                    asChild
+                    variant={canPlay ? "default" : "outline"}
+                    size="sm"
+                  >
+                    <a href={`/team/${encodeURIComponent(pod.name)}`} target="_blank" rel="noopener noreferrer">
+                      {canPlay ? 'Play Now!' : 'Team Page'}
+                    </a>
+                  </Button>
                 </CardContent>
               </Card>
             );
