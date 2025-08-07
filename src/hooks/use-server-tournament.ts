@@ -1,11 +1,18 @@
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { TournamentState } from '@/lib/types';
 
 export function useServerTournament() {
   const [tournament, setTournament] = useState<TournamentState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Use a ref to hold the latest tournament state to avoid stale closures in fetchTournament
+  const tournamentRef = useRef(tournament);
+  useEffect(() => {
+    tournamentRef.current = tournament;
+  }, [tournament]);
 
   const fetchTournament = useCallback(async () => {
     try {
@@ -15,13 +22,10 @@ export function useServerTournament() {
       }
       const data = await response.json();
       
-      setTournament((prevTournament) => {
-        // Only update state if the tournament data has actually changed.
-        if (JSON.stringify(data.tournament) !== JSON.stringify(prevTournament)) {
-          return data.tournament;
-        }
-        return prevTournament;
-      });
+      // Only update state if the tournament data has actually changed.
+      if (JSON.stringify(data.tournament) !== JSON.stringify(tournamentRef.current)) {
+        setTournament(data.tournament);
+      }
 
     } catch (error) {
       console.error('Failed to fetch tournament:', error);
@@ -69,7 +73,7 @@ export function useServerTournament() {
 
   useEffect(() => {
     fetchTournament(); 
-    const interval = setInterval(fetchTournament, 3000);
+    const interval = setInterval(() => fetchTournament(), 3000);
     return () => clearInterval(interval);
   }, [fetchTournament]);
 
@@ -78,7 +82,7 @@ export function useServerTournament() {
     : null;
 
   const currentRound = tournament && tournament.currentMatchId
-    ? tournament.rounds.findIndex(r => r.matches.some(m => m.id === tournament.currentMatchId)) + 1
+    ? tournament.rounds.find(r => r.matches.some(m => m.id === tournament.currentMatchId))?.id ?? null
     : null;
 
   return {
