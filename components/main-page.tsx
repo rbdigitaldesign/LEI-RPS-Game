@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,8 @@ import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
 import { useToast } from '@/hooks/use-toast';
+import type { TournamentState, Match } from '@/lib/types';
+import Link from 'next/link';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -21,70 +23,68 @@ export function MainPageContent() {
   const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [lastTournamentState, setLastTournamentState] = useState<any>(null);
-  const [lastCompletedMatches, setLastCompletedMatches] = useState<Set<string>>(new Set());
+  const lastTournamentState = useRef<TournamentState | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Detect ties and match results
+  // Detect ties and match results to show notifications
   useEffect(() => {
-    if (tournament && lastTournamentState) {
+    if (tournament && lastTournamentState.current) {
       // Check for new completed matches
-      const allMatches = tournament.rounds.flatMap((r: any) => r.matches);
-      const completedMatches = allMatches.filter((m: any) => m.winner && !m.isBye);
-      
-      completedMatches.forEach((match: any) => {
-        if (!lastCompletedMatches.has(match.id)) {
-          // New match completed
-          toast({
-            title: "Match Complete! 🏆",
-            description: `${match.winner.name} defeated ${match.loser?.name || 'opponent'}`,
-            duration: 4000,
-          });
-          
-          // Show elimination notification if there's a loser
-          if (match.loser) {
-            setTimeout(() => {
+      const allCurrentMatches = tournament.rounds.flatMap((r) => r.matches);
+      const allPreviousMatches = lastTournamentState.current.rounds.flatMap((r) => r.matches);
+
+      const newlyCompleted = allCurrentMatches.filter(current => {
+          if (!current.winner || current.isBye) return false;
+          const previous = allPreviousMatches.find(p => p.id === current.id);
+          return !previous || !previous.winner;
+      });
+
+      newlyCompleted.forEach((match: Match, index) => {
+          setTimeout(() => {
               toast({
-                title: "Team Eliminated 😔",
-                description: `${match.loser.name} has been eliminated from the tournament`,
-                duration: 4000,
+                  title: "Match Complete! 🏆",
+                  description: `${match.winner?.name} defeated ${match.loser?.name || 'opponent'}`,
+                  duration: 4000,
               });
-            }, 1000);
-          }
-          
-          setLastCompletedMatches(prev => new Set([...prev, match.id]));
-        }
+
+              if (match.loser) {
+                  setTimeout(() => {
+                      toast({
+                          title: "Team Eliminated 😔",
+                          description: `${match.loser?.name} has been eliminated from the tournament`,
+                          duration: 4000,
+                      });
+                  }, 1000);
+              }
+          }, index * 2000); // Stagger notifications
       });
 
       // Check for ties in current match
-      if (currentMatch && lastTournamentState) {
-        const previousMatch = lastTournamentState.rounds
-          ?.flatMap((r: any) => r.matches)
-          ?.find((m: any) => m.id === currentMatch.id);
-        
-        if (previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
-          // Check if a new tie occurred
+      const currentMatch = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
+      const previousMatch = allPreviousMatches.find(m => m.id === tournament.currentMatchId);
+
+      if (currentMatch && previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
           if (currentMatch.moveHistory.length > previousMatch.moveHistory.length) {
-            const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
-            if (latestRound.pod1 === latestRound.pod2) {
-              toast({
-                title: "Tie in Current Match! 🤝",
-                description: `${currentMatch.pod1?.name} vs ${currentMatch.pod2?.name} - both chose ${latestRound.pod1}. They must play again!`,
-                duration: 5000,
-              });
-            }
+              const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
+              if (latestRound.pod1 === latestRound.pod2) {
+                  toast({
+                      title: "Tie in Current Match! 🤝",
+                      description: `${currentMatch.pod1?.name} vs ${currentMatch.pod2?.name} - both chose ${latestRound.pod1}. They must play again!`,
+                      duration: 5000,
+                  });
+              }
           }
-        }
       }
     }
     if (tournament) {
-      setLastTournamentState(JSON.parse(JSON.stringify(tournament)));
+      lastTournamentState.current = JSON.parse(JSON.stringify(tournament));
     }
-  }, [tournament, currentMatch, toast, lastCompletedMatches, lastTournamentState]);
+  }, [tournament, toast]);
+
 
   // Redirect to team page if team parameter is present
   useEffect(() => {
@@ -129,6 +129,9 @@ export function MainPageContent() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/teams">View Teams</Link>
+            </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
@@ -167,10 +170,10 @@ export function MainPageContent() {
             <TournamentBracket rounds={tournament.rounds} />
             <div className="w-full flex flex-col gap-4">
               <Card className="p-6">
-                <CardHeader>
+                <CardHeader className="pt-0 pl-0">
                   <CardTitle>Tournament in Progress</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                   <p className="text-muted-foreground">
                     Teams are currently playing their matches. View the bracket above to see the current status.
                     {currentMatch && (
@@ -201,13 +204,13 @@ export function MainPageContent() {
                     
                     if (eliminatedTeams.length > 0) {
                       return (
-                        <div className="mt-4 p-3 bg-red-50 rounded border border-red-200">
-                          <h4 className="font-medium text-red-800 mb-2">Eliminated Teams:</h4>
+                        <div className="mt-4 p-3 bg-red-50 rounded border border-red-200 dark:bg-red-900/20 dark:border-red-500/30">
+                          <h4 className="font-medium text-red-800 dark:text-red-200 mb-2">Eliminated Teams:</h4>
                           <div className="flex flex-wrap gap-2">
                             {eliminatedTeams.map((team: any) => (
                               <span 
                                 key={team.name} 
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-sm"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-sm dark:bg-red-500/10 dark:text-red-300"
                               >
                                 <span className="grayscale">{team.emoji}</span>
                                 {team.name}

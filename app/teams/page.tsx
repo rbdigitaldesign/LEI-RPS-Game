@@ -6,8 +6,9 @@ import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PODS } from '@/lib/constants';
-import { Users, Trophy, Clock } from 'lucide-react';
+import { Users, Trophy, Clock, ArrowLeft } from 'lucide-react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
+import Link from 'next/link';
 
 export default function TeamsPage() {
   const { tournament, startTournament, resetTournament, isProcessing } = useServerTournament();
@@ -63,17 +64,17 @@ export default function TeamsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'playing':
-        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">🎮 Playing Now</span>;
+        return <span className="bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">🎮 Playing Now</span>;
       case 'waiting-opponent':
-        return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">⏳ Move Submitted</span>;
+        return <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium">⏳ Move Submitted</span>;
       case 'waiting-turn':
-        return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">⏰ Waiting Turn</span>;
+        return <span className="bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium">⏰ Waiting Turn</span>;
       case 'eliminated':
-        return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">❌ Eliminated</span>;
+        return <span className="bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300 px-2 py-1 rounded-full text-xs font-medium">❌ Eliminated</span>;
       case 'winner':
-        return <span className="bg-gold-100 text-gold-800 px-2 py-1 rounded-full text-xs font-medium">🏆 Champion</span>;
+        return <span className="bg-yellow-400 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium">🏆 Champion</span>;
       default:
-        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">⏳ Tournament Not Started</span>;
+        return <span className="bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium">⏳ Not Started</span>;
     }
   };
 
@@ -81,12 +82,15 @@ export default function TeamsPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+                <Link href="/"><ArrowLeft/> Back to Bracket</Link>
+            </Button>
           {!tournament ? (
             <Button onClick={startTournament} disabled={isProcessing}>
               {isProcessing ? 'Starting...' : 'Start Tournament'}
             </Button>
           ) : (
-            <Button variant="outline" onClick={resetTournament} disabled={isProcessing}>
+            <Button variant="destructive" onClick={resetTournament} disabled={isProcessing}>
               {isProcessing ? 'Resetting...' : 'Reset Tournament'}
             </Button>
           )}
@@ -95,43 +99,10 @@ export default function TeamsPage() {
       
       <main className="flex-grow container mx-auto p-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Rock Paper Scissors Tournament</h1>
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3"><Users/> Team Directory</h1>
           <p className="text-muted-foreground">
-            Select your team below to access your match interface, or view the tournament overview.
+            Select a team below to access their match interface, or view the tournament overview.
           </p>
-        </div>
-
-        <div className="grid gap-4 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5" />
-                Tournament Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                <Button asChild>
-                  <a href="/">View Tournament Bracket</a>
-                </Button>
-                {tournament && (
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {tournament.winner ? (
-                      <span className="flex items-center gap-1">
-                        <Trophy className="w-4 h-4 text-yellow-500" />
-                        Winner: {tournament.winner.name}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        Tournament in Progress
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -140,7 +111,7 @@ export default function TeamsPage() {
             const canPlay = status === 'playing';
             
             return (
-              <Card key={pod.name} className={`transition-all hover:shadow-md ${canPlay ? 'ring-2 ring-primary' : ''}`}>
+              <Card key={pod.name} className={`transition-all hover:shadow-lg ${canPlay ? 'ring-2 ring-primary' : ''}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

@@ -253,7 +253,7 @@ export default function TeamPage() {
         <div className="flex flex-col min-h-screen bg-background">
           <Header />
           <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
-            <Card className="w-full max-w-md text-center border-2 border-red-200">
+            <Card className="w-full max-w-md text-center border-2 border-destructive">
               <CardHeader>
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <span className="text-4xl grayscale">{teamPod.emoji}</span>
@@ -262,13 +262,13 @@ export default function TeamPage() {
                     <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
                   </div>
                 </div>
-                <div className="text-lg font-medium text-red-600">
+                <div className="text-lg font-medium text-destructive">
                   Eliminated from Tournament
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-6xl grayscale">{teamPod.emoji}</div>
-                <div className="text-lg text-red-600 font-semibold">❌ ELIMINATED</div>
+                <div className="text-lg text-destructive font-semibold">❌ ELIMINATED</div>
                 <p className="text-sm text-muted-foreground">
                   Your team has been eliminated from the tournament. Thank you for participating!
                 </p>
