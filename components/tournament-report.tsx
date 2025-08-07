@@ -94,7 +94,7 @@ export function TournamentReport({ tournament }: TournamentReportProps) {
                     <CardHeader>
                         <p className="text-sm font-medium text-accent">Ultimate Pod Champion</p>
                         <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{tournament.winner.name}</CardTitle>
-                        <p className="text-muted-foreground">Managed by {tournament.winner.manager}</p>
+                        <p className="text-muted-foreground">Represented by {tournament.winner.manager}</p>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center space-y-4">
                         <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">

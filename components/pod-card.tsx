@@ -68,7 +68,7 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
             <span className="text-4xl">{pod.emoji}</span>
           </div>
           <CardTitle className={cn("font-headline text-lg", isBoss ? "text-destructive" : "text-primary")}>{pod.name}</CardTitle>
-          <CardDescription className="text-[10px]">Managed by {pod.manager}</CardDescription>
+          <CardDescription className="text-[10px]">Represented by {pod.manager}</CardDescription>
         </CardHeader>
         <CardContent className="h-24 flex flex-col items-center justify-center p-1">
           {reveal && move ? (

@@ -167,7 +167,7 @@ export default function TeamsPage() {
                     <span className="text-4xl">{pod.emoji}</span>
                     <div>
                       <CardTitle className="text-lg">{pod.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">Managed by {pod.manager}</p>
+                      <p className="text-sm text-muted-foreground">Represented by {pod.manager}</p>
                     </div>
                   </div>
                 </CardHeader>

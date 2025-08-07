@@ -209,7 +209,7 @@ export default function TeamPage() {
                 <span className="text-4xl">{teamPod.emoji}</span>
                 <div>
                   <CardTitle className="text-2xl">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
               {isWinner ? (
@@ -259,7 +259,7 @@ export default function TeamPage() {
                   <span className="text-4xl grayscale">{teamPod.emoji}</span>
                   <div>
                     <CardTitle className="text-2xl text-muted-foreground">{teamPod.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
+                    <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                   </div>
                 </div>
                 <div className="text-lg font-medium text-destructive">
@@ -298,7 +298,7 @@ export default function TeamPage() {
                 <span className="text-4xl">{teamPod.emoji}</span>
                 <div>
                   <CardTitle className="text-2xl">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
             </CardHeader>
