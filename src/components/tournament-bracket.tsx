@@ -22,63 +22,44 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
     </div>
 );
 
-const BracketMatch = ({ match, roundId, rounds }: { match: Match, roundId: number, rounds: Round[] }) => {
-    const isFinalRound = roundId === rounds.length;
-    
+const BracketMatch = ({ match }: { match: Match }) => {
+    const hasWinner = !!match.winner;
+
     if (match.isBye && match.winner) {
         return (
-             <div className="relative">
-                <Card className="w-40 bg-card border-2 border-dashed">
-                    <CardContent className="p-0">
-                        <BracketPod 
-                            pod={match.winner} 
-                            isWinner={true}
-                            isLoser={false}
-                        />
-                         <div className="h-8 flex items-center justify-center text-[10px] text-muted-foreground italic">
-                            (Bye)
-                        </div>
-                    </CardContent>
-                </Card>
-                {!isFinalRound && (
-                    <>
-                        {/* Horizontal line out of the match */}
-                        <div className="absolute top-1/2 -right-4 h-px w-4 bg-border"></div>
-                    </>
-                )}
-             </div>
+            <Card className="w-40 bg-card border-2 border-dashed">
+                <CardContent className="p-0">
+                    <BracketPod 
+                        pod={match.winner} 
+                        isWinner={true}
+                        isLoser={false}
+                    />
+                     <div className="h-8 flex items-center justify-center text-[10px] text-muted-foreground italic">
+                        (Bye)
+                    </div>
+                </CardContent>
+            </Card>
         )
     }
 
-    const hasWinner = !!match.winner;
-
     return (
-        <div className="relative">
-            <Card className="w-40 bg-card/80 border-primary/20">
-                <CardContent className="p-0">
-                    <BracketPod 
-                        pod={match.pod1} 
-                        isWinner={hasWinner && match.winner?.id === match.pod1?.id}
-                        isLoser={hasWinner && match.winner?.id !== match.pod1?.id}
-                    />
-                    <div className="border-t border-border/50"></div>
-                    <BracketPod 
-                        pod={match.pod2} 
-                        isWinner={hasWinner && match.winner?.id === match.pod2?.id}
-                        isLoser={hasWinner && match.winner?.id !== match.pod2?.id}
-                    />
-                </CardContent>
-            </Card>
-            {!isFinalRound && (
-                 <>
-                    {/* Horizontal line out of the match */}
-                    <div className="absolute top-1/2 -right-4 h-px w-4 bg-border"></div>
-                </>
-            )}
-        </div>
+        <Card className="w-40 bg-card/80 border-primary/20">
+            <CardContent className="p-0">
+                <BracketPod 
+                    pod={match.pod1} 
+                    isWinner={hasWinner && match.winner?.id === match.pod1?.id}
+                    isLoser={hasWinner && match.winner?.id !== match.pod1?.id}
+                />
+                <div className="border-t border-border/50"></div>
+                <BracketPod 
+                    pod={match.pod2} 
+                    isWinner={hasWinner && match.winner?.id === match.pod2?.id}
+                    isLoser={hasWinner && match.winner?.id !== match.pod2?.id}
+                />
+            </CardContent>
+        </Card>
     );
 };
-
 
 export function TournamentBracket({ rounds }: { rounds: Round[] }) {
     if (!rounds || rounds.length === 0) return null;
@@ -96,26 +77,29 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                                 <div className="flex flex-col gap-10 justify-around flex-grow relative">
                                     {round.matches.map((match, matchIndex) => (
                                         <div key={match.id} className="relative z-10">
-                                            <BracketMatch match={match} roundId={round.id} rounds={rounds} />
+                                            <BracketMatch match={match} />
+                                            {/* Horizontal line out of the match */}
+                                            {roundIndex < rounds.length - 1 && (
+                                                <div className="absolute top-1/2 -right-4 h-px w-4 bg-border"></div>
+                                            )}
 
                                             {/* Vertical connector line for every pair of matches */}
                                             {matchIndex % 2 === 0 && roundIndex < rounds.length -1 && (
-                                                <div 
-                                                    className="absolute w-px bg-border"
-                                                    style={{
-                                                        height: `calc(100% + 2.5rem)`, // 100% of parent + gap
-                                                        right: '-1rem', 
-                                                        top: '50%',
-                                                    }}
-                                                />
-                                            )}
-                                            {roundIndex < rounds.length - 1 && (
-                                                <div className="absolute w-4 h-px bg-border"
-                                                style={{
-                                                    top: `calc(50% + ((100% + 2.5rem) / 2) * ${matchIndex % 2 === 0 ? -1 : 1})`,
-                                                    right: '-2rem',
-                                                }}
-                                                />
+                                                <>
+                                                    <div 
+                                                        className="absolute w-px bg-border"
+                                                        style={{
+                                                            height: `calc(100% + 2.5rem)`, // 100% of parent + gap
+                                                            right: '-1rem', 
+                                                            top: '50%',
+                                                        }}
+                                                    />
+                                                     <div className="absolute w-4 h-px bg-border -right-1"
+                                                        style={{
+                                                            top: `calc(50% + ((100% + 2.5rem) / 2))`,
+                                                        }}
+                                                    />
+                                                </>
                                             )}
                                         </div>
                                     ))}
@@ -129,3 +113,4 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
         </Card>
     );
 }
+
