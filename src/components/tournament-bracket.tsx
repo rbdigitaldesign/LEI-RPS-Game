@@ -22,130 +22,98 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
     </div>
 );
 
-const BracketMatch = ({ match }: { match: Match }) => {
+const BracketMatch = ({ match, roundId, rounds }: { match: Match, roundId: number, rounds: Round[] }) => {
+    const isFinalRound = roundId === rounds.length;
+    
     if (match.isBye && match.winner) {
         return (
-             <Card className="w-52 bg-card border-2 border-dashed">
-                <CardContent className="p-0">
-                    <BracketPod 
-                        pod={match.winner} 
-                        isWinner={true}
-                        isLoser={false}
-                    />
-                     <div className="h-10 flex items-center justify-center text-xs text-muted-foreground italic">
-                        (Bye)
-                    </div>
-                </CardContent>
-            </Card>
+             <div className="relative">
+                <Card className="w-56 bg-card border-2 border-dashed">
+                    <CardContent className="p-0">
+                        <BracketPod 
+                            pod={match.winner} 
+                            isWinner={true}
+                            isLoser={false}
+                        />
+                         <div className="h-10 flex items-center justify-center text-xs text-muted-foreground italic">
+                            (Bye)
+                        </div>
+                    </CardContent>
+                </Card>
+                {!isFinalRound && (
+                    <>
+                        {/* Horizontal line out of the match */}
+                        <div className="absolute top-1/2 -right-8 h-px w-8 bg-border"></div>
+                    </>
+                )}
+             </div>
         )
     }
 
     const hasWinner = !!match.winner;
 
     return (
-        <Card className="w-52 bg-card/80 border-primary/20">
-            <CardContent className="p-0">
-                <BracketPod 
-                    pod={match.pod1} 
-                    isWinner={hasWinner && match.winner?.id === match.pod1?.id}
-                    isLoser={hasWinner && match.winner?.id !== match.pod1?.id}
-                />
-                <div className="border-t border-border/50"></div>
-                <BracketPod 
-                    pod={match.pod2} 
-                    isWinner={hasWinner && match.winner?.id === match.pod2?.id}
-                    isLoser={hasWinner && match.winner?.id !== match.pod2?.id}
-                />
-            </CardContent>
-        </Card>
-    );
-};
-
-const RoundColumn = ({ round, isRightSide = false }: { round: Round, isRightSide?: boolean }) => {
-  return (
-    <div className="flex flex-col justify-center h-full">
-      <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4 h-5">
-        {round.name}
-      </h3>
-      <div className="flex flex-col gap-12 justify-around flex-grow py-8">
-        {round.matches.map((match, matchIndex) => (
-          <div key={match.id} className="relative">
-            <BracketMatch match={match} />
-            {/* Connector lines pointing to the next match */}
-            <div
-              className={cn(
-                "absolute top-1/2 w-6 border-t-2 border-border",
-                isRightSide ? "-left-6" : "-right-6"
-              )}
-            />
-             {/* Vertical connector line joining two matches */}
-            {matchIndex % 2 === 0 && (
-              <div
-                className={cn(
-                  "absolute h-[calc(100%_+_3rem)] w-px top-1/2 bg-border",
-                  isRightSide ? "left-[-1.5rem]" : "right-[-1.5rem]"
-                )}
-              />
+        <div className="relative">
+            <Card className="w-56 bg-card/80 border-primary/20">
+                <CardContent className="p-0">
+                    <BracketPod 
+                        pod={match.pod1} 
+                        isWinner={hasWinner && match.winner?.id === match.pod1?.id}
+                        isLoser={hasWinner && match.winner?.id !== match.pod1?.id}
+                    />
+                    <div className="border-t border-border/50"></div>
+                    <BracketPod 
+                        pod={match.pod2} 
+                        isWinner={hasWinner && match.winner?.id === match.pod2?.id}
+                        isLoser={hasWinner && match.winner?.id !== match.pod2?.id}
+                    />
+                </CardContent>
+            </Card>
+            {!isFinalRound && (
+                 <>
+                    {/* Horizontal line out of the match */}
+                    <div className="absolute top-1/2 -right-8 h-px w-8 bg-border"></div>
+                </>
             )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
 
 export function TournamentBracket({ rounds }: { rounds: Round[] }) {
     if (!rounds || rounds.length === 0) return null;
 
-    const finalRoundIndex = rounds.length - 1;
-    const finalRound = rounds[finalRoundIndex];
-
-    const leftBracketRounds: Round[] = [];
-    const rightBracketRounds: Round[] = [];
-    
-    // Process all rounds except the final
-    rounds.slice(0, finalRoundIndex).forEach(round => {
-        const midPoint = round.matches.length / 2;
-        leftBracketRounds.push({ ...round, matches: round.matches.slice(0, midPoint) });
-        rightBracketRounds.push({ ...round, matches: round.matches.slice(midPoint) });
-    });
-
     return (
         <Card className="w-full bg-card border-2 overflow-hidden">
             <CardContent className="p-4">
-                 <ScrollArea className="w-full whitespace-nowrap" >
-                    <div className="flex justify-between items-center p-8 min-h-[700px]">
-                        
-                        {/* Left Bracket */}
-                        <div className="flex gap-16 items-center">
-                            {leftBracketRounds.map((round) => (
-                                <RoundColumn key={`left-${round.id}`} round={round} />
-                            ))}
-                        </div>
+                 <ScrollArea className="w-full whitespace-nowrap">
+                    <div className="flex gap-16 items-center py-4">
+                        {rounds.map((round, roundIndex) => (
+                            <div key={round.id} className="flex flex-col justify-center h-full">
+                                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4 h-5">
+                                    {round.name}
+                                </h3>
+                                <div className="flex flex-col gap-12 justify-around flex-grow relative">
+                                    {round.matches.map((match, matchIndex) => (
+                                        <div key={match.id} className="relative z-10">
+                                            <BracketMatch match={match} roundId={round.id} rounds={rounds} />
 
-                        {/* Final */}
-                         <div className="flex flex-col justify-center items-center h-full">
-                             <h3 className="text-center font-bold text-accent uppercase tracking-widest text-lg mb-4 h-5">
-                                 {finalRound.name}
-                             </h3>
-                             <div className="flex flex-col justify-around flex-grow">
-                                {finalRound.matches.map((match) => (
-                                    <div key={match.id} className="relative">
-                                        <BracketMatch match={match} />
-                                         <div className="absolute top-1/2 -left-6 w-6 border-t-2 border-border"></div>
-                                         <div className="absolute top-1/2 -right-6 w-6 border-t-2 border-border"></div>
-                                    </div>
-                                ))}
+                                            {/* Vertical connector line for every pair of matches */}
+                                            {matchIndex % 2 === 0 && roundIndex < rounds.length -1 && (
+                                                <div 
+                                                    className="absolute w-px bg-border"
+                                                    style={{
+                                                        height: `calc(100% + 3rem)`, // 100% of parent + gap
+                                                        right: '-2rem', // in the middle of the horizontal lines
+                                                        top: '50%',
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                         </div>
-                        
-                        {/* Right Bracket */}
-                        <div className="flex flex-row-reverse gap-16 items-center">
-                             {rightBracketRounds.reverse().map((round) => (
-                                <RoundColumn key={`right-${round.id}`} round={round} isRightSide/>
-                            ))}
-                        </div>
+                        ))}
                     </div>
                     <ScrollBar orientation="horizontal" />
                 </ScrollArea>

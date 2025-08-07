@@ -5,21 +5,73 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { PODS } from '@/lib/constants';
-import { Users, Trophy, Clock, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft } from 'lucide-react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import Link from 'next/link';
 
 export default function TeamsPage() {
   const { tournament, startTournament, resetTournament, isProcessing } = useServerTournament();
   const [isClient, setIsClient] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'Part3') {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Incorrect password. Please try again.');
+      setPassword('');
+    }
+  };
+
   if (!isClient) {
     return null;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <Header>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/">
+              <ArrowLeft /> Back to Bracket
+            </Link>
+          </Button>
+        </Header>
+        <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Password Required</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                <p className="text-muted-foreground">Please enter the password to access the team management page.</p>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  autoFocus
+                />
+                {error && <p className="text-sm text-destructive">{error}</p>}
+                <Button type="submit" className="w-full">
+                  Submit
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
   }
 
   const getTeamStatus = (teamName: string) => {
@@ -29,7 +81,6 @@ export default function TeamsPage() {
       return tournament.winner.name === teamName ? 'winner' : 'eliminated';
     }
 
-    // Check if team has a current match
     const currentMatch = tournament.rounds
       .flatMap(r => r.matches)
       .find(m => 
@@ -40,7 +91,7 @@ export default function TeamsPage() {
 
     if (currentMatch) {
       const teamIsPod1 = currentMatch.pod1?.name === teamName;
-      const teamMove = teamIsPod1 ? currentMatch.moves?.pod1 : currentMatch.moves?.pod2;
+      const teamMove = teamIsPod1 ? (currentMatch.moves as any)?.pod1 : (currentMatch.moves as any)?.pod2;
       
       if (teamMove) {
         return 'waiting-opponent';
@@ -49,7 +100,6 @@ export default function TeamsPage() {
       }
     }
 
-    // Check if team is eliminated
     const isEliminated = tournament.rounds
       .flatMap(r => r.matches)
       .some(m => m.loser?.name === teamName);
@@ -131,7 +181,7 @@ export default function TeamsPage() {
                       variant={canPlay ? "default" : "outline"}
                       size="sm"
                     >
-                      <a href={`/team/${encodeURIComponent(pod.name)}`}>
+                      <a href={`/team/${encodeURIComponent(pod.name)}`} target="_blank" rel="noopener noreferrer">
                         {canPlay ? 'Play Now!' : 'Team Page'}
                       </a>
                     </Button>
