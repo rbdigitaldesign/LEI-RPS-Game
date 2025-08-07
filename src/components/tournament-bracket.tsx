@@ -8,14 +8,14 @@ import { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boolean, isLoser: boolean }) => (
     <div className={cn(
-        "flex items-center gap-2 p-1 text-[10px] h-6",
+        "flex items-center gap-2 p-2 text-sm h-8",
         isWinner && "font-bold text-primary",
         isLoser && "text-muted-foreground line-through opacity-70",
         !pod && "italic text-muted-foreground"
     )}>
         {pod ? (
             <>
-                <span className="text-sm">{pod.emoji}</span>
+                <span className="text-lg">{pod.emoji}</span>
                 <span className="truncate">{pod.name}</span>
             </>
         ) : "TBD"}
@@ -25,7 +25,7 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
 const BracketMatch = ({ match }: { match: Match }) => {
     const hasWinner = !!match.winner;
     return (
-        <Card className="w-48 bg-card/50 border-primary/20">
+        <Card className="w-56 bg-card/50 border-primary/20">
             <CardContent className="p-0">
                 <BracketPod 
                     pod={match.pod1} 
@@ -54,7 +54,7 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                     <div className="flex gap-8 items-stretch">
                         {rounds.map((round) => (
                             <div key={round.id} className="flex flex-col h-full">
-                                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4">
+                                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-lg mb-4">
                                     {round.name}
                                 </h3>
                                 <div className="flex flex-col gap-8 relative justify-around flex-grow">
