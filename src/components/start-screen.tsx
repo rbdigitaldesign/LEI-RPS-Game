@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Header } from './header';
+import Link from 'next/link';
 
 type StartScreenProps = {
     onStartTournament: () => void;
@@ -14,7 +15,11 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
-      <Header />
+      <Header>
+        <Button asChild variant="secondary" size="sm">
+          <Link href="/teams">View Teams</Link>
+        </Button>
+      </Header>
       <main className="flex-grow flex items-center justify-center p-4">
         <motion.div
             initial={{ opacity: 0, y: -50 }}
