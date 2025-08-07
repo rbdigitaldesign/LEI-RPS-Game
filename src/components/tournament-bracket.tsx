@@ -61,62 +61,55 @@ const BracketMatch = ({ match }: { match: Match }) => {
     );
 };
 
-
-const RoundColumn = ({ round, roundIndex, totalRounds, isRightSide = false }: { round: Round, roundIndex: number, totalRounds: number, isRightSide?: boolean }) => {
-    const isFinalRound = roundIndex === totalRounds - 1;
-
-    return (
-        <div className="flex flex-col justify-center h-full space-y-12">
-            {!isFinalRound && (
-                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4 h-5">
-                    {round.name}
-                </h3>
+const RoundColumn = ({ round, isRightSide = false }: { round: Round, isRightSide?: boolean }) => {
+  return (
+    <div className="flex flex-col justify-center h-full">
+      <h3 className="text-center font-bold text-accent uppercase tracking-widest text-sm mb-4 h-5">
+        {round.name}
+      </h3>
+      <div className="flex flex-col gap-12 justify-around flex-grow py-8">
+        {round.matches.map((match, matchIndex) => (
+          <div key={match.id} className="relative">
+            <BracketMatch match={match} />
+            {/* Connector lines pointing to the next match */}
+            <div
+              className={cn(
+                "absolute top-1/2 w-6 border-t-2 border-border",
+                isRightSide ? "-left-6" : "-right-6"
+              )}
+            />
+             {/* Vertical connector line joining two matches */}
+            {matchIndex % 2 === 0 && (
+              <div
+                className={cn(
+                  "absolute h-[calc(100%_+_3rem)] w-px top-1/2 bg-border",
+                  isRightSide ? "left-[-1.5rem]" : "right-[-1.5rem]"
+                )}
+              />
             )}
-            <div className={cn(
-                "flex flex-col justify-around flex-grow gap-20", 
-                 roundIndex > 0 && "py-12"
-            )}>
-                {round.matches.map((match) => (
-                    <div key={match.id} className="relative">
-                        <BracketMatch match={match} />
-                        {!isFinalRound && (
-                             <div 
-                                className={cn("absolute top-1/2 w-6 border-t-2 border-border", isRightSide ? "-left-6" : "right-0")}
-                            />
-                        )}
-                       
-                        {roundIndex < totalRounds - 2 && (
-                             <div 
-                                className={cn("absolute h-full w-px top-0 bg-border", isRightSide ? "left-[-1.5rem]" : "right-[-1.5rem]")}
-                                style={{ height: `calc(100% + ${5 + (roundIndex * 2)}rem)`}}
-                            />
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 
 export function TournamentBracket({ rounds }: { rounds: Round[] }) {
     if (!rounds || rounds.length === 0) return null;
 
-    const totalRounds = rounds.length;
-    const finalRoundIndex = totalRounds - 1;
+    const finalRoundIndex = rounds.length - 1;
     const finalRound = rounds[finalRoundIndex];
 
     const leftBracketRounds: Round[] = [];
     const rightBracketRounds: Round[] = [];
-
-    // Split all rounds before the final
-    for(let i=0; i < finalRoundIndex; i++) {
-        const round = rounds[i];
-        const midPoint = Math.ceil(round.matches.length / 2);
-        
+    
+    // Process all rounds except the final
+    rounds.slice(0, finalRoundIndex).forEach(round => {
+        const midPoint = round.matches.length / 2;
         leftBracketRounds.push({ ...round, matches: round.matches.slice(0, midPoint) });
         rightBracketRounds.push({ ...round, matches: round.matches.slice(midPoint) });
-    }
+    });
 
     return (
         <Card className="w-full bg-card border-2 overflow-hidden">
@@ -126,8 +119,8 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                         
                         {/* Left Bracket */}
                         <div className="flex gap-16 items-center">
-                            {leftBracketRounds.map((round, index) => (
-                                <RoundColumn key={`left-${round.id}`} round={round} roundIndex={index} totalRounds={totalRounds}/>
+                            {leftBracketRounds.map((round) => (
+                                <RoundColumn key={`left-${round.id}`} round={round} />
                             ))}
                         </div>
 
@@ -149,8 +142,8 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                         
                         {/* Right Bracket */}
                         <div className="flex flex-row-reverse gap-16 items-center">
-                            {rightBracketRounds.map((round, index) => (
-                                <RoundColumn key={`right-${round.id}`} round={round} roundIndex={index} totalRounds={totalRounds} isRightSide/>
+                             {rightBracketRounds.reverse().map((round) => (
+                                <RoundColumn key={`right-${round.id}`} round={round} isRightSide/>
                             ))}
                         </div>
                     </div>
