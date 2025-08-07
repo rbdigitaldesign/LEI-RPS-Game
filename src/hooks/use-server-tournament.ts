@@ -11,11 +11,15 @@ export function useServerTournament() {
     try {
       const response = await fetch('/api/tournament');
       const data = await response.json();
-      setTournament(data.tournament);
+      
+      // Prevent re-render if tournament state is the same
+      if (JSON.stringify(data.tournament) !== JSON.stringify(tournament)) {
+        setTournament(data.tournament);
+      }
     } catch (error) {
       console.error('Failed to fetch tournament:', error);
     }
-  }, []);
+  }, [tournament]);
 
   const startTournament = useCallback(async () => {
     setIsProcessing(true);
@@ -57,8 +61,6 @@ export function useServerTournament() {
   }, []);
 
   useEffect(() => {
-    fetchTournament();
-    // Poll for updates every 3 seconds
     const interval = setInterval(fetchTournament, 3000);
     return () => clearInterval(interval);
   }, [fetchTournament]);
