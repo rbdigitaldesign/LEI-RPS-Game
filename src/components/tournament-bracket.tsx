@@ -28,7 +28,7 @@ const BracketMatch = ({ match, roundId, rounds }: { match: Match, roundId: numbe
     if (match.isBye && match.winner) {
         return (
              <div className="relative">
-                <Card className="w-56 bg-card border-2 border-dashed">
+                <Card className="w-64 bg-card border-2 border-dashed">
                     <CardContent className="p-0">
                         <BracketPod 
                             pod={match.winner} 
@@ -54,7 +54,7 @@ const BracketMatch = ({ match, roundId, rounds }: { match: Match, roundId: numbe
 
     return (
         <div className="relative">
-            <Card className="w-56 bg-card/80 border-primary/20">
+            <Card className="w-64 bg-card/80 border-primary/20">
                 <CardContent className="p-0">
                     <BracketPod 
                         pod={match.pod1} 
