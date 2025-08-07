@@ -33,52 +33,95 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
   let rounds: Round[] = [];
   let podsForNextRound: (Pod | null)[] = [...shuffledPods];
   
-  for (let i = 0; i < totalRounds; i++) {
-      const roundMatches: Match[] = [];
-      const isFirstRound = i === 0;
-      let matchCounter = 0;
-      let byePods: Pod[] = [];
-      
-      if (isFirstRound && byesCount > 0) {
-          byePods = podsForNextRound.slice(0, byesCount) as Pod[];
-          podsForNextRound = podsForNextRound.slice(byesCount);
-      }
+  // First round with byes
+  const round1Matches: Match[] = [];
+  let podsToPlay = podsForNextRound;
 
-      for (let j = 0; j < podsForNextRound.length; j += 2) {
-          roundMatches.push({
-              id: `r${i + 1}-m${matchCounter++}`,
-              pod1: podsForNextRound[j],
-              pod2: podsForNextRound[j + 1],
-              winner: null,
-              loser: null,
-              moveHistory: [],
-          });
-      }
-      
-      if (isFirstRound) {
-          byePods.forEach((pod, k) => {
-              roundMatches.unshift({
-                  id: `r${i + 1}-bye${k}`,
-                  pod1: pod,
-                  pod2: null,
-                  winner: pod,
-                  loser: null,
-                  isBye: true,
-                  moveHistory: [],
-              });
-          });
-      }
+  if (byesCount > 0) {
+    const byePods = podsForNextRound.slice(0, byesCount);
+    podsToPlay = podsForNextRound.slice(byesCount);
 
-      rounds.push({ 
-        id: i + 1, 
-        name: i === totalRounds - 1 ? 'Final' : 
-              i === totalRounds - 2 ? 'Semi-Final' : 
-              i === totalRounds - 3 ? 'Quarter-Final' : 
-              `Round ${i + 1}`,
-        matches: roundMatches 
+    byePods.forEach((pod, index) => {
+      round1Matches.push({
+        id: `r1-bye${index}`,
+        pod1: pod,
+        pod2: null,
+        winner: pod,
+        loser: null,
+        isBye: true,
+        moveHistory: [],
       });
+    });
+  }
 
-      podsForNextRound = new Array(roundMatches.length).fill(null);
+  for (let j = 0; j < podsToPlay.length; j += 2) {
+    round1Matches.push({
+      id: `r1-m${j/2}`,
+      pod1: podsToPlay[j],
+      pod2: podsToPlay[j+1],
+      winner: null,
+      loser: null,
+      moveHistory: [],
+    });
+  }
+  
+  rounds.push({ id: 1, name: 'Round 1', matches: round1Matches });
+  
+  // Subsequent rounds
+  for (let i = 1; i < totalRounds; i++) {
+    const previousRoundMatches = rounds[i - 1].matches;
+    const nextRoundMatches: Match[] = [];
+    
+    // Get winners from the previous round
+    const winners = previousRoundMatches.map(m => m.winner).filter(Boolean);
+
+    // Group winners into pairs for the new matches
+    for (let j = 0; j < winners.length; j += 2) {
+      nextRoundMatches.push({
+        id: `r${i + 1}-m${j/2}`,
+        pod1: winners[j],
+        pod2: winners[j+1],
+        winner: null,
+        loser: null,
+        moveHistory: [],
+      });
+    }
+
+    // Fill remaining matches with null pods to create the bracket structure
+    const requiredMatches = (nextPowerOfTwo / (2 ** (i + 1)));
+    while (nextRoundMatches.length < requiredMatches) {
+        nextRoundMatches.push({
+            id: `r${i + 1}-m${nextRoundMatches.length}`,
+            pod1: null,
+            pod2: null,
+            winner: null,
+            loser: null,
+            moveHistory: [],
+        });
+    }
+    
+    let roundName = `Round ${i + 1}`;
+    if (i === totalRounds - 1) roundName = 'Final';
+    else if (i === totalRounds - 2) roundName = 'Semi-Final';
+    else if (i === totalRounds - 3) roundName = 'Quarter-Final';
+
+    rounds.push({ id: i + 1, name: roundName, matches: nextRoundMatches });
+  }
+
+  // Set initial pods for advancing winners
+  for(let i = 0; i < rounds.length - 1; i++) {
+    const currentRoundMatches = rounds[i].matches;
+    for(let j = 0; j < currentRoundMatches.length; j++) {
+      const winner = currentRoundMatches[j].winner;
+      if (winner) {
+        const nextMatchIndex = Math.floor(j/2);
+        if (j % 2 === 0) {
+          rounds[i+1].matches[nextMatchIndex].pod1 = winner;
+        } else {
+          rounds[i+1].matches[nextMatchIndex].pod2 = winner;
+        }
+      }
+    }
   }
 
   const firstPlayableMatch = rounds[0].matches.find(m => !m.isBye && m.pod1 && m.pod2);
