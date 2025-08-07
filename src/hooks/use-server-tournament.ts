@@ -12,14 +12,17 @@ export function useServerTournament() {
       const response = await fetch('/api/tournament');
       const data = await response.json();
       
-      // Prevent re-render if tournament state is the same
-      if (JSON.stringify(data.tournament) !== JSON.stringify(tournament)) {
-        setTournament(data.tournament);
-      }
+      setTournament((prevTournament) => {
+        if (JSON.stringify(data.tournament) !== JSON.stringify(prevTournament)) {
+          return data.tournament;
+        }
+        return prevTournament;
+      });
+
     } catch (error) {
       console.error('Failed to fetch tournament:', error);
     }
-  }, [tournament]);
+  }, []);
 
   const startTournament = useCallback(async () => {
     setIsProcessing(true);
@@ -61,6 +64,7 @@ export function useServerTournament() {
   }, []);
 
   useEffect(() => {
+    fetchTournament(); 
     const interval = setInterval(fetchTournament, 3000);
     return () => clearInterval(interval);
   }, [fetchTournament]);
