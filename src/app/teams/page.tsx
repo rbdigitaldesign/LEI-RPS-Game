@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { PODS } from '@/lib/constants';
 import { Users, ArrowLeft, Bot } from 'lucide-react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
@@ -14,66 +13,15 @@ import Link from 'next/link';
 export default function TeamsPage() {
   const { tournament, startTournament, resetTournament, isProcessing } = useServerTournament();
   const [isClient, setIsClient] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === 'Part3') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Incorrect password. Please try again.');
-      setPassword('');
-    }
-  };
-
   if (!isClient) {
     return null;
   }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <Header>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/">
-              <ArrowLeft /> Back to Bracket
-            </Link>
-          </Button>
-        </Header>
-        <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Password Required</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                <p className="text-muted-foreground">Please enter the password to access the team management page.</p>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  autoFocus
-                />
-                {error && <p className="text-sm text-destructive">{error}</p>}
-                <Button type="submit" className="w-full">
-                  Submit
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
-    );
-  }
-
+  
   const getTeamStatus = (teamName: string) => {
     if (!tournament) return 'waiting';
     
@@ -133,7 +81,7 @@ export default function TeamsPage() {
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="outline" size="sm">
-                <Link href="/"><ArrowLeft/> Back to Bracket</Link>
+                <Link href="/"><ArrowLeft/> Back to Tournament</Link>
             </Button>
           {!tournament ? (
             <Button onClick={startTournament} disabled={isProcessing}>
@@ -149,7 +97,7 @@ export default function TeamsPage() {
       
       <main className="flex-grow container mx-auto p-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3"><Users/> Pod Directory</h1>
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3"><Users/> Pod Battleground</h1>
           <p className="text-muted-foreground">
             Select a pod below to access their match interface, or view the tournament overview.
           </p>
