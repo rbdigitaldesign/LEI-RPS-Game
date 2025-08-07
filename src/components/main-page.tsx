@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,9 @@ import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
+import { useToast } from '@/hooks/use-toast';
+import type { TournamentState, Match } from '@/lib/types';
+import Link from 'next/link';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -20,10 +23,68 @@ export function MainPageContent() {
   const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const lastTournamentState = useRef<TournamentState | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Detect ties and match results to show notifications
+  useEffect(() => {
+    if (tournament && lastTournamentState.current) {
+      // Check for new completed matches
+      const allCurrentMatches = tournament.rounds.flatMap((r) => r.matches);
+      const allPreviousMatches = lastTournamentState.current.rounds.flatMap((r) => r.matches);
+
+      const newlyCompleted = allCurrentMatches.filter(current => {
+          if (!current.winner || current.isBye) return false;
+          const previous = allPreviousMatches.find(p => p.id === current.id);
+          return !previous || !previous.winner;
+      });
+
+      newlyCompleted.forEach((match: Match, index) => {
+          setTimeout(() => {
+              toast({
+                  title: "Match Complete! 🏆",
+                  description: `${match.winner?.name} defeated ${match.loser?.name || 'opponent'}`,
+                  duration: 4000,
+              });
+
+              if (match.loser) {
+                  setTimeout(() => {
+                      toast({
+                          title: "Team Eliminated 😔",
+                          description: `${match.loser?.name} has been eliminated from the tournament`,
+                          duration: 4000,
+                      });
+                  }, 1000);
+              }
+          }, index * 2000); // Stagger notifications
+      });
+
+      // Check for ties in current match
+      const currentMatch = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
+      const previousMatch = allPreviousMatches.find(m => m.id === tournament.currentMatchId);
+
+      if (currentMatch && previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
+          if (currentMatch.moveHistory.length > previousMatch.moveHistory.length) {
+              const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
+              if (latestRound.pod1 === latestRound.pod2) {
+                  toast({
+                      title: "Tie in Current Match! 🤝",
+                      description: `${currentMatch.pod1?.name} vs ${currentMatch.pod2?.name} - both chose ${latestRound.pod1}. They must play again!`,
+                      duration: 5000,
+                  });
+              }
+          }
+      }
+    }
+    if (tournament) {
+      lastTournamentState.current = JSON.parse(JSON.stringify(tournament));
+    }
+  }, [tournament, toast]);
+
 
   // Redirect to team page if team parameter is present
   useEffect(() => {
@@ -68,6 +129,9 @@ export function MainPageContent() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header>
         <div className="flex items-center gap-2">
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/teams">View Teams</Link>
+            </Button>
             <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
                 Reset
             </Button>
