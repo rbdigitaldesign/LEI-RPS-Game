@@ -16,6 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
+import { AnnouncementModal } from './announcement-modal';
+import { TieAnnouncementModal } from './tie-announcement-modal';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -26,6 +28,8 @@ export function MainPageContent() {
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const lastTournamentState = useRef<TournamentState | null>(null);
+  const [lastCompletedMatch, setLastCompletedMatch] = useState<Match | null>(null);
+  const [isTie, setIsTie] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,7 +43,6 @@ export function MainPageContent() {
   // Detect ties and match results to show notifications
   useEffect(() => {
     if (tournament && lastTournamentState.current) {
-      // Check for new completed matches
       const allCurrentMatches = tournament.rounds.flatMap((r) => r.matches);
       const allPreviousMatches = lastTournamentState.current.rounds.flatMap((r) => r.matches);
 
@@ -49,39 +52,30 @@ export function MainPageContent() {
           return !previous || !previous.winner;
       });
 
-      newlyCompleted.forEach((match: Match, index) => {
-          setTimeout(() => {
-              toast({
-                  title: "Match Complete! 🏆",
-                  description: `${match.winner?.name} defeated ${match.loser?.name || 'opponent'}`,
-                  duration: 4000,
-              });
+      if (newlyCompleted.length > 0) {
+        const lastMatch = newlyCompleted[newlyCompleted.length - 1];
+        setLastCompletedMatch(lastMatch);
+        setTimeout(() => {
+          if (lastMatch.loser) {
+            toast({
+                title: "Team Eliminated 😔",
+                description: `${lastMatch.loser?.name} has been eliminated.`,
+                duration: 4000,
+            });
+          }
+        }, 1500);
+        setTimeout(() => setLastCompletedMatch(null), 4000);
+      }
 
-              if (match.loser) {
-                  setTimeout(() => {
-                      toast({
-                          title: "Team Eliminated 😔",
-                          description: `${match.loser?.name} has been eliminated from the tournament`,
-                          duration: 4000,
-                      });
-                  }, 1000);
-              }
-          }, index * 2000); // Stagger notifications
-      });
+      const currentMatchData = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
+      const previousMatchData = allPreviousMatches.find(m => m.id === tournament.currentMatchId);
 
-      // Check for ties in current match
-      const currentMatch = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
-      const previousMatch = allPreviousMatches.find(m => m.id === tournament.currentMatchId);
-
-      if (currentMatch && previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
-          if (currentMatch.moveHistory.length > previousMatch.moveHistory.length) {
-              const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
+      if (currentMatchData && previousMatchData && currentMatchData.moveHistory && previousMatchData.moveHistory) {
+          if (currentMatchData.moveHistory.length > previousMatchData.moveHistory.length) {
+              const latestRound = currentMatchData.moveHistory[currentMatchData.moveHistory.length - 1];
               if (latestRound.pod1 === latestRound.pod2) {
-                  toast({
-                      title: "Tie in Current Match! 🤝",
-                      description: `${currentMatch.pod1?.name} vs ${currentMatch.pod2?.name} - both chose ${latestRound.pod1}. They must play again!`,
-                      duration: 5000,
-                  });
+                  setIsTie(true);
+                  setTimeout(() => setIsTie(false), 4000);
               }
           }
       }
@@ -103,7 +97,6 @@ export function MainPageContent() {
     return null; // Render nothing on the server to avoid hydration errors
   }
 
-  // Show loading if redirecting to team page
   if (teamParam) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
@@ -154,6 +147,12 @@ export function MainPageContent() {
         </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 flex flex-col">
+        {isTie && <TieAnnouncementModal />}
+        {lastCompletedMatch?.winner && (
+          <AnnouncementModal
+            match={lastCompletedMatch}
+          />
+        )}
         {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
@@ -208,7 +207,6 @@ export function MainPageContent() {
                     )}
                   </p>
                   
-                  {/* Show eliminated teams */}
                   {tournament && (() => {
                     const eliminatedTeams = tournament.rounds
                       .flatMap((r: any) => r.matches)
