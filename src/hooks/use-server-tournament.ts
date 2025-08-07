@@ -10,9 +10,13 @@ export function useServerTournament() {
   const fetchTournament = useCallback(async () => {
     try {
       const response = await fetch('/api/tournament');
+      if (!response.ok) {
+        throw new Error('Failed to fetch tournament state');
+      }
       const data = await response.json();
       
       setTournament((prevTournament) => {
+        // Only update state if the tournament data has actually changed.
         if (JSON.stringify(data.tournament) !== JSON.stringify(prevTournament)) {
           return data.tournament;
         }
