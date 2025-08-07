@@ -181,11 +181,13 @@ export function MainPageContent() {
             </Card>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 items-start flex-grow">
-            <TournamentBracket rounds={tournament.rounds} />
-            <div className="w-full flex flex-col gap-4">
+          <div className="flex flex-col lg:flex-row gap-4 items-start flex-grow">
+            <div className="flex-grow w-full">
+                <TournamentBracket rounds={tournament.rounds} />
+            </div>
+            <div className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4">
               <Card className="p-6">
-                <CardHeader className="pt-0 pl-0">
+                <CardHeader className="p-0 pb-4">
                   <CardTitle>Tournament in Progress</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -245,3 +247,4 @@ export function MainPageContent() {
     </div>
   );
 }
+
