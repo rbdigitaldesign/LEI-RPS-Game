@@ -22,7 +22,7 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
     </div>
 );
 
-const BracketMatch = ({ match }: { match: Match }) => {
+const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent: boolean }) => {
     const hasWinner = !!match.winner;
 
     if (match.isBye && match.winner) {
@@ -43,7 +43,10 @@ const BracketMatch = ({ match }: { match: Match }) => {
     }
 
     return (
-        <Card className="w-48 bg-card/80 border-primary/20">
+        <Card className={cn(
+            "w-48 bg-card/80 border-primary/20",
+            isCurrent && "border-accent border-4 shadow-lg shadow-accent/20"
+        )}>
             <CardContent className="p-0">
                 <BracketPod 
                     pod={match.pod1} 
@@ -61,7 +64,7 @@ const BracketMatch = ({ match }: { match: Match }) => {
     );
 };
 
-export function TournamentBracket({ rounds }: { rounds: Round[] }) {
+export function TournamentBracket({ rounds, currentMatchId }: { rounds: Round[], currentMatchId: string | null }) {
     if (!rounds || rounds.length === 0) return null;
 
     return (
@@ -77,7 +80,7 @@ export function TournamentBracket({ rounds }: { rounds: Round[] }) {
                                 <div className="flex flex-col gap-10 justify-around flex-grow relative">
                                     {round.matches.map((match, matchIndex) => (
                                         <div key={match.id} className="relative z-10">
-                                            <BracketMatch match={match} />
+                                            <BracketMatch match={match} isCurrent={match.id === currentMatchId}/>
                                             {/* Horizontal line out of the match */}
                                             {roundIndex < rounds.length - 1 && (
                                                 <div className="absolute top-1/2 -right-4 h-px w-4 bg-border"></div>

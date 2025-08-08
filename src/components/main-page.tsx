@@ -176,7 +176,7 @@ export function MainPageContent() {
         ) : (
           <div className="flex flex-col lg:flex-row gap-4 items-start flex-grow">
             <div className="flex-grow w-full">
-                <TournamentBracket rounds={tournament.rounds} />
+                <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
             </div>
             <div className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4">
               <Card className="p-6">
@@ -234,7 +234,7 @@ export function MainPageContent() {
                 </CardContent>
               </Card>
 
-              <Card className="p-6 text-center border-accent border-4 shadow-lg shadow-accent/20">
+              <Card className="p-6 text-center">
                 <CardHeader className="p-0 pb-4">
                   <CardTitle>Latest Result</CardTitle>
                   <CardDescription>The result of the most recent match appears here.</CardDescription>
