@@ -3,7 +3,7 @@ import type { Pod, Move } from './types';
 
 export const PODS: Omit<Pod, 'id'>[] = [
   { name: 'Owls', manager: 'Rebecca', emoji: '🦉' },
-  { name: 'Racoons', manager: 'Aaron', emoji: '🦝' },
+  { name: 'Racoons', manager: 'Aaron and Dave', emoji: '🦝' },
   { name: 'Octopus', manager: 'Paul', emoji: '🐙' },
   { name: 'Dolphins', manager: 'Jamie', emoji: '🐬' },
   { name: 'Orcas', manager: 'Tim', emoji: '🐳' },
