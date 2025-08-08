@@ -8,14 +8,14 @@ import { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boolean, isLoser: boolean }) => (
     <div className={cn(
-        "flex items-center gap-2 p-1 text-[10px] h-8",
+        "flex items-center gap-2 p-2 text-xs h-10",
         isWinner && "font-bold text-primary",
         isLoser && "text-muted-foreground line-through opacity-70",
         !pod && "italic text-muted-foreground"
     )}>
         {pod ? (
             <>
-                <span className="text-base">{pod.emoji}</span>
+                <span className="text-xl">{pod.emoji}</span>
                 <span className="truncate">{pod.name}</span>
             </>
         ) : "TBD"}
@@ -27,14 +27,14 @@ const BracketMatch = ({ match }: { match: Match }) => {
 
     if (match.isBye && match.winner) {
         return (
-            <Card className="w-40 bg-card border-2 border-dashed">
+            <Card className="w-48 bg-card border-2 border-dashed">
                 <CardContent className="p-0">
                     <BracketPod 
                         pod={match.winner} 
                         isWinner={true}
                         isLoser={false}
                     />
-                     <div className="h-8 flex items-center justify-center text-[10px] text-muted-foreground italic">
+                     <div className="h-10 flex items-center justify-center text-xs text-muted-foreground italic">
                         (Bye)
                     </div>
                 </CardContent>
@@ -43,7 +43,7 @@ const BracketMatch = ({ match }: { match: Match }) => {
     }
 
     return (
-        <Card className="w-40 bg-card/80 border-primary/20">
+        <Card className="w-48 bg-card/80 border-primary/20">
             <CardContent className="p-0">
                 <BracketPod 
                     pod={match.pod1} 

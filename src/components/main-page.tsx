@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Trophy, Swords, Flame, Handshake } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
@@ -235,45 +235,49 @@ export function MainPageContent() {
               </Card>
 
               <Card className="p-6 text-center border-accent border-4 shadow-lg shadow-accent/20">
-                {isTie ? (
-                   <div className="animate-in fade-in">
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1, rotate: 360 }}
-                        transition={{ delay: 0.2, type: 'spring' }}
-                        className="mx-auto w-fit"
-                    >
-                        <Handshake className="w-16 h-16 text-yellow-500" />
-                    </motion.div>
-                    <CardTitle className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</CardTitle>
-                    <CardContent className="p-0 pt-2">
-                        <p className="text-lg text-muted-foreground">A rematch is taking place!</p>
-                    </CardContent>
-                   </div>
-                ) : lastCompletedMatch?.winner ? (
-                  <div className="animate-in fade-in">
-                    <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
-                    <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
-                    <CardTitle className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</CardTitle>
-                    <CardContent className="flex flex-col items-center space-y-4 p-0 pt-4">
-                        <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center">
-                        <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
-                        </div>
-                        <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
-                            <p className="text-lg font-semibold">Defeated</p>
-                            <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center">
-                                <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
-                            </div>
-                            <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
-                        </div>
-                    </CardContent>
-                  </div>
-                ) : (
-                    <div className="space-y-2">
-                        <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
-                        <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
+                <CardHeader className="p-0 pb-4">
+                  <CardTitle>Latest Result</CardTitle>
+                  <CardDescription>The result of the most recent match appears here.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isTie ? (
+                    <div className="animate-in fade-in">
+                      <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1, rotate: 360 }}
+                          transition={{ delay: 0.2, type: 'spring' }}
+                          className="mx-auto w-fit"
+                      >
+                          <Handshake className="w-16 h-16 text-yellow-500" />
+                      </motion.div>
+                      <h3 className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</h3>
+                      <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
                     </div>
-                )}
+                  ) : lastCompletedMatch?.winner ? (
+                    <div className="animate-in fade-in">
+                      <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
+                      <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
+                      <h3 className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
+                      <div className="flex flex-col items-center space-y-4 pt-4">
+                          <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center">
+                          <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
+                          </div>
+                          <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                              <p className="text-lg font-semibold">Defeated</p>
+                              <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center">
+                                  <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
+                              </div>
+                              <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
+                          </div>
+                      </div>
+                    </div>
+                  ) : (
+                      <div className="space-y-2">
+                          <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
+                          <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
+                      </div>
+                  )}
+                </CardContent>
               </Card>
             </div>
           </div>
