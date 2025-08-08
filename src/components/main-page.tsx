@@ -7,7 +7,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Trophy, Swords, Flame, Handshake } from 'lucide-react';
+import { Trophy, Swords, Flame, Handshake, Bot } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -17,6 +17,7 @@ import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
 import { motion } from 'framer-motion';
+import { getCommentary } from '@/ai/flows/commentary-flow';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -29,6 +30,8 @@ export function MainPageContent() {
   const lastTournamentState = useRef<TournamentState | null>(null);
   const [lastCompletedMatch, setLastCompletedMatch] = useState<Match | null>(null);
   const [isTie, setIsTie] = useState(false);
+  const [commentary, setCommentary] = useState<string>('');
+  const [isGeneratingCommentary, setIsGeneratingCommentary] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,8 +56,25 @@ export function MainPageContent() {
 
       if (newlyCompleted.length > 0) {
         const lastMatch = newlyCompleted[newlyCompleted.length - 1];
-        setIsTie(false); // A match finished, so it can't be a tie announcement
+        setIsTie(false);
         setLastCompletedMatch(lastMatch);
+        
+        // Generate commentary for the completed match
+        if (lastMatch.winner && lastMatch.loser) {
+          setIsGeneratingCommentary(true);
+          getCommentary({
+              pod1Name: lastMatch.winner.name,
+              pod2Name: lastMatch.loser.name,
+              winnerName: lastMatch.winner.name,
+          }).then(res => {
+              setCommentary(res.commentary);
+              setIsGeneratingCommentary(false);
+          }).catch(err => {
+              console.error(err);
+              setCommentary('The commentator is speechless...');
+              setIsGeneratingCommentary(false);
+          });
+        }
       }
 
       const currentMatchData = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
@@ -66,6 +86,7 @@ export function MainPageContent() {
               if (latestRound.pod1 === latestRound.pod2) {
                   setIsTie(true);
                   setLastCompletedMatch(null); // Clear last winner on a new tie
+                  setCommentary('A tie! The tension is palpable. Are we sure this aligns with the learning outcomes? Paul, can we get a rubric for this?');
               }
           }
       }
@@ -73,7 +94,7 @@ export function MainPageContent() {
     if (tournament) {
       lastTournamentState.current = JSON.parse(JSON.stringify(tournament));
     }
-  }, [tournament, toast]);
+  }, [tournament]);
 
 
   // Redirect to team page if team parameter is present
@@ -241,20 +262,23 @@ export function MainPageContent() {
                 </CardHeader>
                 <CardContent className="p-0">
                   {isTie ? (
-                    <div className="animate-in fade-in">
-                      <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1, rotate: 360 }}
-                          transition={{ delay: 0.2, type: 'spring' }}
-                          className="mx-auto w-fit"
-                      >
-                          <Handshake className="w-16 h-16 text-yellow-500" />
-                      </motion.div>
+                    <motion.div
+                      key="tie"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="animate-in fade-in"
+                    >
+                      <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
                       <h3 className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</h3>
                       <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
-                    </div>
+                    </motion.div>
                   ) : lastCompletedMatch?.winner ? (
-                    <div className="animate-in fade-in">
+                     <motion.div
+                        key={lastCompletedMatch.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="animate-in fade-in"
+                      >
                       <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
                       <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
                       <h3 className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
@@ -270,12 +294,28 @@ export function MainPageContent() {
                               <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
                           </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ) : (
                       <div className="space-y-2">
                           <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
                           <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
                       </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="p-6">
+                <CardHeader className="p-0 pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Bot />
+                    LEI Commentary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isGeneratingCommentary ? (
+                    <p className="text-muted-foreground italic animate-pulse">Commentator is thinking...</p>
+                  ) : (
+                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{commentary || 'Waiting for match to complete...'}</p>
                   )}
                 </CardContent>
               </Card>
