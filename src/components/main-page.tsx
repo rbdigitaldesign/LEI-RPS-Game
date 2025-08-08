@@ -7,7 +7,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy } from 'lucide-react';
+import { Trophy, Swords, Flame } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -55,7 +55,7 @@ export function MainPageContent() {
       if (newlyCompleted.length > 0) {
         const lastMatch = newlyCompleted[newlyCompleted.length - 1];
         setLastCompletedMatch(lastMatch);
-        setTimeout(() => setLastCompletedMatch(null), 4000);
+        // Don't clear the match so it persists
       }
 
       const currentMatchData = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
@@ -148,7 +148,7 @@ export function MainPageContent() {
       </Header>
       <main className="flex-grow container mx-auto p-4 flex flex-col">
         {isTie && <TieAnnouncementModal />}
-        {lastCompletedMatch?.winner && (
+        {lastCompletedMatch?.winner && !isTie && (
           <AnnouncementModal
             match={lastCompletedMatch}
           />
@@ -238,6 +238,32 @@ export function MainPageContent() {
                     }
                     return null;
                   })()}
+                </CardContent>
+              </Card>
+
+              <Card className="p-6">
+                <CardHeader className="p-0 pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Flame className="text-destructive" />
+                    Latest Result
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {lastCompletedMatch?.winner ? (
+                    <div className="space-y-2 animate-in fade-in">
+                        <div className="flex items-center gap-2">
+                            <span className="text-3xl">{lastCompletedMatch.winner.emoji}</span>
+                            <div className="font-bold text-lg text-primary">{lastCompletedMatch.winner.name}</div>
+                        </div>
+                        <div className="flex items-center gap-2 pl-2 text-sm">
+                            <Swords className="w-4 h-4"/>
+                            <span>Defeated</span>
+                            <span className="font-semibold text-muted-foreground">{lastCompletedMatch.loser?.name}</span>
+                        </div>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
+                  )}
                 </CardContent>
               </Card>
             </div>
