@@ -7,7 +7,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, Swords, Flame } from 'lucide-react';
+import { Trophy, Swords, Flame, Handshake } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -16,8 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
-import { AnnouncementModal } from './announcement-modal';
-import { TieAnnouncementModal } from './tie-announcement-modal';
+import { motion } from 'framer-motion';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -54,8 +53,8 @@ export function MainPageContent() {
 
       if (newlyCompleted.length > 0) {
         const lastMatch = newlyCompleted[newlyCompleted.length - 1];
+        setIsTie(false); // A match finished, so it can't be a tie announcement
         setLastCompletedMatch(lastMatch);
-        // Don't clear the match so it persists
       }
 
       const currentMatchData = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
@@ -66,7 +65,7 @@ export function MainPageContent() {
               const latestRound = currentMatchData.moveHistory[currentMatchData.moveHistory.length - 1];
               if (latestRound.pod1 === latestRound.pod2) {
                   setIsTie(true);
-                  setTimeout(() => setIsTie(false), 4000);
+                  setLastCompletedMatch(null); // Clear last winner on a new tie
               }
           }
       }
@@ -147,12 +146,6 @@ export function MainPageContent() {
         </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 flex flex-col">
-        {isTie && <TieAnnouncementModal />}
-        {lastCompletedMatch?.winner && !isTie && (
-          <AnnouncementModal
-            match={lastCompletedMatch}
-          />
-        )}
         {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
@@ -241,30 +234,46 @@ export function MainPageContent() {
                 </CardContent>
               </Card>
 
-              <Card className="p-6">
-                <CardHeader className="p-0 pb-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <Flame className="text-destructive" />
-                    Latest Result
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  {lastCompletedMatch?.winner ? (
-                    <div className="space-y-2 animate-in fade-in">
-                        <div className="flex items-center gap-2">
-                            <span className="text-3xl">{lastCompletedMatch.winner.emoji}</span>
-                            <div className="font-bold text-lg text-primary">{lastCompletedMatch.winner.name}</div>
+              <Card className="p-6 text-center border-accent border-4 shadow-lg shadow-accent/20">
+                {isTie ? (
+                   <div className="animate-in fade-in">
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1, rotate: 360 }}
+                        transition={{ delay: 0.2, type: 'spring' }}
+                        className="mx-auto w-fit"
+                    >
+                        <Handshake className="w-16 h-16 text-yellow-500" />
+                    </motion.div>
+                    <CardTitle className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</CardTitle>
+                    <CardContent className="p-0 pt-2">
+                        <p className="text-lg text-muted-foreground">A rematch is taking place!</p>
+                    </CardContent>
+                   </div>
+                ) : lastCompletedMatch?.winner ? (
+                  <div className="animate-in fade-in">
+                    <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
+                    <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
+                    <CardTitle className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</CardTitle>
+                    <CardContent className="flex flex-col items-center space-y-4 p-0 pt-4">
+                        <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center">
+                        <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
                         </div>
-                        <div className="flex items-center gap-2 pl-2 text-sm">
-                            <Swords className="w-4 h-4"/>
-                            <span>Defeated</span>
-                            <span className="font-semibold text-muted-foreground">{lastCompletedMatch.loser?.name}</span>
+                        <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                            <p className="text-lg font-semibold">Defeated</p>
+                            <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center">
+                                <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
+                            </div>
+                            <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
                         </div>
+                    </CardContent>
+                  </div>
+                ) : (
+                    <div className="space-y-2">
+                        <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
+                        <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
-                  )}
-                </CardContent>
+                )}
               </Card>
             </div>
           </div>
