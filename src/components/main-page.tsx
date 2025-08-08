@@ -17,7 +17,7 @@ import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
 import { motion } from 'framer-motion';
-import { getCommentary } from '@/ai/flows/commentary-flow';
+import { getLiveCommentary } from '@/ai/flows/commentary-flow';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -41,8 +41,46 @@ export function MainPageContent() {
       setIntroFinished(true);
     }
   }, []);
+  
+  // Continuous commentary
+  useEffect(() => {
+    const generateCommentary = async () => {
+      if (!tournament || isGeneratingCommentary) return;
 
-  // Detect ties and match results to show notifications
+      setIsGeneratingCommentary(true);
+      try {
+        const eliminatedTeamNames = tournament.rounds
+          .flatMap(r => r.matches)
+          .filter(m => m.loser)
+          .map(m => m.loser!.name);
+
+        const input = {
+          currentMatch: tournament.currentMatchId 
+            ? { pod1Name: currentMatch?.pod1?.name, pod2Name: currentMatch?.pod2?.name }
+            : undefined,
+          eliminatedTeamNames,
+          winnerName: tournament.winner?.name,
+        };
+
+        const res = await getLiveCommentary(input);
+        setCommentary(res.commentary);
+      } catch (err) {
+        console.error(err);
+        setCommentary('The commentator seems to be taking a coffee break...');
+      } finally {
+        setIsGeneratingCommentary(false);
+      }
+    };
+    
+    // Generate commentary immediately and then on an interval
+    generateCommentary();
+    const commentaryInterval = setInterval(generateCommentary, 15000); // every 15 seconds
+
+    return () => clearInterval(commentaryInterval);
+  }, [tournament, currentMatch, isGeneratingCommentary]);
+
+
+  // Detect ties and match results for the "Latest Result" card
   useEffect(() => {
     if (tournament && lastTournamentState.current) {
       const allCurrentMatches = tournament.rounds.flatMap((r) => r.matches);
@@ -58,23 +96,6 @@ export function MainPageContent() {
         const lastMatch = newlyCompleted[newlyCompleted.length - 1];
         setIsTie(false);
         setLastCompletedMatch(lastMatch);
-        
-        // Generate commentary for the completed match
-        if (lastMatch.winner && lastMatch.loser) {
-          setIsGeneratingCommentary(true);
-          getCommentary({
-              pod1Name: lastMatch.winner.name,
-              pod2Name: lastMatch.loser.name,
-              winnerName: lastMatch.winner.name,
-          }).then(res => {
-              setCommentary(res.commentary);
-              setIsGeneratingCommentary(false);
-          }).catch(err => {
-              console.error(err);
-              setCommentary('The commentator is speechless...');
-              setIsGeneratingCommentary(false);
-          });
-        }
       }
 
       const currentMatchData = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
@@ -85,8 +106,7 @@ export function MainPageContent() {
               const latestRound = currentMatchData.moveHistory[currentMatchData.moveHistory.length - 1];
               if (latestRound.pod1 === latestRound.pod2) {
                   setIsTie(true);
-                  setLastCompletedMatch(null); // Clear last winner on a new tie
-                  setCommentary('A tie! The tension is palpable. Are we sure this aligns with the learning outcomes? Paul, can we get a rubric for this?');
+                  setLastCompletedMatch(null); 
               }
           }
       }
@@ -312,10 +332,10 @@ export function MainPageContent() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  {isGeneratingCommentary ? (
+                  {isGeneratingCommentary && !commentary ? (
                     <p className="text-muted-foreground italic animate-pulse">Commentator is thinking...</p>
                   ) : (
-                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{commentary || 'Waiting for match to complete...'}</p>
+                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{commentary || 'Waiting for the tournament to start...'}</p>
                   )}
                 </CardContent>
               </Card>
@@ -326,3 +346,4 @@ export function MainPageContent() {
     </div>
   );
 }
+

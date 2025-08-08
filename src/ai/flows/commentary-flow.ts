@@ -4,23 +4,28 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-const CommentaryInputSchema = z.object({
-  pod1Name: z.string().describe('The name of the first pod in the match.'),
-  pod2Name: z.string().describe('The name of the second pod in the match.'),
-  winnerName: z.string().describe('The name of the pod that won the match.'),
+const MatchInfoSchema = z.object({
+  pod1Name: z.string().optional(),
+  pod2Name: z.string().optional(),
 });
 
-export type CommentaryInput = z.infer<typeof CommentaryInputSchema>;
+const LiveCommentaryInputSchema = z.object({
+  currentMatch: MatchInfoSchema.optional().describe('The current match being played.'),
+  eliminatedTeamNames: z.array(z.string()).optional().describe('An array of names of teams that have been eliminated.'),
+  winnerName: z.string().optional().describe('The name of the overall tournament winner, if decided.'),
+});
+
+export type LiveCommentaryInput = z.infer<typeof LiveCommentaryInputSchema>;
 
 const CommentaryOutputSchema = z.object({
-  commentary: z.string().describe('The AI-generated commentary for the match.'),
+  commentary: z.string().describe('The AI-generated commentary for the tournament.'),
 });
 
 export type CommentaryOutput = z.infer<typeof CommentaryOutputSchema>;
 
-const commentaryPrompt = ai.definePrompt({
-  name: 'commentaryPrompt',
-  input: { schema: CommentaryInputSchema },
+const liveCommentaryPrompt = ai.definePrompt({
+  name: 'liveCommentaryPrompt',
+  input: { schema: LiveCommentaryInputSchema },
   output: { schema: CommentaryOutputSchema },
   prompt: `You are a sarcastic, witty, and slightly unhinged AI commentator for a Rock, Paper, Scissors tournament at a university's Learning Environments Innovation (LEI) unit. 
 
@@ -40,16 +45,22 @@ const commentaryPrompt = ai.definePrompt({
   - The media team is always busy in their "pit".
   - Laura once ate ramen and... well, you can ask if she's blaming the air conditioning again.
 
-  Match Details:
-  - Team 1: {{{pod1Name}}}
-  - Team 2: {{{pod2Name}}}
-  - Winner: {{{winnerName}}}
+  Based on the current state of the tournament, generate a short, insightful, and hilarious commentary. Keep it to a few sentences.
 
-  Generate a short, insightful, and hilarious commentary on this match result. Be creative and weave in the persona details. Keep it to a few sentences.
+  - If there is a winner, congratulate them and wrap up the tournament.
+  - If there is a current match, comment on the teams playing.
+  - If there are eliminated teams, you can mention them.
+  - If the tournament is just starting, welcome everyone.
+  - Feel free to just make a random observation using your persona.
+
+  Tournament State:
+  - Current Match: {{{currentMatch.pod1Name}}} vs {{{currentMatch.pod2Name}}}
+  - Eliminated Teams: {{#each eliminatedTeamNames}}{{{this}}}{{/each}}
+  - Winner: {{{winnerName}}}
   `,
 });
 
-export async function getCommentary(input: CommentaryInput): Promise<CommentaryOutput> {
-  const { output } = await commentaryPrompt(input);
+export async function getLiveCommentary(input: LiveCommentaryInput): Promise<CommentaryOutput> {
+  const { output } = await liveCommentaryPrompt(input);
   return output!;
 }
