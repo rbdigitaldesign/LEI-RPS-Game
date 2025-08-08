@@ -55,15 +55,6 @@ export function MainPageContent() {
       if (newlyCompleted.length > 0) {
         const lastMatch = newlyCompleted[newlyCompleted.length - 1];
         setLastCompletedMatch(lastMatch);
-        setTimeout(() => {
-          if (lastMatch.loser) {
-            toast({
-                title: "Team Eliminated 😔",
-                description: `${lastMatch.loser?.name} has been eliminated.`,
-                duration: 4000,
-            });
-          }
-        }, 1500);
         setTimeout(() => setLastCompletedMatch(null), 4000);
       }
 
