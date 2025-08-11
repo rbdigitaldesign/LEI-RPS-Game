@@ -7,7 +7,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Trophy, Swords, Flame, Handshake, Bot } from 'lucide-react';
+import { Trophy, Swords, Flame, Handshake, Bot, Info } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -411,6 +411,24 @@ export function MainPageContent() {
                       &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
                     </motion.p>
                   </AnimatePresence>
+                </CardContent>
+              </Card>
+
+              <Card className="p-6">
+                <CardHeader className="p-0 pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Info />
+                    Credits & References
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2">
+                        <li>Credit to Aaron Honson from Media team for coding prowess</li>
+                        <li>Reference Chat GPT for the image creation</li>
+                        <li>Firebase Studio and Gemini AI for the App creation</li>
+                        <li>Orca Pod for UX testing</li>
+                        <li>8-BIT BATTLE MUSIC by Dragon Fren on SoundCloud</li>
+                    </ul>
                 </CardContent>
               </Card>
 
