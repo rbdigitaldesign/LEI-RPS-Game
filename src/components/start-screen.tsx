@@ -8,6 +8,7 @@ import { Header } from './header';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 type StartScreenProps = {
     onStartTournament: () => void;
@@ -18,6 +19,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -25,17 +27,23 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
 
   const handleStartClick = () => {
     setIsLoading(true);
-    // When the user clicks start, we ensure the music is unmuted if it was manually muted.
     if (isMuted) {
       setIsMuted(false); 
     }
-
-    setTimeout(() => {
-      onStartTournament();
-    }, 4000);
+    // Simulate loading time for the nostalgic progress bar
+    const interval = setInterval(() => {
+        setProgress(prev => {
+            if (prev >= 100) {
+                clearInterval(interval);
+                setTimeout(onStartTournament, 500);
+                return 100;
+            }
+            return prev + 10;
+        });
+    }, 300);
   };
   
-  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23F44336&auto_play=${!isLoading && !isMuted}&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
+  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23F44336&auto_play=${!isMuted}&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
 
   return (
     <div className="flex flex-col min-h-screen bg-black/80">
@@ -81,10 +89,12 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center gap-4 text-primary-foreground font-sans"
+                    className="flex flex-col items-center justify-center gap-8 w-full max-w-md px-4"
                   >
-                    <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"></div>
-                    <p className="text-2xl tracking-widest animate-pulse font-headline">LOADING TOURNAMENT...</p>
+                    <p className="text-2xl tracking-widest text-primary-foreground animate-pulse font-headline">LOADING TOURNAMENT...</p>
+                    <div className="w-full bg-black/50 p-1 border-2 border-primary-foreground">
+                        <Progress value={progress} className="h-6 [&>div]:bg-primary" />
+                    </div>
                   </motion.div>
                 ) : (
                   <>
