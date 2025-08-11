@@ -19,6 +19,7 @@ import Link from 'next/link';
 export function MainPageContent() {
   const searchParams = useSearchParams();
   const teamParam = searchParams?.get('team');
+  const skipIntroParam = searchParams?.get('skipIntro');
   
   const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
   const [introFinished, setIntroFinished] = useState(false);
@@ -118,7 +119,11 @@ export function MainPageContent() {
     );
   }
 
-  if (!tournament) {
+  // Determine if we should skip intro/start screen
+  const shouldSkipIntroAndStart = skipIntroParam === 'true' && tournament;
+
+
+  if (!tournament || (!introFinished && !shouldSkipIntroAndStart)) {
     if (!introFinished) {
         return <IntroTrailer onFinished={() => setIntroFinished(true)} />;
     }

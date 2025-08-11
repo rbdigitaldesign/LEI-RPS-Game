@@ -22,7 +22,6 @@ const commentaryJokes = [
   "Quick reminder folks: your next payday is Thursday 4 September.",
   "Hey Media pod, what is the charge? Throwing a rock? A succulent Chinese rock?!",
   "Hey Media pod, just get your press secretary to win this tournament so you can all relax.",
-  "Hey Media pod, I’ve seen better visuals come out of TIU than this game.",
   "Hey Dolphin pod, is anyone wishing they could be playing Magic: The Gathering right now?",
   "Dolphin pod, please don’t performance manage anyone if they lose.",
   "Wombat pod, if you’re struggling, just tell the hosts you’ve got network issues from your “remote” workplace.",

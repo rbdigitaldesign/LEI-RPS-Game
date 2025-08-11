@@ -146,7 +146,7 @@ export default function TeamPage() {
         variant: "destructive",
       });
       const redirectTimer = setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/?skipIntro=true';
       }, 4000);
 
       return () => clearTimeout(redirectTimer);

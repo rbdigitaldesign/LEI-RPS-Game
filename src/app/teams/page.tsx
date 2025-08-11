@@ -90,7 +90,7 @@ export default function TeamsPage() {
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="outline" size="sm">
-                <Link href="/"><ArrowLeft/> Back to Tournament</Link>
+                <Link href="/?skipIntro=true"><ArrowLeft/> Back to Tournament</Link>
             </Button>
           {!tournament ? (
             <Button onClick={startTournament} disabled={isProcessing}>
