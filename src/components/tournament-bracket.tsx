@@ -10,7 +10,7 @@ const BracketPod = ({ pod, isWinner, isLoser }: { pod: Pod | null, isWinner: boo
     <div className={cn(
         "flex items-center gap-2 p-2 text-xs h-10",
         isWinner && "font-bold text-primary",
-        isLoser && "text-muted-foreground line-through opacity-70",
+        isLoser && "text-destructive line-through decoration-destructive/70 opacity-70",
         !pod && "italic text-muted-foreground"
     )}>
         {pod ? (

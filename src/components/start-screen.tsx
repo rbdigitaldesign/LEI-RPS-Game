@@ -18,7 +18,7 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             </Button>
         </div>
       </Header>
-      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-cover bg-center"
+      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-cover bg-top"
        >
         {isClient && !isMuted && (
           <iframe
