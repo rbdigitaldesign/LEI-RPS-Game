@@ -225,7 +225,16 @@ export function MainPageContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+       <Header>
+        <div className="flex items-center gap-2">
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/teams">View Pods</Link>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
+                Reset
+            </Button>
+        </div>
+      </Header>
       
       {winner ? (
         <main className="flex-grow container mx-auto p-4 flex flex-col">
