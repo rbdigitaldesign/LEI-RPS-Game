@@ -352,6 +352,9 @@ export function MainPageContent() {
                     <Bot />
                     LEI Commentary
                   </CardTitle>
+                  <CardDescription className="text-xs pt-2">
+                    These comments aren’t live match updates — just safe, evergreen banter to keep the tournament fun for everyone
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0 h-16 flex items-center justify-center">
                   <AnimatePresence mode="wait">
