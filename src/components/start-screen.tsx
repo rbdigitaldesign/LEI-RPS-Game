@@ -18,7 +18,7 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -27,9 +27,6 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
 
   const handleStartClick = () => {
     setIsLoading(true);
-    if (isMuted) {
-      setIsMuted(false); 
-    }
     // Simulate loading time for the nostalgic progress bar
     const interval = setInterval(() => {
         setProgress(prev => {
@@ -65,7 +62,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
       </Header>
       <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-cover bg-center"
        >
-        {isClient && (
+        {isClient && !isMuted && (
           <iframe
             width="0"
             height="0"
@@ -91,7 +88,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                     exit={{ opacity: 0 }}
                     className="flex flex-col items-center justify-center gap-8 w-full max-w-md px-4"
                   >
-                    <p className="text-2xl tracking-widest text-primary-foreground animate-pulse font-headline">LOADING TOURNAMENT...</p>
+                    <p className="text-2xl tracking-widest text-accent animate-pulse font-headline">LOADING TOURNAMENT...</p>
                     <div className="w-full bg-black/50 p-1 border-2 border-primary-foreground">
                         <Progress value={progress} className="h-6 [&>div]:bg-primary" />
                     </div>
