@@ -34,12 +34,8 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
       onStartTournament();
     }, 4000);
   };
-
-  if (!isClient) {
-    return null;
-  }
   
-  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23F44336&auto_play=${!isMuted}&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
+  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23F44336&auto_play=${!isLoading && !isMuted}&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
 
   return (
     <div className="flex flex-col min-h-screen bg-black/80">
@@ -100,7 +96,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                           RPS Pod Battle
                       </CardTitle>
                       <CardDescription
-                          className="text-lg md:text-2xl text-accent leading-relaxed mt-2"
+                          className="text-lg md:text-2xl text-accent leading-relaxed mt-2 font-headline"
                           style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}
                       >
                           The ultimate rock, paper, scissors showdown
