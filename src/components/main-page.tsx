@@ -267,7 +267,7 @@ export function MainPageContent() {
         </main>
       ) : (
         <div className="flex-grow">
-             <main className="mx-auto px-4 py-6 grid grid-cols-12 gap-6 w-full">
+             <main className="container mx-auto px-4 py-6 grid grid-cols-12 gap-6 w-full">
                 <div className="col-span-12 xl:col-span-8 flex flex-col gap-6">
                     <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
                     <Card className="p-4 border-slate-700 bg-slate-900/40">
@@ -285,52 +285,28 @@ export function MainPageContent() {
                     </Card>
                 </div>
                 <div className="col-span-12 xl:col-span-4 flex flex-col gap-6">
-                  {/* <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
-                    <CardHeader className="p-0 pb-4">
-                      <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Tournament in Progress</CardTitle>
+                  <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
+                    <CardHeader className="p-0 pb-2">
+                      <CardTitle className="flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
+                        <Bot size={16}/>
+                        LEI Commentary
+                      </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <p className="text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)] text-muted-foreground">
-                        Teams are playing their matches. View the bracket to see the current status.
-                        {currentMatch && (
-                          <span className="block mt-2">
-                            Current Match: <strong>{currentMatch.pod1?.name}</strong> vs <strong>{currentMatch.pod2?.name}</strong>
-                          </span>
-                        )}
-                      </p>
-                      
-                      {tournament && (() => {
-                        const eliminatedTeams = tournament.rounds
-                          .flatMap((r: any) => r.matches)
-                          .filter((m: any) => m.winner && m.loser && !m.isBye)
-                          .map((m: any) => m.loser)
-                          .filter((team: any, index: number, arr: any[]) => 
-                            arr.findIndex((t: any) => t.name === team.name) === index
-                          );
-                        
-                        if (eliminatedTeams.length > 0) {
-                          return (
-                            <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
-                              <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
-                              <div className="flex flex-wrap gap-2">
-                                {eliminatedTeams.map((team: any) => (
-                                  <span 
-                                    key={team.name} 
-                                    className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-300 rounded text-sm"
-                                  >
-                                    <span className="grayscale">{team.emoji}</span>
-                                    {team.name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      })()}
+                    <CardContent className="p-0 min-h-20 flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={currentCommentaryIndex}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.5 }}
+                          className="text-foreground text-sm italic text-center text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]"
+                        >
+                          &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
+                        </motion.p>
+                      </AnimatePresence>
                     </CardContent>
-                  </Card> */}
-
+                  </Card>
                   <Card className="p-4 md:p-6 text-center border-slate-700 bg-slate-900/40">
                     <CardHeader className="p-0 pb-4">
                       <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
@@ -378,29 +354,6 @@ export function MainPageContent() {
                               <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
                           </motion.div>
                       )}
-                      </AnimatePresence>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
-                    <CardHeader className="p-0 pb-2">
-                      <CardTitle className="flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
-                        <Bot size={16}/>
-                        LEI Commentary
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0 min-h-20 flex items-center justify-center">
-                      <AnimatePresence mode="wait">
-                        <motion.p
-                          key={currentCommentaryIndex}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.5 }}
-                          className="text-foreground text-sm italic text-center text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]"
-                        >
-                          &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
-                        </motion.p>
                       </AnimatePresence>
                     </CardContent>
                   </Card>
