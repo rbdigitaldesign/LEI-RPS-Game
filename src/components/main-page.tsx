@@ -37,7 +37,7 @@ const commentaryJokes = [
   "The beauty of RPS is these are three things impossible to merge… State Government, hold my beer.",
   "Can someone explain RPS to the newbies? BFFR.",
   "The chances of winning RPS are about the same as a new AU student dropping out.",
-  "This joke is authorised by the Integration Management Office.",
+  "These jokes are authorised by the Integration Management Office.",
   "This tournament is sponsored by the NTEU… unless you’re not a member.",
   "The prize is an upgrade to a working water tap on your level.",
   "The runner-up gets to explain pedagogy to the new VC.",
