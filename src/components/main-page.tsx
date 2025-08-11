@@ -279,7 +279,7 @@ export function MainPageContent() {
                         </CardHeader>
                         <CardContent className="p-0">
                             <p className="text-xs text-muted-foreground leading-relaxed">
-                                Acknowledgement is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. The application was developed using Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                                Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
                             </p>
                         </CardContent>
                     </Card>
