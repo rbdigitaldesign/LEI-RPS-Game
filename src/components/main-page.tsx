@@ -267,7 +267,7 @@ export function MainPageContent() {
         </main>
       ) : (
         <div className="flex-grow">
-            <main className="container mx-auto px-4 py-6 grid grid-cols-12 gap-6 max-w-screen-2xl">
+             <main className="mx-auto px-4 py-6 grid grid-cols-12 gap-6 w-full">
                 <div className="col-span-12 xl:col-span-8 flex flex-col gap-6">
                     <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
                     <Card className="p-4 border-slate-700 bg-slate-900/40">
