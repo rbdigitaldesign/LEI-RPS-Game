@@ -226,7 +226,7 @@ export function MainPageContent() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <p className="text-muted-foreground">
-                    Teams are currently playing their matches. View the bracket above to see the current status.
+                    Teams are currently playing their matches. View the tournament bracket to see the current status.
                     {currentMatch && (
                       <span className="block mt-2">
                         Current Match: <strong>{currentMatch.pod1?.name}</strong> vs <strong>{currentMatch.pod2?.name}</strong>
@@ -346,4 +346,3 @@ export function MainPageContent() {
     </div>
   );
 }
-
