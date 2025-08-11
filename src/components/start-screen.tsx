@@ -16,57 +16,24 @@ type StartScreenProps = {
 
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [isClient, setIsClient] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Start muted
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // Pre-load the music by default but keep it muted.
-    const savedMuteState = sessionStorage.getItem('rps-music-muted');
-    if (savedMuteState !== null) {
-      setIsMuted(JSON.parse(savedMuteState));
-    }
   }, []);
 
-  const handleMuteToggle = () => {
-    const newMutedState = !isMuted;
-    setIsMuted(newMutedState);
-    sessionStorage.setItem('rps-music-muted', JSON.stringify(newMutedState));
-  };
-
   const handleStartClick = () => {
-    setIsMuted(false); // Unmute for the loading sequence
     setIsLoading(true);
 
     setTimeout(() => {
-      setIsMuted(true); // Mute again after loading
       onStartTournament();
-    }, 8000); // 8-second loading time
+    }, 4000); // 4-second loading time
   };
-
-  const soundCloudSrc = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false";
 
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
-      {isClient && !isMuted && (
-        <iframe
-            key="soundcloud-player"
-            width="0"
-            height="0"
-            scrolling="no"
-            frameBorder="no"
-            allow="autoplay"
-            src={soundCloudSrc}
-            style={{ position: 'absolute', left: '-9999px' }}
-        >
-        </iframe>
-      )}
       <Header>
         <div className="flex items-center gap-2">
-            <Button variant="secondary" size="icon" onClick={handleMuteToggle}>
-                {isMuted ? <VolumeX /> : <Volume2 />}
-                <span className="sr-only">{isMuted ? 'Unmute' : 'Mute'}</span>
-            </Button>
             <Button asChild variant="secondary" size="sm">
             <Link href="/teams">View Pods</Link>
             </Button>
