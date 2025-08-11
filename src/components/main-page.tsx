@@ -205,13 +205,10 @@ export function MainPageContent() {
     );
   }
 
-  if (!preIntroFinished) {
-    const skipIntroParam = searchParams?.get('skipIntro');
-    if (skipIntroParam === 'true') {
-        setPreIntroFinished(true);
-    } else {
-        return <PreIntroScreen onStart={() => { setPreIntroFinished(true); }} />;
-    }
+  const skipIntroParam = searchParams?.get('skipIntro');
+
+  if (!preIntroFinished && skipIntroParam !== 'true') {
+      return <PreIntroScreen onStart={() => { setPreIntroFinished(true); }} />;
   }
   
   if (!introFinished) {
@@ -264,9 +261,8 @@ export function MainPageContent() {
             </Card>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-6">
-            <div className="w-full flex flex-col gap-6">
-              <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
+          <div className="container mx-auto">
+            <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
                 <div className="flex-grow w-full">
                   <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
                 </div>
@@ -321,22 +317,21 @@ export function MainPageContent() {
                       </AnimatePresence>
                     </CardContent>
                   </Card>
+                   <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base font-headline">
+                        <Info size={16} />
+                        Acknowledgements
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base font-headline">
-                    <Info size={16} />
-                    Acknowledgements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
           </div>
         )}
       </main>
@@ -344,7 +339,7 @@ export function MainPageContent() {
       {!winner && (
         <Card className="fixed top-16 right-4 w-[32rem] max-w-[calc(100%-2rem)] p-4 z-50">
           <CardHeader className="p-0 pb-2">
-            <CardTitle className="font-headline flex items-center gap-2 text-xl font-semibold">
+            <CardTitle className="font-headline flex items-center gap-2 text-2xl font-semibold">
               <Bot size={24}/>
               LEI Commentary
             </CardTitle>
@@ -357,7 +352,7 @@ export function MainPageContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.5 }}
-                className="text-foreground italic text-center text-xl"
+                className="text-foreground italic text-center text-2xl"
               >
                 &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
               </motion.p>
