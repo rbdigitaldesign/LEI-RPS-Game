@@ -58,12 +58,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             </Button>
         </div>
       </Header>
-      <main className="flex-grow flex items-center justify-center p-4" style={{ 
-          backgroundImage: `url('https://placehold.co/1920x1080.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        data-ai-hint="battle arena"
+      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-cover bg-center"
        >
         {isClient && (
           <iframe
