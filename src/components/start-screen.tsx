@@ -15,27 +15,25 @@ type StartScreenProps = {
 };
 
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
-  const [showPlayer, setShowPlayer] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // Delay showing the player to ensure autoplay works more reliably
-    const timer = setTimeout(() => setShowPlayer(true), 1000);
-    return () => clearTimeout(timer);
   }, []);
 
   const handleStartClick = () => {
-    setShowPlayer(false); // This will remove the iframe, stopping the music
+    // Stop the music by setting muted to true, which removes the iframe
+    setIsMuted(true);
     onStartTournament();
   };
 
+  // The URL should have auto_play=true. The visual player is hidden.
   const soundCloudSrc = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false";
 
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
-      {isClient && showPlayer && !isMuted && (
+      {isClient && !isMuted && (
         <iframe
             width="0"
             height="0"
