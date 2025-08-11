@@ -17,6 +17,7 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
@@ -24,11 +25,18 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
 
   const handleStartClick = () => {
     setIsLoading(true);
+    setIsMuted(false); // Unmute when loading starts
 
     setTimeout(() => {
       onStartTournament();
     }, 4000); // 4-second loading time
   };
+
+  if (!isClient) {
+    return null;
+  }
+  
+  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=${!isMuted}&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
 
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
@@ -37,9 +45,29 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             <Button asChild variant="secondary" size="sm">
             <Link href="/teams">View Pods</Link>
             </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsMuted(!isMuted)}
+              className="w-9 h-9"
+            >
+              {isMuted ? <VolumeX /> : <Volume2 />}
+              <span className="sr-only">Toggle Music</span>
+            </Button>
         </div>
       </Header>
       <main className="flex-grow flex items-center justify-center p-4">
+        {isClient && (
+          <iframe
+            width="0"
+            height="0"
+            scrolling="no"
+            frameBorder="no"
+            allow="autoplay"
+            src={soundCloudSrc}
+            style={{ display: 'none' }}
+          ></iframe>
+        )}
         <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
