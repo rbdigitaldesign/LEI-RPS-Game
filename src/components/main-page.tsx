@@ -90,7 +90,8 @@ const commentaryJokes = [
   "It’s not cheating if you win with style.",
   "Don’t let one loss shake your next throw.",
   "Paper to open, scissors to close — it’s a classic.",
-  "Rock, paper, scissors — the eternal cycle of triumph and defeat."
+  "Rock, paper, scissors — the eternal cycle of triumph and defeat.",
+  "Today is World Rock Paper Scissors Day. Celebrated annually on August 27th. It's a day to enjoy the simple, yet globally recognised game and its role in decision-making and social interaction."
 ];
 
 const shuffleArray = (array: any[]) => {
