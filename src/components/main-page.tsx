@@ -280,8 +280,21 @@ export function MainPageContent() {
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row gap-4 items-start flex-grow">
-            <div className="flex-grow w-full">
+            <div className="flex-grow w-full flex flex-col gap-4">
                 <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+                <Card className="p-4">
+                 <CardHeader className="p-0 pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Info size={16}/>
+                    Acknowledgements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                        Acknowledgement is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. The application was developed using Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                    </p>
+                </CardContent>
+              </Card>
             </div>
             <div className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4">
               <Card className="p-6">
@@ -388,17 +401,14 @@ export function MainPageContent() {
                 </CardContent>
               </Card>
               
-              <Card className="p-6">
-                <CardHeader className="p-0 pb-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <Bot />
+              <Card className="p-4">
+                <CardHeader className="p-0 pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Bot size={16}/>
                     LEI Commentary
                   </CardTitle>
-                  <CardDescription className="text-xs pt-2">
-                    These comments aren’t live match updates — just safe, evergreen banter to keep the tournament fun for everyone
-                  </CardDescription>
                 </CardHeader>
-                <CardContent className="p-0 min-h-24 flex items-center justify-center">
+                <CardContent className="p-0 min-h-20 flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     <motion.p
                       key={currentCommentaryIndex}
@@ -406,29 +416,11 @@ export function MainPageContent() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.5 }}
-                      className="text-foreground text-lg italic text-center"
+                      className="text-foreground text-sm italic text-center"
                     >
                       &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
                     </motion.p>
                   </AnimatePresence>
-                </CardContent>
-              </Card>
-
-              <Card className="p-6">
-                <CardHeader className="p-0 pb-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <Info />
-                    Credits & References
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2">
-                        <li>Credit to Aaron Honson from Media team for coding prowess</li>
-                        <li>Reference Chat GPT for the image creation</li>
-                        <li>Firebase Studio and Gemini AI for the App creation</li>
-                        <li>Orca Pod for UX testing</li>
-                        <li>8-BIT BATTLE MUSIC by Dragon Fren on SoundCloud</li>
-                    </ul>
                 </CardContent>
               </Card>
 
