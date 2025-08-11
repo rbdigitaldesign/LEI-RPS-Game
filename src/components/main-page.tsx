@@ -337,7 +337,7 @@ export function MainPageContent() {
       </main>
 
       {!winner && (
-        <Card className="fixed top-16 right-4 w-[32rem] max-w-[calc(100%-2rem)] p-4 z-50">
+        <Card className="fixed bottom-4 right-4 w-[32rem] max-w-[calc(100%-2rem)] p-4 z-50">
           <CardHeader className="p-0 pb-2">
             <CardTitle className="font-headline flex items-center gap-2 text-2xl font-semibold">
               <Bot size={24}/>
