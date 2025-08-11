@@ -285,28 +285,6 @@ export function MainPageContent() {
                     </Card>
                 </div>
                 <div className="col-span-12 xl:col-span-4 flex flex-col gap-6">
-                  <Card className="p-4 md:p-6">
-                    <CardHeader className="p-0 pb-2">
-                      <CardTitle className="font-headline flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
-                        <Bot size={16}/>
-                        LEI Commentary
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0 min-h-20 flex items-center justify-center">
-                      <AnimatePresence mode="wait">
-                        <motion.p
-                          key={currentCommentaryIndex}
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.5 }}
-                          className="text-foreground italic text-center text-lg"
-                        >
-                          &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
-                        </motion.p>
-                      </AnimatePresence>
-                    </CardContent>
-                  </Card>
                   <Card className="p-4 md:p-6 text-center">
                     <CardHeader className="p-0 pb-4">
                       <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
@@ -359,6 +337,28 @@ export function MainPageContent() {
                   </Card>
                 </div>
             </main>
+            <Card className="fixed bottom-4 right-4 w-80 max-w-full p-4 md:p-6 z-50">
+              <CardHeader className="p-0 pb-2">
+                <CardTitle className="font-headline flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
+                  <Bot size={16}/>
+                  LEI Commentary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 min-h-20 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={currentCommentaryIndex}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-foreground italic text-center text-base"
+                  >
+                    &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
+                  </motion.p>
+                </AnimatePresence>
+              </CardContent>
+            </Card>
         </div>
       )}
     </div>
