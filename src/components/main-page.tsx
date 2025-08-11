@@ -16,6 +16,7 @@ import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const commentaryItems = [
   "Quick reminder folks: your next payday is Thursday 4 September.",
@@ -318,17 +319,21 @@ export function MainPageContent() {
                     </CardContent>
                   </Card>
                    <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base font-headline">
-                        <Info size={16} />
-                        Acknowledgements
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
-                      </p>
-                    </CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="item-1" className="border-b-0">
+                        <AccordionTrigger className="p-4">
+                          <CardTitle className="flex items-center gap-2 text-base font-headline">
+                              <Info size={16} />
+                              Acknowledgements
+                          </CardTitle>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4">
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                          </p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </Card>
                 </div>
               </div>
@@ -337,10 +342,10 @@ export function MainPageContent() {
       </main>
 
       {!winner && (
-        <Card className="fixed bottom-4 right-4 w-[32rem] max-w-[calc(100%-2rem)] p-4 z-50">
+        <Card className="fixed bottom-4 right-4 w-96 max-w-[calc(100%-2rem)] p-4 z-50">
           <CardHeader className="p-0 pb-2">
-            <CardTitle className="font-headline flex items-center gap-2 text-2xl font-semibold">
-              <Bot size={24}/>
+            <CardTitle className="font-headline flex items-center gap-2 text-lg font-semibold">
+              <Bot size={20}/>
               LEI Commentary
             </CardTitle>
           </CardHeader>
@@ -352,7 +357,7 @@ export function MainPageContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.5 }}
-                className="text-foreground italic text-center text-2xl"
+                className="text-foreground italic text-center text-lg"
               >
                 &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
               </motion.p>
