@@ -19,16 +19,18 @@ export default function TeamsPage() {
   }, []);
 
   const handleReset = () => {
-    const password = prompt('Enter password to reset tournament:', '');
-    if (password === 'orcas2025') {
+    console.log("handling reset; should prompt");
+    const enteredPassword = prompt('Enter password to reset tournament:', '');
+    if (enteredPassword === 'orcas2025') {
       resetTournament();
-    } else if (password !== null) {
+      startTournament();
+    } else if (enteredPassword !== null) {
       alert('Incorrect password.');
     }
   };
 
   if (!isClient) {
-    return null;
+ return null;
   }
   
   const getTeamStatus = (teamName: string) => {

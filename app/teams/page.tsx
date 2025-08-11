@@ -18,6 +18,16 @@ export default function TeamsPage() {
     setIsClient(true);
   }, []);
 
+  const handleReset = () => {
+    console.log("handling reset; should prompt");
+    const enteredPassword = prompt('Enter password to reset tournament:', '');
+    if (enteredPassword === 'orcas2025') {
+      resetTournament();
+    } else if (enteredPassword !== null) {
+      alert('Incorrect password.');
+    }
+  };
+
   if (!isClient) {
     return null;
   }
@@ -88,7 +98,7 @@ export default function TeamsPage() {
               {isProcessing ? 'Starting...' : 'Start Tournament'}
             </Button>
           ) : (
-            <Button variant="destructive" onClick={resetTournament} disabled={isProcessing}>
+            <Button variant="destructive" onClick={handleReset} disabled={isProcessing}>
               {isProcessing ? 'Resetting...' : 'Reset Tournament'}
             </Button>
           )}

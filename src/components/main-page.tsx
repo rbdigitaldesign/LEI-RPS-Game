@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const commentaryJokes = [
+const commentaryItems = [
   "Quick reminder folks: your next payday is Thursday 4 September.",
   "Hey Media pod, what is the charge? Throwing a rock? A succulent Chinese rock?!",
   "Hey Media pod, just get your press secretary to win this tournament so you can all relax.",
@@ -37,32 +37,13 @@ const commentaryJokes = [
   "The chances of winning RPS are about the same as a new AU student dropping out.",
   "These jokes are authorised by the Integration Management Office.",
   "This tournament is sponsored by the NTEU… unless you’re not a member.",
-  "The prize is an upgrade to a working water tap on your level.",
+  "The prize for winning this tournament is an upgrade to a working water tap on your level.",
   "The runner-up gets to explain pedagogy to the new VC.",
   "The champion gets to hear the VC try to explain pedagogy.",
   "Faculty have their own version of RPS — it’s called “Caught Between a Rock and a Hard Place.”",
   "The two VCs allegedly play RPS before every town hall to decide who gets the spicy questions.",
   "Fun fact: RPS is how blank spots in the org chart are filled.",
   "Coming soon: RPS v2.0 with DLC Bomb & Laser, plus “Sulking Because You Lost” mode.",
-  "If you take issue with my comments, go to HR — I can’t be fired because I don’t exist!",
-  "In this tournament, rock is strong, steady, and impossible to fit into the stationery drawer.",
-  "Paper remains the stationery cupboard’s pride and joy.",
-  "Scissors will always be the craft cupboard’s secret weapon.",
-  "Double paper? That’s just two people trying to book the same meeting room.",
-  "Double scissors — the official handshake of this tournament.",
-  "A bold paper throw is always a “low-risk” strategy.",
-  "Rock is the geological veteran of the game.",
-  "Paper is the recycling bin’s favourite champion.",
-  "Scissors are the go-to choice for anyone who’s been near the craft supplies lately.",
-  "Some players swear by rock, others by paper, others by scissors… and some just pick randomly every time.",
-  "If you see a lot of scissors, it might be time to check the supply cupboard.",
-  "In this tournament, paper loves to wrap up rock like an urgent memo.",
-  "Rock and paper is the ultimate underdog story.",
-  "Scissors versus paper is the original “deadline cuts into lunch break” moment.",
-  "This is the only competition where stationery and geology collide.",
-  "RPS: the game where strategy meets chaos… and chaos usually wins.",
-  "This competition could go anywhere — except for a draw with rock, paper, and scissors all at once.",
-  "Remember: in this tournament, even the simplest throw can change your fate.",
   "If I got paid to play rock-paper-scissors, I’d be making money hand over fist.",
   "The Rock said he could beat any wrestler; I asked, “What about one named Paper?”",
   "Make stone scissors to cut paper — call them Rock Paper Scissors.",
@@ -91,7 +72,17 @@ const commentaryJokes = [
   "Don’t let one loss shake your next throw.",
   "Paper to open, scissors to close — it’s a classic.",
   "Rock, paper, scissors — the eternal cycle of triumph and defeat.",
-  "Today is World Rock Paper Scissors Day. Celebrated annually on August 27th. It's a day to enjoy the simple, yet globally recognised game and its role in decision-making and social interaction."
+  "Today is World Rock Paper Scissors Day. Celebrated annually on August 27th. It's a day to enjoy the simple, yet globally recognised game and its role in decision-making and social interaction.",
+  "This game dates back to the Han Dynasty in China, where it was called shoushiling.",
+  "The original Chinese version featured animals like frog, slug, and snake instead of rock, paper, scissors.",
+  "Japan adopted the game as sansukumi-ken, meaning “three afraid of each other.”",
+  "One Japanese variation had a fox, a village headman, and a hunter as the three elements.",
+  "Britain first heard of the game in 1924 under the name “zhot.”",
+  "The US popularised the modern rock, paper, scissors format in the 1930s.",
+  "In parts of the US, it’s called “Roshambo,” possibly named after a French general.",
+  "In Japan, janken is still a go-to way to settle small disputes.",
+  "The game often features in Japanese promotions and even drinking games.",
+  "Today, RPS is recognised worldwide as the fastest way to make a decision."
 ];
 
 const shuffleArray = (array: any[]) => {
@@ -108,7 +99,6 @@ const shuffleArray = (array: any[]) => {
 export function MainPageContent() {
   const searchParams = useSearchParams();
   const teamParam = searchParams?.get('team');
-  
   const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
   const [preIntroFinished, setPreIntroFinished] = useState(false);
   const [introFinished, setIntroFinished] = useState(false);
@@ -116,30 +106,37 @@ export function MainPageContent() {
   const lastTournamentState = useRef<TournamentState | null>(null);
   const [lastCompletedMatch, setLastCompletedMatch] = useState<Match | null>(null);
   const [isTie, setIsTie] = useState(false);
-  const [shuffledJokes, setShuffledJokes] = useState<string[]>([]);
-  const [commentaryIndex, setCommentaryIndex] = useState(0);
+  const [commentaryQueue, setCommentaryQueue] = useState<string[]>([]);
+  const [currentCommentaryIndex, setCurrentCommentaryIndex] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
     const welcomeMessage = "Welcome to the very first LEI RPS Pod Battle. Let's get ready to rumble!";
-    setShuffledJokes([welcomeMessage, ...shuffleArray([...commentaryJokes])]);
+    // Setup the commentary queue on initial load
+    setCommentaryQueue([welcomeMessage, ...shuffleArray([...commentaryItems])]);
+    
+    const skipIntroParam = searchParams?.get('skipIntro');
 
-    if (sessionStorage.getItem('introSeen')) {
+    if (sessionStorage.getItem('introSeen') || skipIntroParam === 'true') {
       setPreIntroFinished(true);
       setIntroFinished(true);
+      // If skipping intro, also try to start the tournament immediately
+      if (skipIntroParam === 'true' && !tournament) {
+        startTournament();
+      }
     }
-  }, []);
+  }, [startTournament, tournament]);
   
-  // Joke slideshow
+  // Commentary slideshow
   useEffect(() => {
-    if (!tournament || winner || shuffledJokes.length === 0) return;
+    if (!tournament || winner || commentaryQueue.length === 0) return;
 
     const commentaryInterval = setInterval(() => {
-      setCommentaryIndex(prevIndex => (prevIndex + 1) % shuffledJokes.length);
+      setCurrentCommentaryIndex(prevIndex => (prevIndex + 1) % commentaryQueue.length);
     }, 7000); // Change joke every 7 seconds
 
     return () => clearInterval(commentaryInterval);
-  }, [tournament, winner, shuffledJokes.length]);
+  }, [tournament, winner, commentaryQueue.length]);
 
 
   // Detect ties and match results for the "Latest Result" card
@@ -190,6 +187,7 @@ export function MainPageContent() {
     const password = prompt('Enter password to reset tournament:', '');
     if (password === 'orcas2025') {
       resetTournament();
+      startTournament();
     } else if (password !== null) {
       alert('Incorrect password.');
     }
@@ -220,9 +218,13 @@ export function MainPageContent() {
   }
 
   if (!preIntroFinished) {
+    const skipIntroParam = searchParams?.get('skipIntro');
+    if (skipIntroParam === 'true') {
+        // Skip intro screens and go directly to tournament
+        return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
+    }
     return <PreIntroScreen onStart={() => {
         setPreIntroFinished(true);
-        sessionStorage.setItem('introSeen', 'true');
     }} />;
   }
   
@@ -249,6 +251,19 @@ export function MainPageContent() {
         </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 flex flex-col">
+        {isClient && introFinished && (
+            <iframe 
+                width="0" 
+                height="0" 
+                scrolling="no" 
+                frameBorder="no" 
+                allow="autoplay" 
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+                style={{ position: 'absolute', left: '-9999px' }}
+            >
+            </iframe>
+        )}
+
         {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
@@ -399,14 +414,14 @@ export function MainPageContent() {
                 <CardContent className="p-0 min-h-24 flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     <motion.p
-                      key={commentaryIndex}
+                      key={currentCommentaryIndex}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.5 }}
                       className="text-foreground text-lg italic text-center"
                     >
-                      &ldquo;{shuffledJokes[commentaryIndex]}&rdquo;
+                      &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
                     </motion.p>
                   </AnimatePresence>
                 </CardContent>
