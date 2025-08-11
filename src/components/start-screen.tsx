@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/
 import { Header } from './header';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Volume2, VolumeX } from 'lucide-react';
 
 type StartScreenProps = {
     onStartTournament: () => void;
@@ -16,6 +17,7 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [showPlayer, setShowPlayer] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -29,24 +31,32 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
     onStartTournament();
   };
 
+  const soundCloudSrc = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false";
+
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
-      {isClient && showPlayer && (
-        <iframe 
-            width="0" 
-            height="0" 
-            scrolling="no" 
-            frameBorder="no" 
-            allow="autoplay" 
-            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false"
+      {isClient && showPlayer && !isMuted && (
+        <iframe
+            width="0"
+            height="0"
+            scrolling="no"
+            frameBorder="no"
+            allow="autoplay"
+            src={soundCloudSrc}
             style={{ position: 'absolute', left: '-9999px' }}
         >
         </iframe>
       )}
       <Header>
-        <Button asChild variant="secondary" size="sm">
-          <Link href="/teams">View Pods</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button variant="secondary" size="icon" onClick={() => setIsMuted(!isMuted)}>
+                {isMuted ? <VolumeX /> : <Volume2 />}
+                <span className="sr-only">{isMuted ? 'Unmute' : 'Mute'}</span>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
+            <Link href="/teams">View Pods</Link>
+            </Button>
+        </div>
       </Header>
       <main className="flex-grow flex items-center justify-center p-4">
         <motion.div
@@ -55,7 +65,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             transition={{ duration: 0.8, type: 'spring' }}
             className="w-full"
         >
-            <Card className="w-full max-w-4xl text-center bg-black/70 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
+            <Card className="w-full max-w-4xl text-center bg-black/50 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto">
                 <CardHeader className="p-4">
                     <CardTitle
                         className="text-5xl md:text-8xl font-black font-headline text-accent tracking-wider uppercase"
