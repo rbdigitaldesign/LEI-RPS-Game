@@ -31,7 +31,7 @@ const commentaryJokes = [
   "Panda Pod, if you’re having issues with this tournament, log a ticket with MyUni support.",
   "Octopod, the only team whose name also sounds like an occupation.",
   "Octopod, remember — no OH&S breaches from rocks or scissors here.",
-  "Owls pod, parliament now in session.",
+  "Owl pod, parliament now in session.",
   "Alpacas pod… or whatever name you’re going by this week.",
   "If you think this activity is pointless, try a VC town hall.",
   "The beauty of RPS is these are three things impossible to merge… State Government, hold my beer.",
@@ -65,9 +65,49 @@ const commentaryJokes = [
   "RPS: the game where strategy meets chaos… and chaos usually wins.",
   "This competition could go anywhere — except for a draw with rock, paper, and scissors all at once.",
   "If you’ve ever tied in RPS, you know it’s the “two Zoom meetings booked at once” of gaming.",
-  "Remember: in this tournament, even the simplest throw can change your fate."
+  "Remember: in this tournament, even the simplest throw can change your fate.",
+  "If I got paid to play rock-paper-scissors, I’d be making money hand over fist.",
+  "The Rock said he could beat any wrestler; I asked, “What about one named Paper?”",
+  "Make stone scissors to cut paper — call them Rock Paper Scissors.",
+  "If a tree beats a rock in the forest, does anyone look for broken scissors?",
+  "Rock music always beats Scissors’ sister — at least on Paper.",
+  "Walk around the office with scissors and literally cut ties with coworkers.",
+  "I lost The Rock’s paper scissors — origami class is ruined.",
+  "Don’t throw scissors against someone without papers.",
+  "Whoever keeps stealing my scissors needs to cut it out.",
+  "Won RPS with a cop — he said “Papers,” I said “Scissors” and drove off.",
+  "Rap is like scissors — it always loses to rock.",
+  "Remember: changing your throw every round keeps your opponent guessing.",
+  "Going for rock three times in a row? Bold move.",
+  "The paper-first strategy works… until it doesn’t.",
+  "Never underestimate the psychological power of a well-timed scissor throw.",
+  "Some say starting with rock sends a message — but is it the right one?",
+  "A mixed pattern keeps your opponent on their toes.",
+  "If you’ve thrown paper twice, they’re expecting scissors… or are they?",
+  "Rock is reliable, but too much of it is just predictable geology.",
+  "Paper is the stealthiest throw — it looks harmless until it wins.",
+  "Scissors are for the confident and the crafty.",
+  "The perfect throw is the one they least expect.",
+  "The key to victory? Confidence… and maybe a little luck.",
+  "Sometimes it’s less about what you throw, and more about what they think you’ll throw.",
+  "Reverse psychology is risky — unless your opponent is overthinking too.",
+  "Balance your throws — too much of one is an open book.",
+  "It’s not cheating if you win with style.",
+  "Don’t let one loss shake your next throw.",
+  "Paper to open, scissors to close — it’s a classic.",
+  "Rock, paper, scissors — the eternal cycle of triumph and defeat."
 ];
 
+const shuffleArray = (array: any[]) => {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+  return array;
+};
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -80,10 +120,12 @@ export function MainPageContent() {
   const lastTournamentState = useRef<TournamentState | null>(null);
   const [lastCompletedMatch, setLastCompletedMatch] = useState<Match | null>(null);
   const [isTie, setIsTie] = useState(false);
+  const [shuffledJokes, setShuffledJokes] = useState<string[]>([]);
   const [commentaryIndex, setCommentaryIndex] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
+    setShuffledJokes(shuffleArray([...commentaryJokes]));
     if (sessionStorage.getItem('introSeen')) {
       setPreIntroFinished(true);
       setIntroFinished(true);
@@ -95,11 +137,11 @@ export function MainPageContent() {
     if (!tournament || winner) return;
 
     const commentaryInterval = setInterval(() => {
-      setCommentaryIndex(prevIndex => (prevIndex + 1) % commentaryJokes.length);
+      setCommentaryIndex(prevIndex => (prevIndex + 1) % shuffledJokes.length);
     }, 7000); // Change joke every 7 seconds
 
     return () => clearInterval(commentaryInterval);
-  }, [tournament, winner]);
+  }, [tournament, winner, shuffledJokes.length]);
 
 
   // Detect ties and match results for the "Latest Result" card
@@ -366,7 +408,7 @@ export function MainPageContent() {
                       transition={{ duration: 0.5 }}
                       className="text-muted-foreground text-sm text-center"
                     >
-                      {commentaryJokes[commentaryIndex]}
+                      {shuffledJokes[commentaryIndex]}
                     </motion.p>
                   </AnimatePresence>
                 </CardContent>
