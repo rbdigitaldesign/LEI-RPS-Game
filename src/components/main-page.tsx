@@ -264,8 +264,8 @@ export function MainPageContent() {
             </Card>
           </div>
         ) : (
-          <div className="container mx-auto flex flex-col gap-6">
-            <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow">
+          <div className="container mx-auto flex flex-col items-center gap-6">
+            <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
               <div className="flex-grow w-full">
                 <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
               </div>
@@ -322,7 +322,7 @@ export function MainPageContent() {
                 </Card>
               </div>
             </div>
-            <Card>
+            <Card className="w-full" style={{maxWidth: '927px'}}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base font-headline">
                   <Info size={16} />
