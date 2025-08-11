@@ -342,10 +342,10 @@ export function MainPageContent() {
       </main>
 
       {!winner && (
-        <Card className="fixed bottom-4 right-4 w-[28rem] max-w-[calc(100%-2rem)] p-4 z-50">
+        <Card className="fixed bottom-4 right-4 w-[32rem] max-w-[calc(100%-2rem)] p-4 z-50">
           <CardHeader className="p-0 pb-2">
-            <CardTitle className="font-headline flex items-center gap-2 text-base font-semibold">
-              <Bot size={18}/>
+            <CardTitle className="font-headline flex items-center gap-2 text-lg font-semibold">
+              <Bot size={20}/>
               LEI Commentary
             </CardTitle>
           </CardHeader>
@@ -357,7 +357,7 @@ export function MainPageContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.5 }}
-                className="text-foreground italic text-center text-base"
+                className="text-foreground italic text-center text-lg"
               >
                 &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
               </motion.p>
