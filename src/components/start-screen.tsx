@@ -35,7 +35,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                 setTimeout(onStartTournament, 500);
                 return 100;
             }
-            return prev + 10;
+            return prev + Math.random() * 20;
         });
     }, 300);
   };

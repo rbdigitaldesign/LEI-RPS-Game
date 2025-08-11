@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      backgroundImage: {
+        'hero-pattern': "url('https://i.imgur.com/cHVMAki.jpeg')",
+      },
       fontFamily: {
         sans: ['var(--font-space-grotesk)', 'sans-serif'],
       },
