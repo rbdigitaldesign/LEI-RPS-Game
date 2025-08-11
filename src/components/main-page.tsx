@@ -28,7 +28,7 @@ const commentaryJokes = [
   "Dolphin pod, please don’t performance manage anyone if they lose.",
   "Wombat pod, if you’re struggling, just tell the hosts you’ve got network issues from your “remote” workplace.",
   "Wombat pod, longing for Smart Storyboard yet?",
-  "Pandas pod, if you’re having issues with this tournament, log a ticket with MyUni support.",
+  "Panda Pod, if you’re having issues with this tournament, log a ticket with MyUni support.",
   "Octopod, the only team whose name also sounds like an occupation.",
   "Octopod, remember — no OH&S breaches from rocks or scissors here.",
   "Owls pod, parliament now in session.",
