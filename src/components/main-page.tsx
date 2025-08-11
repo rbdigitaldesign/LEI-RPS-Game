@@ -121,7 +121,9 @@ export function MainPageContent() {
 
   useEffect(() => {
     setIsClient(true);
-    setShuffledJokes(shuffleArray([...commentaryJokes]));
+    const welcomeMessage = "Welcome to the very first LEI RPS Pod Battle. Let's get ready to rumble!";
+    setShuffledJokes([welcomeMessage, ...shuffleArray([...commentaryJokes])]);
+
     if (sessionStorage.getItem('introSeen')) {
       setPreIntroFinished(true);
       setIntroFinished(true);
