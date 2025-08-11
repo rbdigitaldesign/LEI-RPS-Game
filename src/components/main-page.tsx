@@ -285,7 +285,7 @@ export function MainPageContent() {
                     </Card>
                 </div>
                 <div className="col-span-12 xl:col-span-4 flex flex-col gap-6">
-                  <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
+                  {/* <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
                     <CardHeader className="p-0 pb-4">
                       <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Tournament in Progress</CardTitle>
                     </CardHeader>
@@ -329,7 +329,7 @@ export function MainPageContent() {
                         return null;
                       })()}
                     </CardContent>
-                  </Card>
+                  </Card> */}
 
                   <Card className="p-4 md:p-6 text-center border-slate-700 bg-slate-900/40">
                     <CardHeader className="p-0 pb-4">
