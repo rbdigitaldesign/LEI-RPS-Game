@@ -76,7 +76,7 @@ const commentaryItems = [
   "The original Chinese version featured animals like frog, slug, and snake instead of rock, paper, scissors.",
   "Japan adopted the game as sansukumi-ken, meaning “three afraid of each other.”",
   "One Japanese variation had a fox, a village headman, and a hunter as the three elements.",
-  "Britain first heard of the game in 1924 under the name “zhot.”",
+  "Britain first heard of the game in 1924 under the name zhot.",
   "The US popularised the modern rock, paper, scissors format in the 1930s.",
   "In parts of the US, it’s called “Roshambo,” possibly named after a French general.",
   "In Japan, janken is still a go-to way to settle small disputes.",
@@ -272,14 +272,14 @@ export function MainPageContent() {
                     <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
                     <Card className="p-4">
                         <CardHeader className="p-0 pb-2">
-                        <CardTitle className="flex items-center gap-2 text-base">
+                        <CardTitle className="flex items-center gap-2 text-base font-headline">
                             <Info size={16}/>
                             Acknowledgements
                         </CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             <p className="text-xs text-muted-foreground leading-relaxed">
-                                Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                                Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
                             </p>
                         </CardContent>
                     </Card>
@@ -300,7 +300,7 @@ export function MainPageContent() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.5 }}
-                          className="text-foreground italic text-center text-[clamp(1.1rem,1rem+0.5vw,1.5rem)]"
+                          className="text-foreground italic text-center text-lg"
                         >
                           &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
                         </motion.p>
@@ -310,7 +310,7 @@ export function MainPageContent() {
                   <Card className="p-4 md:p-6 text-center">
                     <CardHeader className="p-0 pb-4">
                       <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
-                      <CardDescription className="text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]">The result of the most recent match appears here.</CardDescription>
+                      <CardDescription className="text-sm">The result of the most recent match appears here.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                       <AnimatePresence mode="wait">

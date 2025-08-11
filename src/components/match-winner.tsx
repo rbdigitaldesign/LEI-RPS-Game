@@ -74,7 +74,7 @@ export function MatchWinner({ winner, winningMove, isDraw }: MatchWinnerProps) {
             >
                 <Trophy className="w-16 h-16 text-yellow-500" />
             </motion.div>
-            <p className="text-xl font-medium text-accent uppercase tracking-widest">Match Winner</p>
+            <p className="text-xl font-medium text-accent uppercase tracking-widest font-headline">Match Winner</p>
             <CardTitle className="text-6xl font-black font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
@@ -82,11 +82,11 @@ export function MatchWinner({ winner, winningMove, isDraw }: MatchWinnerProps) {
               <span className="text-8xl">{winner.emoji}</span>
             </div>
             <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
-                <p className="text-2xl font-semibold capitalize text-primary">{winningMove}</p>
+                <p className="text-2xl font-semibold capitalize text-primary font-headline">{winningMove}</p>
                 <div className="w-16 h-16 bg-background text-secondary-foreground flex items-center justify-center border-2">
                   <MoveIcon move={winningMove} className="text-5xl" />
                 </div>
-                <p className="text-2xl font-semibold capitalize text-primary">Wins!</p>
+                <p className="text-2xl font-semibold capitalize text-primary font-headline">Wins!</p>
             </div>
           </CardContent>
         </Card>

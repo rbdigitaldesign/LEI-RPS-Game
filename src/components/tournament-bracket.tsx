@@ -73,7 +73,7 @@ export function TournamentBracket({ rounds, currentMatchId }: { rounds: Round[],
                 <div className="flex gap-x-6 gap-y-4 items-center py-4 min-w-[820px] md:min-w-[980px] xl:min-w-full">
                     {rounds.map((round, roundIndex) => (
                         <div key={round.id} className="flex flex-col justify-center h-full">
-                            <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-4 h-5">
+                            <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-4 h-5 font-headline">
                                 {round.name}
                             </h3>
                             <div className="flex flex-col gap-10 justify-around flex-grow relative">

@@ -50,7 +50,7 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
           >
-            <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6">{pod.name} WIN!</p>
+            <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6 font-headline">{pod.name} WIN!</p>
           </motion.div>
         )}
         {isDraw && reveal && (
@@ -60,14 +60,14 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
           >
-            <p className="text-2xl lg:text-3xl font-black text-yellow-950 tracking-tighter">DRAW</p>
+            <p className="text-2xl lg:text-3xl font-black text-yellow-950 tracking-tighter font-headline">DRAW</p>
           </motion.div>
         )}
         <CardHeader className="p-2">
           <div className="w-16 h-16 mx-auto bg-secondary flex items-center justify-center border-2 border-border mb-1 relative">
             <span className="text-4xl">{pod.emoji}</span>
           </div>
-          <CardTitle className={cn("font-headline text-lg", isBoss ? "text-destructive" : "text-primary")}>{pod.name}</CardTitle>
+          <CardTitle className={cn("text-lg", isBoss ? "text-destructive" : "text-primary")}>{pod.name}</CardTitle>
           <CardDescription className="text-[10px]">Managed by {pod.manager}</CardDescription>
         </CardHeader>
         <CardContent className="h-24 flex flex-col items-center justify-center p-1">

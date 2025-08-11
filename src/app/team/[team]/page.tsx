@@ -133,7 +133,7 @@ export default function TeamPage() {
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle className="text-red-500">Invalid Team</CardTitle>
+              <CardTitle className="text-red-500 font-headline">Invalid Team</CardTitle>
             </CardHeader>
             <CardContent>
               <p>No team specified. Please use a valid team URL.</p>
@@ -151,7 +151,7 @@ export default function TeamPage() {
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle>Loading Tournament...</CardTitle>
+              <CardTitle className='font-headline'>Loading Tournament...</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="animate-pulse">
@@ -171,7 +171,7 @@ export default function TeamPage() {
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle className="text-destructive">Team Not Found</CardTitle>
+              <CardTitle className="text-destructive font-headline">Team Not Found</CardTitle>
             </CardHeader>
             <CardContent>
               <p>Team "{teamName}" is not part of this tournament.</p>
@@ -193,17 +193,17 @@ export default function TeamPage() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-4xl">{teamPod.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl">{teamPod.name}</CardTitle>
+                  <CardTitle className="text-2xl font-headline">{teamPod.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
               {isWinner ? (
-                <div className="flex items-center justify-center gap-2 text-2xl font-semibold text-primary">
+                <div className="flex items-center justify-center gap-2 text-2xl font-semibold text-primary font-headline">
                   <Trophy className="w-8 h-8"/>
                   <span>Tournament Champion!</span>
                 </div>
               ) : (
-                <div className="text-lg font-medium text-muted-foreground">
+                <div className="text-lg font-medium text-muted-foreground font-headline">
                   Tournament Complete
                 </div>
               )}
@@ -242,11 +242,11 @@ export default function TeamPage() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-4xl grayscale">{teamPod.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl text-muted-foreground">{teamPod.name}</CardTitle>
+                  <CardTitle className="text-2xl text-muted-foreground font-headline">{teamPod.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
-              <div className="text-lg font-medium text-destructive">
+              <div className="text-lg font-medium text-destructive font-headline">
                 Eliminated from Tournament
               </div>
             </CardHeader>
@@ -274,7 +274,7 @@ export default function TeamPage() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-4xl">{teamPod.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl">{teamPod.name}</CardTitle>
+                  <CardTitle className="text-2xl font-headline">{teamPod.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function TeamPage() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Badge variant="outline">{currentRound?.name}</Badge>
             </div>
-            <CardTitle className="text-3xl font-bold">Rock Paper Scissors Battle</CardTitle>
+            <CardTitle className="text-3xl font-bold font-headline">Rock Paper Scissors Battle</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
@@ -324,7 +324,7 @@ export default function TeamPage() {
                 )}
               </div>
 
-              <div className="text-4xl font-bold text-muted-foreground">VS</div>
+              <div className="text-4xl font-bold text-muted-foreground font-headline">VS</div>
 
               <div className="text-center space-y-2">
                 <div className="text-6xl">{opponentPod?.emoji}</div>
@@ -343,7 +343,7 @@ export default function TeamPage() {
 
             {bothMovesSubmitted && (
               <div className="text-center space-y-4 p-4 bg-muted rounded-lg">
-                <h3 className="text-xl font-bold">Round Result</h3>
+                <h3 className="text-xl font-bold font-headline">Round Result</h3>
                 <div className="flex items-center justify-center gap-8">
                   <div className="text-center">
                     <div className="text-3xl mb-2">
@@ -368,7 +368,7 @@ export default function TeamPage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-center gap-2 text-lg font-bold text-yellow-500">
                       <AlertTriangle className="w-5 h-5" />
-                      <span>It's a Tie!</span>
+                      <span className='font-headline'>It's a Tie!</span>
                     </div>
                     <p className="text-sm text-muted-foreground">Both teams chose the same move. Choose again!</p>
                   </div>
@@ -376,7 +376,7 @@ export default function TeamPage() {
                 
                 {currentMatch.moveHistory && currentMatch.moveHistory.length > 1 && (
                   <div className="mt-4 p-3 bg-background rounded border">
-                    <h4 className="font-medium mb-2">Previous Rounds:</h4>
+                    <h4 className="font-medium mb-2 font-headline">Previous Rounds:</h4>
                     <div className="space-y-1">
                       {currentMatch.moveHistory.slice(0, -1).map((round, index) => (
                         <div key={index} className="flex items-center justify-center gap-4 text-sm">
@@ -384,7 +384,7 @@ export default function TeamPage() {
                           <span>{round.pod1 === 'rock' ? '🪨' : round.pod1 === 'paper' ? '📄' : '✂️'}</span>
                           <span className="text-muted-foreground">vs</span>
                           <span>{round.pod2 === 'rock' ? '🪨' : round.pod2 === 'paper' ? '📄' : '✂️'}</span>
-                          <span className="text-yellow-500 font-medium">{round.pod1 === round.pod2 ? 'TIE' : ''}</span>
+                          <span className="text-yellow-500 font-medium font-headline">{round.pod1 === round.pod2 ? 'TIE' : ''}</span>
                         </div>
                       ))}
                     </div>
@@ -395,7 +395,7 @@ export default function TeamPage() {
 
             {!hasSubmittedMove && !bothMovesSubmitted && (
               <div className="space-y-4">
-                <h3 className="text-xl font-bold text-center">Choose Your Move</h3>
+                <h3 className="text-xl font-bold text-center font-headline">Choose Your Move</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {(['rock', 'paper', 'scissors'] as Move[]).map((move) => (
                     <Button

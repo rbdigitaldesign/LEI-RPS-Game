@@ -45,7 +45,7 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.8 }}
-                className="text-4xl sm:text-6xl text-center p-8 uppercase tracking-wider font-sans"
+                className="text-4xl sm:text-6xl text-center p-8 uppercase tracking-wider font-headline"
             >
                 {trailerLines[index] || ''}
             </motion.p>
