@@ -268,7 +268,7 @@ export function MainPageContent() {
             <div className="flex-grow w-full">
                 <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
             </div>
-            <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6 container mx-auto xl:mx-0 xl:container-none">
+            <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
               <Card className="p-4 md:p-6 text-center">
                 <CardHeader className="p-0 pb-4">
                   <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
@@ -338,7 +338,7 @@ export function MainPageContent() {
       </main>
 
       {!winner && (
-        <Card className="fixed bottom-4 left-4 w-80 max-w-[calc(100%-2rem)] p-4 z-50">
+        <Card className="fixed bottom-4 right-4 w-80 max-w-[calc(100%-2rem)] p-4 z-50">
           <CardHeader className="p-0 pb-2">
             <CardTitle className="font-headline flex items-center gap-2 text-sm font-semibold">
               <Bot size={16}/>
