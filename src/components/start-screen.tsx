@@ -17,7 +17,7 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -25,7 +25,9 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
 
   const handleStartClick = () => {
     setIsLoading(true);
-    setIsMuted(false); // Unmute when loading starts
+    if (isMuted) {
+      setIsMuted(false); // Unmute when loading starts if it was muted
+    }
 
     setTimeout(() => {
       onStartTournament();
@@ -36,7 +38,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
     return null;
   }
   
-  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=${!isMuted}&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
+  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=${!isMuted}&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true`;
 
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
