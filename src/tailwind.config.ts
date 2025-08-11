@@ -18,7 +18,7 @@ export default {
     },
     extend: {
       backgroundImage: {
-        'hero-pattern': "url('https://i.imgur.com/DoA6NkS.png')",
+        'hero-pattern': "url('https://i.imgur.com/cHVMAki.jpeg')",
       },
       fontFamily: {
         sans: ['var(--font-space-grotesk)'],
