@@ -251,19 +251,6 @@ export function MainPageContent() {
         </div>
       </Header>
       <main className="flex-grow container mx-auto p-4 flex flex-col">
-        {isClient && introFinished && (
-            <iframe 
-                width="0" 
-                height="0" 
-                scrolling="no" 
-                frameBorder="no" 
-                allow="autoplay" 
-                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-                style={{ position: 'absolute', left: '-9999px' }}
-            >
-            </iframe>
-        )}
-
         {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
