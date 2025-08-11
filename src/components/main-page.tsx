@@ -264,79 +264,77 @@ export function MainPageContent() {
             </Card>
           </div>
         ) : (
-          <div className="container mx-auto">
-            <div className="flex flex-col gap-6">
-                <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow">
-                    <div className="flex-grow w-full">
-                        <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
-                    </div>
-                    <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
-                    <Card className="p-4 md:p-6 text-center">
-                        <CardHeader className="p-0 pb-4">
-                        <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
-                        <CardDescription className="text-sm">The result of the most recent match appears here.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                        <AnimatePresence mode="wait">
-                        {isTie ? (
-                            <motion.div
-                            key="tie"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            >
-                            <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
-                            <h3 className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2 font-headline">DRAW</h3>
-                            <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
-                            </motion.div>
-                        ) : lastCompletedMatch?.winner ? (
-                            <motion.div
-                                key={lastCompletedMatch.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                            >
-                            <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
-                            <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
-                            <h3 className="text-4xl font-bold tracking-tight text-primary font-headline">{lastCompletedMatch.winner.name}</h3>
-                            <div className="flex flex-col items-center space-y-4 pt-4">
-                                <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
-                                <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
-                                </div>
-                                <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
-                                    <p className="text-lg font-semibold">Defeated</p>
-                                    <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center rounded-lg">
-                                        <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
-                                    </div>
-                                    <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
-                                </div>
+          <div className="container mx-auto flex flex-col gap-6">
+            <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow">
+              <div className="flex-grow w-full">
+                <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+              </div>
+              <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
+                <Card className="p-4 md:p-6 text-center">
+                  <CardHeader className="p-0 pb-4">
+                    <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
+                    <CardDescription className="text-sm">The result of the most recent match appears here.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <AnimatePresence mode="wait">
+                      {isTie ? (
+                        <motion.div
+                          key="tie"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                        >
+                          <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
+                          <h3 className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2 font-headline">DRAW</h3>
+                          <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
+                        </motion.div>
+                      ) : lastCompletedMatch?.winner ? (
+                        <motion.div
+                          key={lastCompletedMatch.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                        >
+                          <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
+                          <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
+                          <h3 className="text-4xl font-bold tracking-tight text-primary font-headline">{lastCompletedMatch.winner.name}</h3>
+                          <div className="flex flex-col items-center space-y-4 pt-4">
+                            <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
+                              <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
                             </div>
-                            </motion.div>
-                        ) : (
-                            <motion.div key="waiting" className="space-y-2">
-                                <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
-                                <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
-                            </motion.div>
-                        )}
-                        </AnimatePresence>
-                        </CardContent>
-                    </Card>
-                    </div>
-                </div>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base font-headline">
-                            <Info size={16}/>
-                            Acknowledgements
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                            Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
-                        </p>
-                    </CardContent>
+                            <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                              <p className="text-lg font-semibold">Defeated</p>
+                              <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center rounded-lg">
+                                <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
+                              </div>
+                              <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div key="waiting" className="space-y-2">
+                          <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
+                          <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </CardContent>
                 </Card>
+              </div>
             </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base font-headline">
+                  <Info size={16} />
+                  Acknowledgements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>
