@@ -63,7 +63,6 @@ const commentaryJokes = [
   "This is the only competition where stationery and geology collide.",
   "RPS: the game where strategy meets chaos… and chaos usually wins.",
   "This competition could go anywhere — except for a draw with rock, paper, and scissors all at once.",
-  "If you’ve ever tied in RPS, you know it’s the “two Zoom meetings booked at once” of gaming.",
   "Remember: in this tournament, even the simplest throw can change your fate.",
   "If I got paid to play rock-paper-scissors, I’d be making money hand over fist.",
   "The Rock said he could beat any wrestler; I asked, “What about one named Paper?”",
@@ -71,8 +70,6 @@ const commentaryJokes = [
   "If a tree beats a rock in the forest, does anyone look for broken scissors?",
   "Rock music always beats Scissors’ sister — at least on Paper.",
   "Walk around the office with scissors and literally cut ties with coworkers.",
-  "I lost The Rock’s paper scissors — origami class is ruined.",
-  "Don’t throw scissors against someone without papers.",
   "Whoever keeps stealing my scissors needs to cut it out.",
   "Won RPS with a cop — he said “Papers,” I said “Scissors” and drove off.",
   "Rap is like scissors — it always loses to rock.",
@@ -397,7 +394,7 @@ export function MainPageContent() {
                     These comments aren’t live match updates — just safe, evergreen banter to keep the tournament fun for everyone
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-0 h-16 flex items-center justify-center">
+                <CardContent className="p-0 min-h-24 flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     <motion.p
                       key={commentaryIndex}
@@ -405,9 +402,9 @@ export function MainPageContent() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.5 }}
-                      className="text-muted-foreground text-sm text-center"
+                      className="text-foreground text-lg italic text-center"
                     >
-                      {shuffledJokes[commentaryIndex]}
+                      &ldquo;{shuffledJokes[commentaryIndex]}&rdquo;
                     </motion.p>
                   </AnimatePresence>
                 </CardContent>
