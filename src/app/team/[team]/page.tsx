@@ -8,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/header';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import type { Move, Match, Pod } from '@/lib/types';
-import { Trophy, Clock, Users, AlertTriangle } from 'lucide-react';
+import { Trophy, Clock, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { CommentaryBox } from '@/components/commentary-box';
 
 export default function TeamPage() {
   const params = useParams();
@@ -231,7 +232,6 @@ export default function TeamPage() {
     );
   }
 
-  // Handle eliminated state
   if (isEliminated) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -439,6 +439,7 @@ export default function TeamPage() {
           </CardContent>
         </Card>
       </main>
+      <CommentaryBox show={!!currentMatch} />
     </div>
   );
 }
