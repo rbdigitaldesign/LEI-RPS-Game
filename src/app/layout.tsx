@@ -21,6 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+       <head>
+        <link rel="preload" as="image" href="https://i.imgur.com/cHVMAki.jpeg" />
+      </head>
       <body className={`${spaceGrotesk.variable} font-sans antialiased min-h-screen flex flex-col`}>
         {children}
         <Toaster />
