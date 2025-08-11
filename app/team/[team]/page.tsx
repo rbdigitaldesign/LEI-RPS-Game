@@ -11,6 +11,7 @@ import type { Move, Match, Pod } from '@/lib/types';
 import { Trophy, Clock, Users, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { CommentaryBox } from '@/components/commentary-box';
 
 export default function TeamPage() {
   const params = useParams();
@@ -481,8 +482,7 @@ export default function TeamPage() {
           </CardContent>
         </Card>
       </main>
+      <CommentaryBox show={!!currentMatch} />
     </div>
   );
 }
-
-    
