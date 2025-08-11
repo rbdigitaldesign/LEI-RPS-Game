@@ -17,7 +17,6 @@ export default function TeamPage() {
   const searchParams = useSearchParams();
   const rawTeamName = (params?.team as string) || searchParams?.get('team');
   
-  // Decode the team name from URL encoding
   const teamName = rawTeamName ? decodeURIComponent(rawTeamName) : null;
   
   const { tournament, refetch } = useServerTournament();
@@ -50,7 +49,6 @@ export default function TeamPage() {
       if (response.ok) {
         setHasSubmittedMove(true);
         setSelectedMove(null);
-        // Fetch updated tournament state
         await refetch();
       }
     } catch (error) {
@@ -62,12 +60,10 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (tournament && teamName) {
-      // Find the team's pod
       const pod = tournament.pods.find(p => p.name === teamName);
       setTeamPod(pod || null);
 
       if (pod) {
-        // Find current match for this team
         const match = tournament.rounds
           .flatMap(r => r.matches)
           .find(m => 
@@ -79,30 +75,25 @@ export default function TeamPage() {
         setCurrentMatch(match || null);
 
         if (match) {
-          // Find opponent
           const opponent = match.pod1?.name === teamName ? match.pod2 : match.pod1;
           setOpponentPod(opponent);
-          const isOpponentAI = opponent?.name === 'Cox Travis';
 
-          // Check if this team has already submitted a move
           const teamIsPod1 = match.pod1?.name === teamName;
           const teamMove = teamIsPod1 ? match.moves?.pod1 : match.moves?.pod2;
           setHasSubmittedMove(!!teamMove);
 
-          // Check for ties and match results
           if (match.moveHistory && match.moveHistory.length > lastMoveHistory.length) {
             const latestRound = match.moveHistory[match.moveHistory.length - 1];
             if (latestRound.pod1 === latestRound.pod2) {
               toast({
                 title: "It's a Tie! 🤝",
-                description: `Both teams chose ${latestRound.pod1}. Choose again to break the tie!`,
+                description: `Both teams chose ${latestRound.pod1}. Choose again!`,
                 duration: 4000,
               });
             }
             setLastMoveHistory([...match.moveHistory]);
           }
 
-          // Check for match completion and show result notification
           if (match.winner && match.winner !== lastMatchWinner) {
             const isWinner = match.winner.name === teamName;
             
@@ -126,7 +117,6 @@ export default function TeamPage() {
           setHasSubmittedMove(false);
         }
 
-        // Check if team is eliminated (lost a match and not advancing)
         const isTeamEliminated = tournament.rounds
             .flatMap(r => r.matches)
             .some(m => m.loser?.name === teamName);
@@ -138,7 +128,7 @@ export default function TeamPage() {
 
   if (!teamName) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
@@ -156,7 +146,7 @@ export default function TeamPage() {
 
   if (!tournament) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
@@ -176,12 +166,12 @@ export default function TeamPage() {
 
   if (!teamPod) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle className="text-red-500">Team Not Found</CardTitle>
+              <CardTitle className="text-destructive">Team Not Found</CardTitle>
             </CardHeader>
             <CardContent>
               <p>Team "{teamName}" is not part of this tournament.</p>
@@ -195,7 +185,7 @@ export default function TeamPage() {
   if (tournament.winner) {
     const isWinner = tournament.winner.name === teamName;
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className={`w-full max-w-lg text-center ${isWinner ? 'border-4 border-accent' : ''}`}>
@@ -204,7 +194,7 @@ export default function TeamPage() {
                 <span className="text-4xl">{teamPod.emoji}</span>
                 <div>
                   <CardTitle className="text-2xl">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
               {isWinner ? (
@@ -244,7 +234,7 @@ export default function TeamPage() {
   // Handle eliminated state
   if (isEliminated) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center border-2 border-destructive">
@@ -253,7 +243,7 @@ export default function TeamPage() {
                 <span className="text-4xl grayscale">{teamPod.emoji}</span>
                 <div>
                   <CardTitle className="text-2xl text-muted-foreground">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
               <div className="text-lg font-medium text-destructive">
@@ -276,7 +266,7 @@ export default function TeamPage() {
 
   if (!currentMatch) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
@@ -285,7 +275,7 @@ export default function TeamPage() {
                 <span className="text-4xl">{teamPod.emoji}</span>
                 <div>
                   <CardTitle className="text-2xl">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Managed by {teamPod.manager}</p>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
                 </div>
               </div>
             </CardHeader>
@@ -311,7 +301,7 @@ export default function TeamPage() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
         <Card className="w-full max-w-2xl">
@@ -322,7 +312,6 @@ export default function TeamPage() {
             <CardTitle className="text-3xl font-bold">Rock Paper Scissors Battle</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Teams Display */}
             <div className="flex items-center justify-between">
               <div className="text-center space-y-2">
                 <div className="text-6xl">{teamPod.emoji}</div>
@@ -352,7 +341,6 @@ export default function TeamPage() {
               </div>
             </div>
 
-            {/* Game Results */}
             {bothMovesSubmitted && (
               <div className="text-center space-y-4 p-4 bg-muted rounded-lg">
                 <h3 className="text-xl font-bold">Round Result</h3>
@@ -378,7 +366,7 @@ export default function TeamPage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-2 text-lg font-bold text-yellow-600">
+                    <div className="flex items-center justify-center gap-2 text-lg font-bold text-yellow-500">
                       <AlertTriangle className="w-5 h-5" />
                       <span>It's a Tie!</span>
                     </div>
@@ -386,7 +374,6 @@ export default function TeamPage() {
                   </div>
                 )}
                 
-                {/* Show tie history if there have been multiple rounds */}
                 {currentMatch.moveHistory && currentMatch.moveHistory.length > 1 && (
                   <div className="mt-4 p-3 bg-background rounded border">
                     <h4 className="font-medium mb-2">Previous Rounds:</h4>
@@ -397,7 +384,7 @@ export default function TeamPage() {
                           <span>{round.pod1 === 'rock' ? '🪨' : round.pod1 === 'paper' ? '📄' : '✂️'}</span>
                           <span className="text-muted-foreground">vs</span>
                           <span>{round.pod2 === 'rock' ? '🪨' : round.pod2 === 'paper' ? '📄' : '✂️'}</span>
-                          <span className="text-yellow-600 font-medium">{round.pod1 === round.pod2 ? 'TIE' : ''}</span>
+                          <span className="text-yellow-500 font-medium">{round.pod1 === round.pod2 ? 'TIE' : ''}</span>
                         </div>
                       ))}
                     </div>
@@ -406,7 +393,6 @@ export default function TeamPage() {
               </div>
             )}
 
-            {/* Move Selection */}
             {!hasSubmittedMove && !bothMovesSubmitted && (
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-center">Choose Your Move</h3>
@@ -439,7 +425,6 @@ export default function TeamPage() {
               </div>
             )}
 
-            {/* Waiting State */}
             {hasSubmittedMove && !bothMovesSubmitted && !opponentIsAI && (
               <div className="text-center space-y-4 p-4 bg-muted rounded-lg">
                 <div className="flex items-center justify-center gap-2">
@@ -457,4 +442,3 @@ export default function TeamPage() {
     </div>
   );
 }
- 

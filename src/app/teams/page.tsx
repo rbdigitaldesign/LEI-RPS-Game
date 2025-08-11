@@ -19,7 +19,6 @@ export default function TeamsPage() {
   }, []);
 
   const handleReset = () => {
-    console.log("handling reset; should prompt");
     const enteredPassword = prompt('Enter password to reset tournament:', '');
     if (enteredPassword === 'orcas2025') {
       resetTournament();
@@ -73,22 +72,22 @@ export default function TeamsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'playing':
-        return <span className="bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🎮 Playing Now</span>;
+        return <span className="bg-green-500/20 text-green-700 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🎮 Playing Now</span>;
       case 'waiting-opponent':
-        return <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Move Submitted</span>;
+        return <span className="bg-yellow-500/20 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Move Submitted</span>;
       case 'waiting-turn':
-        return <span className="bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏰ Waiting Turn</span>;
+        return <span className="bg-blue-500/20 text-blue-700 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏰ Waiting Turn</span>;
       case 'eliminated':
-        return <span className="bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">❌ Eliminated</span>;
+        return <span className="bg-red-500/20 text-red-700 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">❌ Eliminated</span>;
       case 'winner':
-        return <span className="bg-yellow-400 text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🏆 Champion</span>;
+        return <span className="bg-yellow-400/30 text-yellow-600 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🏆 Champion</span>;
       default:
-        return <span className="bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Not Started</span>;
+        return <span className="bg-gray-500/20 text-gray-700 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Not Started</span>;
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="outline" size="sm">
@@ -126,7 +125,7 @@ export default function TeamsPage() {
                     <span className="text-4xl">{pod.emoji}</span>
                     <div>
                       <CardTitle className="text-lg">{pod.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">Managed by {pod.manager}</p>
+                      <p className="text-sm text-muted-foreground">Represented by {pod.manager}</p>
                     </div>
                   </div>
                 </CardHeader>

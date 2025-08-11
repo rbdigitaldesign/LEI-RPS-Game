@@ -17,7 +17,7 @@ type StartScreenProps = {
 export function StartScreen({ onStartTournament, isProcessing }: StartScreenProps) {
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
@@ -26,22 +26,22 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
   const handleStartClick = () => {
     setIsLoading(true);
     if (isMuted) {
-      setIsMuted(false); // Unmute when loading starts if it was muted
+      setIsMuted(false); 
     }
 
     setTimeout(() => {
       onStartTournament();
-    }, 4000); // 4-second loading time
+    }, 4000);
   };
 
   if (!isClient) {
     return null;
   }
   
-  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=${!isMuted}&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true`;
+  const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23F44336&auto_play=${!isMuted}&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
 
   return (
-    <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
+    <div className="flex flex-col min-h-screen bg-black/80">
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
@@ -58,7 +58,13 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             </Button>
         </div>
       </Header>
-      <main className="flex-grow flex items-center justify-center p-4">
+      <main className="flex-grow flex items-center justify-center p-4" style={{ 
+          backgroundImage: `url('https://placehold.co/1920x1080.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+        data-ai-hint="battle arena"
+       >
         {isClient && (
           <iframe
             width="0"
@@ -76,14 +82,14 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             transition={{ duration: 0.8, type: 'spring' }}
             className="w-full"
         >
-            <Card className="w-full max-w-4xl text-center bg-black/40 backdrop-blur-sm border-0 shadow-none flex flex-col justify-center items-center mx-auto min-h-[400px]">
+            <Card className="w-full max-w-4xl text-center bg-background/80 backdrop-blur-sm flex flex-col justify-center items-center mx-auto min-h-[400px]">
                 {isLoading ? (
                   <motion.div
                     key="loading"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center gap-4 text-white font-sans"
+                    className="flex flex-col items-center justify-center gap-4 text-primary-foreground font-sans"
                   >
                     <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"></div>
                     <p className="text-2xl tracking-widest animate-pulse">LOADING TOURNAMENT...</p>
@@ -92,13 +98,13 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                   <>
                   <CardHeader className="p-4">
                       <CardTitle
-                          className="text-5xl md:text-8xl font-black font-headline text-accent tracking-wider uppercase"
+                          className="text-5xl md:text-8xl font-black text-primary tracking-wider uppercase"
                           style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}
                       >
                           RPS Pod Battle
                       </CardTitle>
                       <CardDescription
-                          className="text-lg md:text-2xl text-primary leading-relaxed mt-2 font-sans"
+                          className="text-lg md:text-2xl text-accent leading-relaxed mt-2"
                           style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.7)' }}
                       >
                           The ultimate rock, paper, scissors showdown
@@ -107,7 +113,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                   <CardContent className="mt-8">
                       <Button
                         onClick={handleStartClick}
-                        className="w-48 h-48 rounded-full text-lg font-black font-body text-white bg-red-600 hover:bg-red-700 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out flex flex-col leading-tight"
+                        className="w-48 h-48 rounded-full text-lg font-black text-primary-foreground bg-primary hover:bg-primary/90 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out flex flex-col leading-tight"
                         disabled={isProcessing}
                       >
                         {isProcessing ? 'Loading...' : (

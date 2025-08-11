@@ -37,7 +37,7 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
   }, [index, onFinished]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-black items-center justify-center text-white p-4 font-sans">
+    <div className="flex flex-col min-h-screen bg-black items-center justify-center text-white p-4">
         <AnimatePresence mode="wait">
             <motion.p
                 key={index}
@@ -45,8 +45,7 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.8 }}
-                className="text-4xl sm:text-6xl text-center p-8 uppercase tracking-wider"
-                style={{ fontFamily: 'Anton, sans-serif' }}
+                className="text-4xl sm:text-6xl text-center p-8 uppercase tracking-wider font-sans"
             >
                 {trailerLines[index] || ''}
             </motion.p>

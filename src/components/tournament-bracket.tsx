@@ -27,7 +27,7 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent: boolean }
 
     if (match.isBye && match.winner) {
         return (
-            <Card className="w-48 bg-card border-2 border-dashed">
+            <Card className="w-48 border-2 border-dashed">
                 <CardContent className="p-0">
                     <BracketPod 
                         pod={match.winner} 
@@ -44,7 +44,7 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent: boolean }
 
     return (
         <Card className={cn(
-            "w-48 bg-card/80 border-primary/20",
+            "w-48 bg-card/80",
             isCurrent && "border-accent border-4 shadow-lg shadow-accent/20"
         )}>
             <CardContent className="p-0">
@@ -53,7 +53,7 @@ const BracketMatch = ({ match, isCurrent }: { match: Match, isCurrent: boolean }
                     isWinner={hasWinner && match.winner?.id === match.pod1?.id}
                     isLoser={hasWinner && match.winner?.id !== match.pod1?.id}
                 />
-                <div className="border-t border-border/50"></div>
+                <div className="border-t"></div>
                 <BracketPod 
                     pod={match.pod2} 
                     isWinner={hasWinner && match.winner?.id === match.pod2?.id}
@@ -68,7 +68,7 @@ export function TournamentBracket({ rounds, currentMatchId }: { rounds: Round[],
     if (!rounds || rounds.length === 0) return null;
 
     return (
-        <section className="rounded-lg border border-slate-700 bg-slate-900/40 p-4">
+        <section className="rounded-lg border bg-card/50 p-4">
              <ScrollArea className="w-full whitespace-nowrap">
                 <div className="flex gap-x-6 gap-y-4 items-center py-4 min-w-[820px] md:min-w-[980px] xl:min-w-full">
                     {rounds.map((round, roundIndex) => (

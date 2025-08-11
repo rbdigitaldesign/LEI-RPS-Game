@@ -119,7 +119,7 @@ export function MainPageContent() {
       setPreIntroFinished(true);
       setIntroFinished(true);
     }
-  }, []);
+  }, [searchParams]);
   
   useEffect(() => {
     if (!tournament || winner || commentaryQueue.length === 0) return;
@@ -188,7 +188,7 @@ export function MainPageContent() {
 
   if (teamParam) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
@@ -224,7 +224,7 @@ export function MainPageContent() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
@@ -239,16 +239,16 @@ export function MainPageContent() {
       {winner ? (
         <main className="flex-grow container mx-auto p-4 flex flex-col">
           <div className="flex flex-grow items-center justify-center py-16">
-            <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
+            <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95">
               <CardHeader>
                 <p className="text-sm font-medium text-accent">
                     Ultimate Pod Champion
                 </p>
-                <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
+                <CardTitle className="text-5xl font-bold tracking-tighter text-primary">{winner.name}</CardTitle>
                 <p className="text-muted-foreground">Represented by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
-                <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">
+                <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
                   <span className="text-8xl">{winner.emoji}</span>
                 </div>
                  <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
@@ -266,11 +266,11 @@ export function MainPageContent() {
           </div>
         </main>
       ) : (
-        <div className="flex-grow">
+        <div className="flex-grow w-full">
              <main className="container mx-auto px-4 py-6 grid grid-cols-12 gap-6 w-full">
                 <div className="col-span-12 xl:col-span-8 flex flex-col gap-6">
                     <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
-                    <Card className="p-4 border-slate-700 bg-slate-900/40">
+                    <Card className="p-4">
                         <CardHeader className="p-0 pb-2">
                         <CardTitle className="flex items-center gap-2 text-base">
                             <Info size={16}/>
@@ -278,14 +278,14 @@ export function MainPageContent() {
                         </CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <p className="text-xs text-slate-400 leading-relaxed">
+                            <p className="text-xs text-muted-foreground leading-relaxed">
                                 Acknowledgement is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. The application was developed using Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
                             </p>
                         </CardContent>
                     </Card>
                 </div>
                 <div className="col-span-12 xl:col-span-4 flex flex-col gap-6">
-                  <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
+                  <Card className="p-4 md:p-6">
                     <CardHeader className="p-0 pb-2">
                       <CardTitle className="flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
                         <Bot size={16}/>
@@ -307,7 +307,7 @@ export function MainPageContent() {
                       </AnimatePresence>
                     </CardContent>
                   </Card>
-                  <Card className="p-4 md:p-6 text-center border-slate-700 bg-slate-900/40">
+                  <Card className="p-4 md:p-6 text-center">
                     <CardHeader className="p-0 pb-4">
                       <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
                       <CardDescription className="text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]">The result of the most recent match appears here.</CardDescription>
@@ -322,7 +322,7 @@ export function MainPageContent() {
                           exit={{ opacity: 0, y: -20 }}
                         >
                           <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
-                          <h3 className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</h3>
+                          <h3 className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2">DRAW</h3>
                           <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
                         </motion.div>
                       ) : lastCompletedMatch?.winner ? (
@@ -334,14 +334,14 @@ export function MainPageContent() {
                           >
                           <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
                           <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
-                          <h3 className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
+                          <h3 className="text-4xl font-bold tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
                           <div className="flex flex-col items-center space-y-4 pt-4">
-                              <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center">
+                              <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
                               <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
                               </div>
                               <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
                                   <p className="text-lg font-semibold">Defeated</p>
-                                  <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center">
+                                  <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center rounded-lg">
                                       <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
                                   </div>
                                   <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>

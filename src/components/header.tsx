@@ -6,7 +6,7 @@ export function Header({ children }: { children?: ReactNode }) {
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex">
           <a className="mr-6 flex items-center space-x-2" href="/">
-            <span className="text-xl font-bold font-headline text-accent">RPS Pod Battle</span>
+            <span className="text-xl font-bold text-primary">RPS Pod Showdown</span>
           </a>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
