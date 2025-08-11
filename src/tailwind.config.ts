@@ -23,6 +23,7 @@ export default {
       },
       fontFamily: {
         sans: ['var(--font-space-grotesk)'],
+        headline: ['var(--font-press-start-2p)'],
       },
       colors: {
         background: 'hsl(var(--background))',

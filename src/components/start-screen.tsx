@@ -88,13 +88,13 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                     className="flex flex-col items-center justify-center gap-4 text-primary-foreground font-sans"
                   >
                     <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"></div>
-                    <p className="text-2xl tracking-widest animate-pulse">LOADING TOURNAMENT...</p>
+                    <p className="text-2xl tracking-widest animate-pulse font-headline">LOADING TOURNAMENT...</p>
                   </motion.div>
                 ) : (
                   <>
                   <CardHeader className="p-4">
                       <CardTitle
-                          className="text-5xl md:text-8xl font-black text-primary tracking-wider uppercase"
+                          className="text-5xl md:text-8xl font-black text-primary tracking-wider uppercase font-headline"
                           style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}
                       >
                           RPS Pod Battle
@@ -109,7 +109,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
                   <CardContent className="mt-8">
                       <Button
                         onClick={handleStartClick}
-                        className="w-48 h-48 rounded-full text-lg font-black text-primary-foreground bg-primary hover:bg-primary/90 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out flex flex-col leading-tight"
+                        className="w-48 h-48 rounded-full text-lg font-black text-primary-foreground bg-primary hover:bg-primary/90 border-8 border-red-800 shadow-[0_10px_0_0_#9B2C2C] active:shadow-none active:translate-y-2 transition-all duration-150 ease-in-out flex flex-col leading-tight font-headline"
                         disabled={isProcessing}
                       >
                         {isProcessing ? 'Loading...' : (

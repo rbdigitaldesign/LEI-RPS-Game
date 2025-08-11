@@ -225,16 +225,7 @@ export function MainPageContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header>
-        <div className="flex items-center gap-2">
-            <Button asChild variant="secondary" size="sm">
-              <Link href="/teams">View Pods</Link>
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
-                Reset
-            </Button>
-        </div>
-      </Header>
+      <Header />
       
       {winner ? (
         <main className="flex-grow container mx-auto p-4 flex flex-col">
@@ -244,7 +235,7 @@ export function MainPageContent() {
                 <p className="text-sm font-medium text-accent">
                     Ultimate Pod Champion
                 </p>
-                <CardTitle className="text-5xl font-bold tracking-tighter text-primary">{winner.name}</CardTitle>
+                <CardTitle className="text-5xl font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
                 <p className="text-muted-foreground">Represented by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
@@ -287,7 +278,7 @@ export function MainPageContent() {
                 <div className="col-span-12 xl:col-span-4 flex flex-col gap-6">
                   <Card className="p-4 md:p-6">
                     <CardHeader className="p-0 pb-2">
-                      <CardTitle className="flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
+                      <CardTitle className="font-headline flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
                         <Bot size={16}/>
                         LEI Commentary
                       </CardTitle>
@@ -300,7 +291,7 @@ export function MainPageContent() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.5 }}
-                          className="text-foreground text-sm italic text-center text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]"
+                          className="text-foreground italic text-center text-[clamp(1.1rem,1rem+0.5vw,1.5rem)]"
                         >
                           &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
                         </motion.p>
@@ -309,7 +300,7 @@ export function MainPageContent() {
                   </Card>
                   <Card className="p-4 md:p-6 text-center">
                     <CardHeader className="p-0 pb-4">
-                      <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
+                      <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
                       <CardDescription className="text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]">The result of the most recent match appears here.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
@@ -322,7 +313,7 @@ export function MainPageContent() {
                           exit={{ opacity: 0, y: -20 }}
                         >
                           <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
-                          <h3 className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2">DRAW</h3>
+                          <h3 className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2 font-headline">DRAW</h3>
                           <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
                         </motion.div>
                       ) : lastCompletedMatch?.winner ? (
@@ -334,7 +325,7 @@ export function MainPageContent() {
                           >
                           <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
                           <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
-                          <h3 className="text-4xl font-bold tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
+                          <h3 className="text-4xl font-bold tracking-tight text-primary font-headline">{lastCompletedMatch.winner.name}</h3>
                           <div className="flex flex-col items-center space-y-4 pt-4">
                               <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
                               <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
