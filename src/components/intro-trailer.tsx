@@ -53,7 +53,7 @@ export function IntroTrailer({ onFinished }: IntroTrailerProps) {
         </AnimatePresence>
         
         <div className="absolute bottom-8 right-8">
-            {index < (trailerLines.length -1) && (
+            {index < (trailerLines.length) && (
                 <Button variant="ghost" onClick={onFinished}>Skip</Button>
             )}
         </div>

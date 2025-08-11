@@ -68,52 +68,39 @@ export function TournamentBracket({ rounds, currentMatchId }: { rounds: Round[],
     if (!rounds || rounds.length === 0) return null;
 
     return (
-        <Card className="w-full bg-card border-2 overflow-hidden">
-            <CardContent className="p-4">
-                 <ScrollArea className="w-full whitespace-nowrap">
-                    <div className="flex gap-8 items-center py-4">
-                        {rounds.map((round, roundIndex) => (
-                            <div key={round.id} className="flex flex-col justify-center h-full">
-                                <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-4 h-5">
-                                    {round.name}
-                                </h3>
-                                <div className="flex flex-col gap-10 justify-around flex-grow relative">
-                                    {round.matches.map((match, matchIndex) => (
-                                        <div key={match.id} className="relative z-10">
-                                            <BracketMatch match={match} isCurrent={match.id === currentMatchId}/>
-                                            {/* Horizontal line out of the match */}
-                                            {roundIndex < rounds.length - 1 && (
-                                                <div className="absolute top-1/2 -right-4 h-px w-4 bg-border"></div>
-                                            )}
-
-                                            {/* Vertical connector line for every pair of matches */}
-                                            {matchIndex % 2 === 0 && roundIndex < rounds.length -1 && (
-                                                <>
-                                                    <div 
-                                                        className="absolute w-px bg-border"
-                                                        style={{
-                                                            height: `calc(100% + 2.5rem)`, // 100% of parent + gap
-                                                            right: '-1rem', 
-                                                            top: '50%',
-                                                        }}
-                                                    />
-                                                     <div className="absolute w-4 h-px bg-border"
-                                                        style={{
-                                                            top: `calc(50% + ((100% + 2.5rem) / 2))`,
-                                                            right: '-2rem'
-                                                        }}
-                                                    />
-                                                </>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+        <section className="rounded-lg border border-slate-700 bg-slate-900/40 p-4">
+             <ScrollArea className="w-full whitespace-nowrap">
+                <div className="flex gap-x-6 gap-y-4 items-center py-4 min-w-[820px] md:min-w-[980px] xl:min-w-full">
+                    {rounds.map((round, roundIndex) => (
+                        <div key={round.id} className="flex flex-col justify-center h-full">
+                            <h3 className="text-center font-bold text-accent uppercase tracking-widest text-xs mb-4 h-5">
+                                {round.name}
+                            </h3>
+                            <div className="flex flex-col gap-10 justify-around flex-grow relative">
+                                {round.matches.map((match, matchIndex) => (
+                                    <div key={match.id} className="relative z-10">
+                                        <BracketMatch match={match} isCurrent={match.id === currentMatchId}/>
+                                        {roundIndex < rounds.length - 1 && (
+                                            <div className="absolute top-1/2 -right-3 h-px w-3 bg-border"></div>
+                                        )}
+                                        {roundIndex < rounds.length - 1 && matchIndex % 2 === 0 && (
+                                             <div 
+                                                className="absolute w-px bg-border"
+                                                style={{
+                                                    height: `calc(100% + 2.5rem)`,
+                                                    right: '-0.75rem', 
+                                                    top: '50%',
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                    <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-            </CardContent>
-        </Card>
+                        </div>
+                    ))}
+                </div>
+                <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+        </section>
     );
 }

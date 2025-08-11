@@ -12,7 +12,6 @@ import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
-import { useToast } from '@/hooks/use-toast';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
@@ -112,7 +111,6 @@ export function MainPageContent() {
   useEffect(() => {
     setIsClient(true);
     const welcomeMessage = "Welcome to the very first LEI RPS Pod Battle. Let's get ready to rumble!";
-    // Setup the commentary queue on initial load
     setCommentaryQueue([welcomeMessage, ...shuffleArray([...commentaryItems])]);
     
     const skipIntroParam = searchParams?.get('skipIntro');
@@ -120,26 +118,20 @@ export function MainPageContent() {
     if (sessionStorage.getItem('introSeen') || skipIntroParam === 'true') {
       setPreIntroFinished(true);
       setIntroFinished(true);
-      // If skipping intro, also try to start the tournament immediately
-      if (skipIntroParam === 'true' && !tournament) {
-        startTournament();
-      }
     }
-  }, [startTournament, tournament]);
+  }, []);
   
-  // Commentary slideshow
   useEffect(() => {
     if (!tournament || winner || commentaryQueue.length === 0) return;
 
     const commentaryInterval = setInterval(() => {
       setCurrentCommentaryIndex(prevIndex => (prevIndex + 1) % commentaryQueue.length);
-    }, 7000); // Change joke every 7 seconds
+    }, 7000);
 
     return () => clearInterval(commentaryInterval);
   }, [tournament, winner, commentaryQueue.length]);
 
 
-  // Detect ties and match results for the "Latest Result" card
   useEffect(() => {
     if (tournament && lastTournamentState.current) {
       const allCurrentMatches = tournament.rounds.flatMap((r) => r.matches);
@@ -175,8 +167,6 @@ export function MainPageContent() {
     }
   }, [tournament]);
 
-
-  // Redirect to team page if team parameter is present
   useEffect(() => {
     if (isClient && teamParam) {
       window.location.href = `/team/${encodeURIComponent(teamParam)}`;
@@ -187,14 +177,13 @@ export function MainPageContent() {
     const password = prompt('Enter password to reset tournament:', '');
     if (password === 'orcas2025') {
       resetTournament();
-      startTournament();
     } else if (password !== null) {
       alert('Incorrect password.');
     }
   };
-
+  
   if (!isClient) {
-    return null; // Render nothing on the server to avoid hydration errors
+    return null;
   }
 
   if (teamParam) {
@@ -220,18 +209,14 @@ export function MainPageContent() {
   if (!preIntroFinished) {
     const skipIntroParam = searchParams?.get('skipIntro');
     if (skipIntroParam === 'true') {
-        // Skip intro screens and go directly to tournament
-        return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
-    }
-    return <PreIntroScreen onStart={() => {
         setPreIntroFinished(true);
-    }} />;
+    } else {
+        return <PreIntroScreen onStart={() => { setPreIntroFinished(true); }} />;
+    }
   }
   
   if (!introFinished) {
-    return <IntroTrailer onFinished={() => {
-        setIntroFinished(true);
-    }} />;
+    return <IntroTrailer onFinished={() => { setIntroFinished(true); sessionStorage.setItem('introSeen', 'true'); }} />;
   }
 
   if (!tournament) {
@@ -250,8 +235,9 @@ export function MainPageContent() {
             </Button>
         </div>
       </Header>
-      <main className="flex-grow container mx-auto p-4 flex flex-col">
-        {winner ? (
+      
+      {winner ? (
+        <main className="flex-grow container mx-auto p-4 flex flex-col">
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
               <CardHeader>
@@ -278,156 +264,150 @@ export function MainPageContent() {
               </CardContent>
             </Card>
           </div>
-        ) : (
-          <div className="flex flex-col lg:flex-row gap-4 items-start flex-grow">
-            <div className="flex-grow w-full flex flex-col gap-4">
-                <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
-                <Card className="p-4">
-                 <CardHeader className="p-0 pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Info size={16}/>
-                    Acknowledgements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                        Acknowledgement is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. The application was developed using Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
-                    </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="w-full lg:w-96 flex-shrink-0 flex flex-col gap-4">
-              <Card className="p-6">
-                <CardHeader className="p-0 pb-4">
-                  <CardTitle>Tournament in Progress</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="text-muted-foreground">
-                    Teams are currently playing their matches. View the tournament bracket to see the current status.
-                    {currentMatch && (
-                      <span className="block mt-2">
-                        Current Match: <strong>{currentMatch.pod1?.name}</strong> vs <strong>{currentMatch.pod2?.name}</strong>
-                        {currentMatch.moveHistory && currentMatch.moveHistory.length > 0 && (
-                          <span className="block mt-1 text-sm">
-                            {currentMatch.moveHistory.filter((round: any) => round.pod1 === round.pod2).length > 0 && (
-                              <span className="inline-flex items-center gap-1 text-yellow-600 font-medium">
-                                ⚠️ {currentMatch.moveHistory.filter((round: any) => round.pod1 === round.pod2).length} tie(s) occurred - teams playing again
-                              </span>
-                            )}
+        </main>
+      ) : (
+        <div className="flex-grow">
+            <main className="container mx-auto px-4 py-6 grid grid-cols-12 gap-6 max-w-screen-2xl">
+                <div className="col-span-12 xl:col-span-8 flex flex-col gap-6">
+                    <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+                    <Card className="p-4 border-slate-700 bg-slate-900/40">
+                        <CardHeader className="p-0 pb-2">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <Info size={16}/>
+                            Acknowledgements
+                        </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <p className="text-xs text-slate-400 leading-relaxed">
+                                Acknowledgement is given to Aaron Honson from the Media Team for their expertise in coding. Image generation was undertaken with the assistance of ChatGPT. The application was developed using Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="col-span-12 xl:col-span-4 flex flex-col gap-6">
+                  <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
+                    <CardHeader className="p-0 pb-4">
+                      <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Tournament in Progress</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <p className="text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)] text-muted-foreground">
+                        Teams are playing their matches. View the bracket to see the current status.
+                        {currentMatch && (
+                          <span className="block mt-2">
+                            Current Match: <strong>{currentMatch.pod1?.name}</strong> vs <strong>{currentMatch.pod2?.name}</strong>
                           </span>
                         )}
-                      </span>
-                    )}
-                  </p>
-                  
-                  {tournament && (() => {
-                    const eliminatedTeams = tournament.rounds
-                      .flatMap((r: any) => r.matches)
-                      .filter((m: any) => m.winner && m.loser && !m.isBye)
-                      .map((m: any) => m.loser)
-                      .filter((team: any, index: number, arr: any[]) => 
-                        arr.findIndex((t: any) => t.name === team.name) === index
-                      );
-                    
-                    if (eliminatedTeams.length > 0) {
-                      return (
-                        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
-                          <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {eliminatedTeams.map((team: any) => (
-                              <span 
-                                key={team.name} 
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-300 rounded text-sm"
-                              >
-                                <span className="grayscale">{team.emoji}</span>
-                                {team.name}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                </CardContent>
-              </Card>
-
-              <Card className="p-6 text-center">
-                <CardHeader className="p-0 pb-4">
-                  <CardTitle>Latest Result</CardTitle>
-                  <CardDescription>The result of the most recent match appears here.</CardDescription>
-                </CardHeader>
-                <CardContent className="p-0">
-                  {isTie ? (
-                    <motion.div
-                      key="tie"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="animate-in fade-in"
-                    >
-                      <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
-                      <h3 className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</h3>
-                      <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
-                    </motion.div>
-                  ) : lastCompletedMatch?.winner ? (
-                     <motion.div
-                        key={lastCompletedMatch.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="animate-in fade-in"
-                      >
-                      <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
-                      <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
-                      <h3 className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
-                      <div className="flex flex-col items-center space-y-4 pt-4">
-                          <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center">
-                          <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
-                          </div>
-                          <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
-                              <p className="text-lg font-semibold">Defeated</p>
-                              <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center">
-                                  <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
+                      </p>
+                      
+                      {tournament && (() => {
+                        const eliminatedTeams = tournament.rounds
+                          .flatMap((r: any) => r.matches)
+                          .filter((m: any) => m.winner && m.loser && !m.isBye)
+                          .map((m: any) => m.loser)
+                          .filter((team: any, index: number, arr: any[]) => 
+                            arr.findIndex((t: any) => t.name === team.name) === index
+                          );
+                        
+                        if (eliminatedTeams.length > 0) {
+                          return (
+                            <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                              <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {eliminatedTeams.map((team: any) => (
+                                  <span 
+                                    key={team.name} 
+                                    className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-300 rounded text-sm"
+                                  >
+                                    <span className="grayscale">{team.emoji}</span>
+                                    {team.name}
+                                  </span>
+                                ))}
                               </div>
-                              <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
-                          </div>
-                      </div>
-                    </motion.div>
-                  ) : (
-                      <div className="space-y-2">
-                          <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
-                          <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
-                      </div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card className="p-4">
-                <CardHeader className="p-0 pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Bot size={16}/>
-                    LEI Commentary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 min-h-20 flex items-center justify-center">
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={currentCommentaryIndex}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.5 }}
-                      className="text-foreground text-sm italic text-center"
-                    >
-                      &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
-                    </motion.p>
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </CardContent>
+                  </Card>
 
-            </div>
-          </div>
-        )}
-      </main>
+                  <Card className="p-4 md:p-6 text-center border-slate-700 bg-slate-900/40">
+                    <CardHeader className="p-0 pb-4">
+                      <CardTitle className="text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
+                      <CardDescription className="text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]">The result of the most recent match appears here.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <AnimatePresence mode="wait">
+                      {isTie ? (
+                        <motion.div
+                          key="tie"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                        >
+                          <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
+                          <h3 className="text-5xl font-black font-headline tracking-tighter text-yellow-500 mt-2">DRAW</h3>
+                          <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
+                        </motion.div>
+                      ) : lastCompletedMatch?.winner ? (
+                         <motion.div
+                            key={lastCompletedMatch.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                          >
+                          <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
+                          <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
+                          <h3 className="text-4xl font-black font-headline tracking-tight text-primary">{lastCompletedMatch.winner.name}</h3>
+                          <div className="flex flex-col items-center space-y-4 pt-4">
+                              <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center">
+                              <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
+                              </div>
+                              <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                                  <p className="text-lg font-semibold">Defeated</p>
+                                  <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center">
+                                      <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
+                                  </div>
+                                  <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
+                              </div>
+                          </div>
+                        </motion.div>
+                      ) : (
+                          <motion.div key="waiting" className="space-y-2">
+                              <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
+                              <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
+                          </motion.div>
+                      )}
+                      </AnimatePresence>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="p-4 md:p-6 border-slate-700 bg-slate-900/40">
+                    <CardHeader className="p-0 pb-2">
+                      <CardTitle className="flex items-center gap-2 text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">
+                        <Bot size={16}/>
+                        LEI Commentary
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0 min-h-20 flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={currentCommentaryIndex}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.5 }}
+                          className="text-foreground text-sm italic text-center text-[clamp(0.95rem,0.8rem+0.4vw,1.05rem)]"
+                        >
+                          &ldquo;{commentaryQueue[currentCommentaryIndex]}&rdquo;
+                        </motion.p>
+                      </AnimatePresence>
+                    </CardContent>
+                  </Card>
+                </div>
+            </main>
+        </div>
+      )}
     </div>
   );
 }
