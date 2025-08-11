@@ -32,12 +32,12 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
   return (
     <div className="flex flex-col min-h-screen bg-hero-pattern bg-cover bg-center bg-fixed">
       {isClient && showPlayer && (
-        <iframe
-            width="0"
-            height="0"
-            scrolling="no"
-            frameBorder="no"
-            allow="autoplay"
+        <iframe 
+            width="0" 
+            height="0" 
+            scrolling="no" 
+            frameBorder="no" 
+            allow="autoplay" 
             src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23ff5500&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false"
             style={{ position: 'absolute', left: '-9999px' }}
         >
