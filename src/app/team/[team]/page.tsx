@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -443,4 +442,5 @@ export default function TeamPage() {
       <CommentaryBox show={!!currentMatch} />
     </div>
   );
-}
+
+    
