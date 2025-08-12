@@ -6,35 +6,40 @@ import { useSearchParams } from 'next/navigation';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Trophy, Handshake, Flame } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
-import { useToast } from '@/hooks/use-toast';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
+import { PreIntroScreen } from './pre-intro-screen';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CommentaryBox } from './commentary-box';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
   const teamParam = searchParams?.get('team');
-  const skipIntroParam = searchParams?.get('skipIntro');
-  
-  const { tournament, startTournament, resetTournament, currentMatch, isProcessing, winner } = useServerTournament();
+  const { tournament, startTournament, resetTournament, isProcessing, winner } = useServerTournament();
+  const [preIntroFinished, setPreIntroFinished] = useState(false);
   const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const lastTournamentState = useRef<TournamentState | null>(null);
-  const { toast } = useToast();
+  const [lastCompletedMatch, setLastCompletedMatch] = useState<Match | null>(null);
+  const [isTie, setIsTie] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    const skipIntroParam = searchParams?.get('skipIntro');
+    if (sessionStorage.getItem('introSeen') || skipIntroParam === 'true') {
+      setPreIntroFinished(true);
+      setIntroFinished(true);
+    }
+  }, [searchParams]);
 
-  // Detect ties and match results to show notifications
   useEffect(() => {
     if (tournament && lastTournamentState.current) {
-      // Check for new completed matches
       const allCurrentMatches = tournament.rounds.flatMap((r) => r.matches);
       const allPreviousMatches = lastTournamentState.current.rounds.flatMap((r) => r.matches);
 
@@ -44,39 +49,21 @@ export function MainPageContent() {
           return !previous || !previous.winner;
       });
 
-      newlyCompleted.forEach((match: Match, index) => {
-          setTimeout(() => {
-              toast({
-                  title: "Match Complete! 🏆",
-                  description: `${match.winner?.name} defeated ${match.loser?.name || 'opponent'}`,
-                  duration: 4000,
-              });
+      if (newlyCompleted.length > 0) {
+        const lastMatch = newlyCompleted[newlyCompleted.length - 1];
+        setIsTie(false);
+        setLastCompletedMatch(lastMatch);
+      }
 
-              if (match.loser) {
-                  setTimeout(() => {
-                      toast({
-                          title: "Team Eliminated 😔",
-                          description: `${match.loser?.name} has been eliminated from the tournament`,
-                          duration: 4000,
-                      });
-                  }, 1000);
-              }
-          }, index * 2000); // Stagger notifications
-      });
+      const currentMatchData = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
+      const previousMatchData = allPreviousMatches.find(m => m.id === tournament.currentMatchId);
 
-      // Check for ties in current match
-      const currentMatch = allCurrentMatches.find(m => m.id === tournament.currentMatchId);
-      const previousMatch = allPreviousMatches.find(m => m.id === tournament.currentMatchId);
-
-      if (currentMatch && previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
-          if (currentMatch.moveHistory.length > previousMatch.moveHistory.length) {
-              const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
+      if (currentMatchData && previousMatchData && currentMatchData.moveHistory && previousMatchData.moveHistory) {
+          if (currentMatchData.moveHistory.length > previousMatchData.moveHistory.length) {
+              const latestRound = currentMatchData.moveHistory[currentMatchData.moveHistory.length - 1];
               if (latestRound.pod1 === latestRound.pod2) {
-                  toast({
-                      title: "Tie in Current Match! 🤝",
-                      description: `${currentMatch.pod1?.name} vs ${currentMatch.pod2?.name} - both chose ${latestRound.pod1}. They must play again!`,
-                      duration: 5000,
-                  });
+                  setIsTie(true);
+                  setLastCompletedMatch(null); 
               }
           }
       }
@@ -84,24 +71,30 @@ export function MainPageContent() {
     if (tournament) {
       lastTournamentState.current = JSON.parse(JSON.stringify(tournament));
     }
-  }, [tournament, toast]);
+  }, [tournament]);
 
-
-  // Redirect to team page if team parameter is present
   useEffect(() => {
     if (isClient && teamParam) {
       window.location.href = `/team/${encodeURIComponent(teamParam)}`;
     }
   }, [isClient, teamParam]);
   
+  const handleReset = () => {
+    const password = prompt('Enter password to reset tournament:', '');
+    if (password === 'orcas2025') {
+      resetTournament();
+    } else if (password !== null) {
+      alert('Incorrect password.');
+    }
+  };
+  
   if (!isClient) {
-    return null; // Render nothing on the server to avoid hydration errors
+    return null;
   }
 
-  // Show loading if redirecting to team page
   if (teamParam) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
@@ -119,42 +112,46 @@ export function MainPageContent() {
     );
   }
 
-  // Determine if we should skip intro/start screen
-  const shouldSkipIntroAndStart = skipIntroParam === 'true' && tournament;
+  const skipIntroParam = searchParams?.get('skipIntro');
 
+  if (!preIntroFinished && skipIntroParam !== 'true') {
+      return <PreIntroScreen onStart={() => { setPreIntroFinished(true); }} />;
+  }
+  
+  if (!introFinished) {
+    return <IntroTrailer onFinished={() => { setIntroFinished(true); sessionStorage.setItem('introSeen', 'true'); }} />;
+  }
 
-  if (!tournament || (!introFinished && !shouldSkipIntroAndStart)) {
-    if (!introFinished) {
-        return <IntroTrailer onFinished={() => setIntroFinished(true)} />;
-    }
+  if (!tournament) {
     return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
               <Link href="/teams">View Pods</Link>
             </Button>
-            <Button variant="outline" size="sm" onClick={resetTournament} disabled={isProcessing}>
+            <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
                 Reset
             </Button>
         </div>
       </Header>
-      <main className="flex-grow container mx-auto p-4 flex flex-col">
+      
+      <main className="flex-grow p-4 flex flex-col">
         {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
-            <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95 bg-card border-4 border-accent">
+            <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95">
               <CardHeader>
                 <p className="text-sm font-medium text-accent">
                     Ultimate Pod Champion
                 </p>
-                <CardTitle className="text-5xl font-bold font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
+                <CardTitle className="text-5xl font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
                 <p className="text-muted-foreground">Represented by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
-                <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center">
+                <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
                   <span className="text-8xl">{winner.emoji}</span>
                 </div>
                  <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
@@ -163,7 +160,7 @@ export function MainPageContent() {
                 </div>
                 <div className="flex w-full gap-4 mt-4">
                     <TournamentReport tournament={tournament} />
-                    <Button size="lg" onClick={resetTournament} className="w-full">
+                    <Button size="lg" onClick={handleReset} className="w-full">
                         Play Again
                     </Button>
                 </div>
@@ -171,33 +168,12 @@ export function MainPageContent() {
             </Card>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 items-start flex-grow">
-            <TournamentBracket rounds={tournament.rounds} />
-            <div className="w-full flex flex-col gap-4">
-              <Card className="p-6">
-                <CardHeader className="pt-0 pl-0">
-                  <CardTitle>Tournament in Progress</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="text-muted-foreground">
-                    Teams are currently playing their matches. View the bracket above to see the current status.
-                    {currentMatch && (
-                      <span className="block mt-2">
-                        Current Match: <strong>{currentMatch.pod1?.name}</strong> vs <strong>{currentMatch.pod2?.name}</strong>
-                        {currentMatch.moveHistory && currentMatch.moveHistory.length > 0 && (
-                          <span className="block mt-1 text-sm">
-                            {currentMatch.moveHistory.filter((round: any) => round.pod1 === round.pod2).length > 0 && (
-                              <span className="inline-flex items-center gap-1 text-yellow-600 font-medium">
-                                ⚠️ {currentMatch.moveHistory.filter((round: any) => round.pod1 === round.pod2).length} tie(s) occurred - teams playing again
-                              </span>
-                            )}
-                          </span>
-                        )}
-                      </span>
-                    )}
-                  </p>
-                  
-                  {/* Show eliminated teams */}
+          <div className="container mx-auto">
+            <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
+                <div className="flex-grow w-full">
+                  <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+                </div>
+                <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
                   {tournament && (() => {
                     const eliminatedTeams = tournament.rounds
                       .flatMap((r: any) => r.matches)
@@ -209,7 +185,7 @@ export function MainPageContent() {
                     
                     if (eliminatedTeams.length > 0) {
                       return (
-                        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                        <div className="p-3 bg-red-900/20 border border-red-500/30 rounded">
                           <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
                           <div className="flex flex-wrap gap-2">
                             {eliminatedTeams.map((team: any) => (
@@ -227,12 +203,62 @@ export function MainPageContent() {
                     }
                     return null;
                   })()}
-                </CardContent>
-              </Card>
-            </div>
+                  <Card className="p-4 md:p-6 text-center">
+                    <CardHeader className="p-0 pb-4">
+                      <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
+                      <CardDescription className="text-sm">The result of the most recent match appears here.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <AnimatePresence mode="wait">
+                        {isTie ? (
+                          <motion.div
+                            key="tie"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                          >
+                            <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
+                            <h3 className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2 font-headline">DRAW</h3>
+                            <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
+                          </motion.div>
+                        ) : lastCompletedMatch?.winner ? (
+                          <motion.div
+                            key={lastCompletedMatch.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                          >
+                            <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
+                            <p className="text-lg font-medium text-accent uppercase tracking-widest mt-2">Match Winner</p>
+                            <h3 className="text-4xl font-bold tracking-tight text-primary font-headline">{lastCompletedMatch.winner.name}</h3>
+                            <div className="flex flex-col items-center space-y-4 pt-4">
+                              <div className="relative w-32 h-32 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
+                                <span className="text-7xl">{lastCompletedMatch.winner.emoji}</span>
+                              </div>
+                              <div className="flex items-center gap-4 p-3 bg-secondary rounded-lg">
+                                <p className="text-lg font-semibold">Defeated</p>
+                                <div className="relative w-16 h-16 border-2 border-destructive bg-background flex items-center justify-center rounded-lg">
+                                  <span className="text-4xl grayscale">{lastCompletedMatch.loser?.emoji}</span>
+                                </div>
+                                <p className="text-lg font-semibold capitalize text-destructive tracking-wide">{lastCompletedMatch.loser?.name}</p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ) : (
+                          <motion.div key="waiting" className="space-y-2">
+                            <Flame className="w-8 h-8 mx-auto text-muted-foreground animate-pulse" />
+                            <p className="text-muted-foreground italic text-sm">Waiting for match result...</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
           </div>
         )}
       </main>
+      <CommentaryBox show={!winner} />
     </div>
   );
 }

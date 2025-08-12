@@ -87,3 +87,7 @@ body {
     image-rendering: pixelated;
   }
 }
+
+.font-headline {
+    font-family: "Press Start 2P", cursive;
+}

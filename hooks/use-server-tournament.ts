@@ -1,18 +1,30 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { TournamentState } from '../lib/types';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import type { TournamentState, Match } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 export function useServerTournament() {
   const [tournament, setTournament] = useState<TournamentState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const fetchTournament = useCallback(async () => {
+  const { toast } = useToast();
+  
+  const fetchTournamentCallback = useCallback(async () => {
     try {
       const response = await fetch('/api/tournament');
+      if (!response.ok) {
+        throw new Error('Failed to fetch tournament state');
+      }
       const data = await response.json();
-      setTournament(data.tournament);
+      
+      setTournament(prevTournament => {
+        if (JSON.stringify(data.tournament) !== JSON.stringify(prevTournament)) {
+          return data.tournament;
+        }
+        return prevTournament;
+      });
+
     } catch (error) {
       console.error('Failed to fetch tournament:', error);
     }
@@ -58,18 +70,17 @@ export function useServerTournament() {
   }, []);
 
   useEffect(() => {
-    fetchTournament();
-    // Poll for updates every 3 seconds
-    const interval = setInterval(fetchTournament, 3000);
+    fetchTournamentCallback(); 
+    const interval = setInterval(fetchTournamentCallback, 3000);
     return () => clearInterval(interval);
-  }, [fetchTournament]);
+  }, [fetchTournamentCallback]);
 
   const currentMatch = tournament && tournament.currentMatchId
     ? tournament.rounds.flatMap(r => r.matches).find(m => m.id === tournament.currentMatchId) ?? null
     : null;
 
-  const currentRound = tournament && tournament.currentMatchId
-    ? tournament.rounds.findIndex(r => r.matches.some(m => m.id === tournament.currentMatchId)) + 1
+  const currentRound = tournament && currentMatch
+    ? tournament.rounds.find(r => r.matches.some(m => m.id === currentMatch.id))?.id ?? null
     : null;
 
   return {
@@ -80,6 +91,6 @@ export function useServerTournament() {
     winner: tournament?.winner ?? null,
     isProcessing,
     currentRound,
-    refetch: fetchTournament
+    refetch: fetchTournamentCallback
   };
 }
