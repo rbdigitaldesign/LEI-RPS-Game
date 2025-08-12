@@ -139,7 +139,7 @@ export function MainPageContent() {
         </div>
       </Header>
       
-      <main className="flex-grow p-4 flex flex-col">
+      <main className="p-4 flex flex-col flex-grow">
         {winner ? (
           <div className="flex flex-grow items-center justify-center py-16">
             <Card className="w-full max-w-lg text-center animate-in fade-in zoom-in-95">
@@ -169,7 +169,7 @@ export function MainPageContent() {
           </div>
         ) : (
           <div className="container mx-auto">
-            <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
+            <div className="flex flex-col xl:flex-row gap-6 items-start w-full">
                 <div className="flex-grow w-full">
                   <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
                 </div>
