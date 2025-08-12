@@ -112,14 +112,14 @@ export function CommentaryBox({ show }: CommentaryBoxProps) {
   }
 
   return (
-    <Card className="fixed bottom-4 right-4 w-96 max-w-[calc(100%-2rem)] p-4 z-50">
-        <CardHeader className="p-0 pb-2">
+    <Card className="fixed bottom-4 right-4 w-96 max-w-[calc(100%-2rem)] h-48 flex flex-col p-4 z-50">
+        <CardHeader className="p-0 pb-2 flex-shrink-0">
         <CardTitle className="font-headline flex items-center gap-2 text-lg font-semibold">
             <Bot size={20}/>
             LEI Commentary
         </CardTitle>
         </CardHeader>
-        <CardContent className="p-0 min-h-24 flex items-center justify-center">
+        <CardContent className="p-0 flex-grow flex items-center justify-center">
         <AnimatePresence mode="wait">
             <motion.p
             key={currentCommentaryIndex}
