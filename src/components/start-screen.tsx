@@ -79,7 +79,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             transition={{ duration: 0.8, type: 'spring' }}
             className="w-full"
         >
-            <Card className="w-full max-w-4xl text-center bg-background/25 backdrop-blur-sm flex flex-col justify-center items-center mx-auto min-h-[400px]">
+            <Card className="w-full max-w-4xl text-center bg-background/30 backdrop-blur-sm flex flex-col justify-center items-center mx-auto min-h-[400px]">
                 {isLoading ? (
                   <motion.div
                     key="loading"
