@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Anton', sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 220 13% 10%;
+    --foreground: 220 13% 90%;
+    --card: 220 13% 18%;
+    --card-foreground: 220 13% 90%;
+    --popover: 220 13% 18%;
+    --popover-foreground: 220 13% 90%;
+    --primary: 260 80% 60%;
+    --primary-foreground: 220 13% 10%;
+    --secondary: 220 13% 30%;
+    --secondary-foreground: 220 13% 90%;
+    --muted: 220 13% 25%;
+    --muted-foreground: 220 13% 70%;
+    --accent: 330 80% 60%;
+    --accent-foreground: 220 13% 10%;
+    --destructive: 0 80% 60%;
+    --destructive-foreground: 220 13% 10%;
+    --border: 220 13% 40%;
+    --input: 220 13% 30%;
+    --ring: 260 80% 60%;
+    --chart-1: 260 80% 60%;
+    --chart-2: 330 80% 60%;
+    --chart-3: 43 85% 48%;
+    --chart-4: 210 40% 50%;
+    --chart-5: 210 40% 70%;
+    --radius: 0.1rem;
+    --sidebar-background: 220 13% 10%;
+    --sidebar-foreground: 220 13% 90%;
+    --sidebar-primary: 260 80% 60%;
+    --sidebar-primary-foreground: 220 13% 10%;
+    --sidebar-accent: 220 13% 25%;
+    --sidebar-accent-foreground: 220 13% 90%;
+    --sidebar-border: 220 13% 40%;
+    --sidebar-ring: 260 80% 60%;
+  }
+  .dark {
+    --background: 220 13% 10%;
+    --foreground: 220 13% 90%;
+    --card: 220 13% 18%;
+    --card-foreground: 220 13% 90%;
+    --popover: 220 13% 18%;
+    --popover-foreground: 220 13% 90%;
+    --primary: 260 80% 60%;
+    --primary-foreground: 220 13% 10%;
+    --secondary: 220 13% 30%;
+    --secondary-foreground: 220 13% 90%;
+    --muted: 220 13% 25%;
+    --muted-foreground: 220 13% 70%;
+    --accent: 330 80% 60%;
+    --accent-foreground: 220 13% 10%;
+    --destructive: 0 80% 60%;
+    --destructive-foreground: 220 13% 10%;
+    --border: 220 13% 40%;
+    --input: 220 13% 30%;
+    --ring: 260 80% 60%;
+    --chart-1: 260 80% 60%;
+    --chart-2: 330 80% 60%;
+    --chart-3: 43 85% 55%;
+    --chart-4: 210 40% 60%;
+    --chart-5: 210 40% 80%;
+    --sidebar-background: 220 13% 10%;
+    --sidebar-foreground: 220 13% 90%;
+    --sidebar-primary: 260 80% 60%;
+    --sidebar-primary-foreground: 220 13% 10%;
+    --sidebar-accent: 220 13% 25%;
+    --sidebar-accent-foreground: 220 13% 90%;
+    --sidebar-border: 220 13% 40%;
+    --sidebar-ring: 260 80% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    image-rendering: pixelated;
+  }
+}
+
+.font-headline {
+    font-family: "Press Start 2P", cursive;
+}
