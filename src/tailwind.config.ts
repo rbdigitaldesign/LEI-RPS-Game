@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       backgroundImage: {
-        'hero-pattern': "url('https://i.imgur.com/cHVMAki.jpeg')",
+        'hero-pattern': "url('https://i.imgur.com/DoA6NkS.png')",
       },
       fontFamily: {
         sans: ['var(--font-space-grotesk)', 'sans-serif'],
