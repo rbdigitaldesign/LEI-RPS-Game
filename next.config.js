@@ -1,7 +1,5 @@
-// next.config.js
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
@@ -24,4 +22,4 @@ const nextConfig: NextConfig = {
   // eslint: { ignoreDuringBuilds: true },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
