@@ -36,8 +36,8 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
     >
       <Card
         className={cn(
-          'w-full text-center relative overflow-hidden transition-all duration-300 bg-card border-2',
-          isWinner && 'border-accent ring-2 ring-accent shadow-lg shadow-accent/20',
+          'w-full text-center relative overflow-hidden transition-all duration-300 bg-card border-2 shadow-lg',
+          isWinner && 'border-accent ring-2 ring-accent shadow-accent/20',
           !isWinner && reveal && 'opacity-50 scale-95',
           isDraw && 'border-yellow-500',
           isBoss && 'border-destructive'
@@ -50,7 +50,7 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
           >
-            <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6 font-headline">{pod.name} WIN!</p>
+            <p className="text-2xl lg:text-3xl font-black text-accent-foreground tracking-tighter -rotate-6">{pod.name} WIN!</p>
           </motion.div>
         )}
         {isDraw && reveal && (
@@ -60,15 +60,15 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 15 }}
           >
-            <p className="text-2xl lg:text-3xl font-black text-yellow-950 tracking-tighter font-headline">DRAW</p>
+            <p className="text-2xl lg:text-3xl font-black text-yellow-950 tracking-tighter">DRAW</p>
           </motion.div>
         )}
         <CardHeader className="p-2">
-          <div className="w-16 h-16 mx-auto bg-secondary flex items-center justify-center border-2 border-border mb-1 relative">
+          <div className="w-16 h-16 mx-auto bg-secondary flex items-center justify-center border-2 border-border mb-1 relative rounded-md">
             <span className="text-4xl">{pod.emoji}</span>
           </div>
-          <CardTitle className={cn("text-lg", isBoss ? "text-destructive" : "text-primary")}>{pod.name}</CardTitle>
-          <CardDescription className="text-[10px]">Managed by {pod.manager}</CardDescription>
+          <CardTitle className={cn("text-lg font-bold", isBoss ? "text-destructive" : "text-primary")}>{pod.name}</CardTitle>
+          <CardDescription className="text-xs">Managed by {pod.manager}</CardDescription>
         </CardHeader>
         <CardContent className="h-24 flex flex-col items-center justify-center p-1">
           {reveal && move ? (
@@ -78,7 +78,7 @@ export function PodCard({ pod, move, isWinner, isDraw, reveal, isBoss, className
               transition={{ delay: 0.2 }}
               className="space-y-1"
             >
-              <div className="w-12 h-12 bg-background text-secondary-foreground flex items-center justify-center border-2">
+              <div className="w-12 h-12 bg-background text-secondary-foreground flex items-center justify-center border-2 rounded-md">
                   <MoveIcon move={move} className="text-3xl" />
               </div>
               <p className="font-bold text-sm capitalize">{move}</p>

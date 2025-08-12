@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams, notFound } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/header';
@@ -12,7 +11,6 @@ import { Trophy, Clock, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CommentaryBox } from '@/components/commentary-box';
-import { PODS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -20,11 +18,7 @@ export const revalidate = 0;
 
 export default function TeamPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
-  const rawTeamName = (params?.team as string) || searchParams?.get('team');
-  
-  const decodedTeamName = rawTeamName ? decodeURIComponent(rawTeamName) : null;
-  const teamNameKey = decodedTeamName ? decodedTeamName.toLowerCase().trim() : null;
+  const teamName = params?.team ? decodeURIComponent(params.team as string) : null;
   
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
@@ -33,10 +27,61 @@ export default function TeamPage() {
   const [currentMatch, setCurrentMatch] = useState<Match | null>(null);
   const [teamPod, setTeamPod] = useState<Pod | null>(null);
   const [opponentPod, setOpponentPod] = useState<Pod | null>(null);
-  const [lastMoveHistory, setLastMoveHistory] = useState<any[]>([]);
-  const [lastMatchWinner, setLastMatchWinner] = useState<Pod | null>(null);
   const [isEliminated, setIsEliminated] = useState<boolean>(false);
+  const [lastMoveHistoryLength, setLastMoveHistoryLength] = useState(0);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (tournament && teamName) {
+      const currentTeamPod = tournament.pods.find(
+        (p) => p.name.toLowerCase() === teamName.toLowerCase()
+      );
+
+      if (!currentTeamPod) {
+        return notFound();
+      }
+      setTeamPod(currentTeamPod);
+
+      const isTeamEliminated = tournament.rounds.some(round =>
+        round.matches.some(m => m.loser?.name === currentTeamPod.name)
+      );
+      setIsEliminated(isTeamEliminated);
+
+      const matchForTeam = tournament.rounds
+        .flatMap(r => r.matches)
+        .find(
+          (m) =>
+            m.id === tournament.currentMatchId &&
+            !m.isBye &&
+            (m.pod1?.name.toLowerCase() === currentTeamPod.name.toLowerCase() || m.pod2?.name.toLowerCase() === currentTeamPod.name.toLowerCase())
+        );
+
+      setCurrentMatch(matchForTeam || null);
+
+      if (matchForTeam) {
+        setOpponentPod(
+          matchForTeam.pod1?.name.toLowerCase() === currentTeamPod.name.toLowerCase()
+            ? matchForTeam.pod2
+            : matchForTeam.pod1
+        );
+        const teamIsPod1 = matchForTeam.pod1?.name.toLowerCase() === currentTeamPod.name.toLowerCase();
+        const teamMove = teamIsPod1 ? matchForTeam.moves?.pod1 : matchForTeam.moves?.pod2;
+        setHasSubmittedMove(!!teamMove);
+        
+        if (matchForTeam.moveHistory && matchForTeam.moveHistory.length > lastMoveHistoryLength) {
+          const latestRound = matchForTeam.moveHistory[matchForTeam.moveHistory.length - 1];
+          if (latestRound.pod1 === latestRound.pod2) {
+             toast({
+                title: "It's a Tie! 🤝",
+                description: `Both teams chose ${latestRound.pod1}. Choose again!`,
+                duration: 4000,
+              });
+          }
+           setLastMoveHistoryLength(matchForTeam.moveHistory.length);
+        }
+      }
+    }
+  }, [tournament, teamName, toast, lastMoveHistoryLength]);
 
   const submitMove = async () => {
     if (!selectedMove || !teamPod) return;
@@ -49,114 +94,33 @@ export default function TeamPage() {
         body: JSON.stringify({
           action: 'playMove',
           teamName: teamPod.name,
-          move: selectedMove
-        })
+          move: selectedMove,
+        }),
       });
 
       if (response.ok) {
         setHasSubmittedMove(true);
         setSelectedMove(null);
         await refetch();
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error submitting move',
+          description: 'Please try again.',
+        });
       }
     } catch (error) {
       console.error('Failed to submit move:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Network Error',
+        description: 'Could not connect to the server.',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (tournament && teamNameKey) {
-      const pod = tournament.pods.find(p => p.name.toLowerCase().trim() === teamNameKey);
-      
-      if (!pod) {
-        notFound();
-        return;
-      }
-      
-      setTeamPod(pod || null);
-
-      if (pod) {
-        const match = tournament.rounds
-          .flatMap(r => r.matches)
-          .find(m => 
-            m.id === tournament.currentMatchId && 
-            !m.isBye && 
-            (m.pod1?.name === pod.name || m.pod2?.name === pod.name)
-          );
-
-        setCurrentMatch(match || null);
-
-        if (match) {
-          const opponent = match.pod1?.name === pod.name ? match.pod2 : match.pod1;
-          setOpponentPod(opponent);
-
-          const teamIsPod1 = match.pod1?.name === pod.name;
-          const teamMove = teamIsPod1 ? match.moves?.pod1 : match.moves?.pod2;
-          setHasSubmittedMove(!!teamMove);
-
-          if (match.moveHistory && match.moveHistory.length > lastMoveHistory.length) {
-            const latestRound = match.moveHistory[match.moveHistory.length - 1];
-            if (latestRound.pod1 === latestRound.pod2) {
-              toast({
-                title: "It's a Tie! 🤝",
-                description: `Both teams chose ${latestRound.pod1}. Choose again!`,
-                duration: 4000,
-              });
-            }
-            setLastMoveHistory([...match.moveHistory]);
-          }
-
-          if (match.winner && match.winner !== lastMatchWinner) {
-            const isWinner = match.winner.name === pod.name;
-            
-            if (isWinner) {
-              toast({
-                title: "Victory! 🎉",
-                description: `You defeated ${opponent?.name}! Moving to the next round.`,
-                duration: 5000,
-              });
-            } else {
-              toast({
-                title: "Match Complete",
-                description: `${match.winner.name} won the match. Better luck next time!`,
-                duration: 5000,
-              });
-            }
-            setLastMatchWinner(match.winner);
-          }
-        } else {
-          setOpponentPod(null);
-          setHasSubmittedMove(false);
-        }
-
-        const isTeamEliminated = tournament.rounds
-            .flatMap(r => r.matches)
-            .some(m => m.loser?.name === pod.name);
-        
-        setIsEliminated(isTeamEliminated);
-      }
-    }
-  }, [tournament, teamNameKey, lastMoveHistory.length, toast, lastMatchWinner]);
-
-  if (!decodedTeamName) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
-          <Card className="w-full max-w-md text-center">
-            <CardHeader>
-              <CardTitle className="text-red-500 font-headline">Invalid Team</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>No team specified. Please use a valid team URL.</p>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
-    );
-  }
-
+  
   if (!tournament) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -164,7 +128,7 @@ export default function TeamPage() {
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle className='font-headline'>Loading Tournament...</CardTitle>
+              <CardTitle>Loading Tournament...</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="animate-pulse">
@@ -177,11 +141,6 @@ export default function TeamPage() {
     );
   }
 
-  if (!teamPod && tournament) { // Check after tournament has loaded
-    return notFound();
-  }
-
-
   if (tournament.winner) {
     const isWinner = tournament.winner.name === teamPod?.name;
     return (
@@ -190,20 +149,20 @@ export default function TeamPage() {
         <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
           <Card className={`w-full max-w-lg text-center ${isWinner ? 'border-4 border-accent' : ''}`}>
             <CardHeader>
-              <div className="flex items-center justify-center gap-2 mb-2">
+               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-4xl">{teamPod?.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl font-headline">{teamPod?.name}</CardTitle>
+                  <CardTitle className="text-2xl">{teamPod?.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by {teamPod?.manager}</p>
                 </div>
               </div>
               {isWinner ? (
-                <div className="flex items-center justify-center gap-2 text-2xl font-semibold text-primary font-headline">
+                <div className="flex items-center justify-center gap-2 text-2xl font-semibold text-primary">
                   <Trophy className="w-8 h-8"/>
                   <span>Tournament Champion!</span>
                 </div>
               ) : (
-                <div className="text-lg font-medium text-muted-foreground font-headline">
+                <div className="text-lg font-medium text-muted-foreground">
                   Tournament Complete
                 </div>
               )}
@@ -241,11 +200,11 @@ export default function TeamPage() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-4xl grayscale">{teamPod?.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl text-muted-foreground font-headline">{teamPod?.name}</CardTitle>
+                  <CardTitle className="text-2xl text-muted-foreground">{teamPod?.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by {teamPod?.manager}</p>
                 </div>
               </div>
-              <div className="text-lg font-medium text-destructive font-headline">
+              <div className="text-lg font-medium text-destructive">
                 Eliminated from Tournament
               </div>
             </CardHeader>
@@ -273,7 +232,7 @@ export default function TeamPage() {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-4xl">{teamPod?.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl font-headline">{teamPod?.name}</CardTitle>
+                  <CardTitle className="text-2xl">{teamPod?.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by {teamPod?.manager}</p>
                 </div>
               </div>
@@ -308,7 +267,7 @@ export default function TeamPage() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Badge variant="outline">{currentRound?.name}</Badge>
             </div>
-            <CardTitle className="text-3xl font-bold font-headline">Rock Paper Scissors Battle</CardTitle>
+            <CardTitle className="text-3xl font-bold">Rock Paper Scissors Battle</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
@@ -323,7 +282,7 @@ export default function TeamPage() {
                 )}
               </div>
 
-              <div className="text-4xl font-bold text-muted-foreground font-headline">VS</div>
+              <div className="text-4xl font-bold text-muted-foreground">VS</div>
 
               <div className="text-center space-y-2">
                 <div className="text-6xl">{opponentPod?.emoji}</div>
@@ -342,7 +301,7 @@ export default function TeamPage() {
 
             {bothMovesSubmitted && (
               <div className="text-center space-y-4 p-4 bg-muted rounded-lg">
-                <h3 className="text-xl font-bold font-headline">Round Result</h3>
+                <h3 className="text-xl font-bold">Round Result</h3>
                 <div className="flex items-center justify-center gap-8">
                   <div className="text-center">
                     <div className="text-3xl mb-2">
@@ -367,7 +326,7 @@ export default function TeamPage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-center gap-2 text-lg font-bold text-yellow-500">
                       <AlertTriangle className="w-5 h-5" />
-                      <span className='font-headline'>It's a Tie!</span>
+                      <span>It's a Tie!</span>
                     </div>
                     <p className="text-sm text-muted-foreground">Both teams chose the same move. Choose again!</p>
                   </div>
@@ -375,7 +334,7 @@ export default function TeamPage() {
                 
                 {currentMatch.moveHistory && currentMatch.moveHistory.length > 1 && (
                   <div className="mt-4 p-3 bg-background rounded border">
-                    <h4 className="font-medium mb-2 font-headline">Previous Rounds:</h4>
+                    <h4 className="font-medium mb-2">Previous Rounds:</h4>
                     <div className="space-y-1">
                       {currentMatch.moveHistory.slice(0, -1).map((round, index) => (
                         <div key={index} className="flex items-center justify-center gap-4 text-sm">
@@ -383,7 +342,7 @@ export default function TeamPage() {
                           <span>{round.pod1 === 'rock' ? '🪨' : round.pod1 === 'paper' ? '📄' : '✂️'}</span>
                           <span className="text-muted-foreground">vs</span>
                           <span>{round.pod2 === 'rock' ? '🪨' : round.pod2 === 'paper' ? '📄' : '✂️'}</span>
-                          <span className="text-yellow-500 font-medium font-headline">{round.pod1 === round.pod2 ? 'TIE' : ''}</span>
+                          <span className="text-yellow-500 font-medium">{round.pod1 === round.pod2 ? 'TIE' : ''}</span>
                         </div>
                       ))}
                     </div>
@@ -394,7 +353,7 @@ export default function TeamPage() {
 
             {!hasSubmittedMove && !bothMovesSubmitted && (
               <div className="space-y-4">
-                <h3 className="text-xl font-bold text-center font-headline">Choose Your Move</h3>
+                <h3 className="text-xl font-bold text-center">Choose Your Move</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {(['rock', 'paper', 'scissors'] as Move[]).map((move) => (
                     <Button
@@ -442,5 +401,3 @@ export default function TeamPage() {
     </div>
   );
 }
-
-    

@@ -6,6 +6,7 @@ const config = {
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   prefix: '',
   theme: {
@@ -17,13 +18,8 @@ const config = {
       },
     },
     extend: {
-      backgroundImage: {
-        'hero-pattern': "url('https://i.imgur.com/cHVMAki.jpeg')",
-      },
       fontFamily: {
-        sans: ['var(--font-space-grotesk)', 'sans-serif'],
-        body: ['Anton', 'sans-serif'],
-        headline: ['"Press Start 2P"', 'cursive'],
+        sans: ['Space Grotesk', 'sans-serif'],
       },
       colors: {
         border: 'hsl(var(--border))',

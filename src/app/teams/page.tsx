@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -73,17 +72,17 @@ export default function TeamsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'playing':
-        return <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🎮 Playing Now</span>;
+        return <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🎮 Playing Now</span>;
       case 'waiting-opponent':
-        return <span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Move Submitted</span>;
+        return <span className="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Move Submitted</span>;
       case 'waiting-turn':
-        return <span className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏰ Waiting Turn</span>;
+        return <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏰ Waiting Turn</span>;
       case 'eliminated':
         return <span className="bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">❌ Eliminated</span>;
       case 'winner':
         return <span className="bg-yellow-400/30 text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🏆 Champion</span>;
       default:
-        return <span className="bg-gray-500/20 text-gray-400 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Not Started</span>;
+        return <span className="bg-gray-500/20 text-gray-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Not Started</span>;
     }
   };
 
