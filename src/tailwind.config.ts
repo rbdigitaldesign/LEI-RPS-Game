@@ -23,8 +23,9 @@ const config = {
         'hero-pattern': "url('https://i.imgur.com/cHVMAki.jpeg')",
       },
       fontFamily: {
-        sans: ['var(--font-space-grotesk)'],
-        headline: ['var(--font-press-start-2p)'],
+        sans: ['var(--font-space-grotesk)', 'sans-serif'],
+        body: ['Anton', 'sans-serif'],
+        headline: ['"Press Start 2P"', 'cursive'],
       },
       colors: {
         border: 'hsl(var(--border))',
