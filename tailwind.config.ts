@@ -23,6 +23,8 @@ const config = {
       },
       fontFamily: {
         sans: ['var(--font-space-grotesk)', 'sans-serif'],
+        body: ['Anton', 'sans-serif'],
+        headline: ['"Press Start 2P"', 'cursive'],
       },
       colors: {
         border: 'hsl(var(--border))',
