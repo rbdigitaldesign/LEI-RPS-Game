@@ -172,7 +172,9 @@ export function MainPageContent() {
             <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
                 <div className="flex-grow w-full">
                   <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
-                   {tournament && (() => {
+                </div>
+                <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
+                  {tournament && (() => {
                     const eliminatedTeams = tournament.rounds
                       .flatMap((r: any) => r.matches)
                       .filter((m: any) => m.winner && m.loser && !m.isBye)
@@ -183,7 +185,7 @@ export function MainPageContent() {
                     
                     if (eliminatedTeams.length > 0) {
                       return (
-                        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                        <div className="p-3 bg-red-900/20 border border-red-500/30 rounded">
                           <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
                           <div className="flex flex-wrap gap-2">
                             {eliminatedTeams.map((team: any) => (
@@ -201,8 +203,6 @@ export function MainPageContent() {
                     }
                     return null;
                   })()}
-                </div>
-                <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
                   <Card className="p-4 md:p-6 text-center">
                     <CardHeader className="p-0 pb-4">
                       <CardTitle className="font-headline text-[clamp(1.05rem,0.9rem+0.6vw,1.25rem)] font-semibold">Latest Result</CardTitle>
