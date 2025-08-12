@@ -25,8 +25,9 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
     setIsClient(true);
   }, []);
 
-  const handleStartClick = () => {
-    setIsLoading(true);
+  useEffect(() => {
+    if (!isLoading) return;
+
     // Simulate loading time for the nostalgic progress bar
     const interval = setInterval(() => {
         setProgress(prev => {
@@ -38,6 +39,12 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             return prev + Math.random() * 20;
         });
     }, 300);
+
+    return () => clearInterval(interval);
+  }, [isLoading, onStartTournament]);
+
+  const handleStartClick = () => {
+    setIsLoading(true);
   };
   
   const soundCloudSrc = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1674907137&color=%23F44336&auto_play=${!isMuted}&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
