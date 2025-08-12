@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/header';
@@ -12,6 +12,11 @@ import { Trophy, Clock, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CommentaryBox } from '@/components/commentary-box';
+import { PODS } from '@/lib/constants';
+
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
 
 export default function TeamPage() {
   const params = useParams();
@@ -19,7 +24,7 @@ export default function TeamPage() {
   const rawTeamName = (params?.team as string) || searchParams?.get('team');
   
   const decodedTeamName = rawTeamName ? decodeURIComponent(rawTeamName) : null;
-  const teamNameKey = decodedTeamName ? decodedTeamName.toLowerCase() : null;
+  const teamNameKey = decodedTeamName ? decodedTeamName.toLowerCase().trim() : null;
   
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
@@ -62,7 +67,13 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (tournament && teamNameKey) {
-      const pod = tournament.pods.find(p => p.name.toLowerCase() === teamNameKey);
+      const pod = tournament.pods.find(p => p.name.toLowerCase().trim() === teamNameKey);
+      
+      if (!pod) {
+        notFound();
+        return;
+      }
+      
       setTeamPod(pod || null);
 
       if (pod) {
@@ -166,27 +177,13 @@ export default function TeamPage() {
     );
   }
 
-  if (!teamPod) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow container mx-auto p-4 flex items-center justify-center">
-          <Card className="w-full max-w-md text-center">
-            <CardHeader>
-              <CardTitle className="text-destructive font-headline">Team Not Found</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>The team "{decodedTeamName}" was not found in the tournament.</p>
-              <p className="text-sm text-muted-foreground mt-2">Check the URL and try again.</p>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
-    );
+  if (!teamPod && tournament) { // Check after tournament has loaded
+    return notFound();
   }
 
+
   if (tournament.winner) {
-    const isWinner = tournament.winner.name === teamPod.name;
+    const isWinner = tournament.winner.name === teamPod?.name;
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -194,10 +191,10 @@ export default function TeamPage() {
           <Card className={`w-full max-w-lg text-center ${isWinner ? 'border-4 border-accent' : ''}`}>
             <CardHeader>
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-4xl">{teamPod.emoji}</span>
+                <span className="text-4xl">{teamPod?.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl font-headline">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
+                  <CardTitle className="text-2xl font-headline">{teamPod?.name}</CardTitle>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod?.manager}</p>
                 </div>
               </div>
               {isWinner ? (
@@ -214,7 +211,7 @@ export default function TeamPage() {
             <CardContent>
               {isWinner ? (
                 <div className="space-y-4">
-                  <div className="text-6xl">{teamPod.emoji}</div>
+                  <div className="text-6xl">{teamPod?.emoji}</div>
                   <p className="text-lg font-medium">Congratulations! You've won the tournament!</p>
                 </div>
               ) : (
@@ -242,10 +239,10 @@ export default function TeamPage() {
           <Card className="w-full max-w-md text-center border-2 border-destructive">
             <CardHeader>
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-4xl grayscale">{teamPod.emoji}</span>
+                <span className="text-4xl grayscale">{teamPod?.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl text-muted-foreground font-headline">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
+                  <CardTitle className="text-2xl text-muted-foreground font-headline">{teamPod?.name}</CardTitle>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod?.manager}</p>
                 </div>
               </div>
               <div className="text-lg font-medium text-destructive font-headline">
@@ -253,7 +250,7 @@ export default function TeamPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-6xl grayscale">{teamPod.emoji}</div>
+              <div className="text-6xl grayscale">{teamPod?.emoji}</div>
               <div className="text-lg text-destructive font-semibold">❌ ELIMINATED</div>
               <p className="text-sm text-muted-foreground">
                 Your team has been eliminated. Thank you for participating!
@@ -274,10 +271,10 @@ export default function TeamPage() {
           <Card className="w-full max-w-md text-center">
             <CardHeader>
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-4xl">{teamPod.emoji}</span>
+                <span className="text-4xl">{teamPod?.emoji}</span>
                 <div>
-                  <CardTitle className="text-2xl font-headline">{teamPod.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">Represented by {teamPod.manager}</p>
+                  <CardTitle className="text-2xl font-headline">{teamPod?.name}</CardTitle>
+                  <p className="text-sm text-muted-foreground">Represented by {teamPod?.manager}</p>
                 </div>
               </div>
             </CardHeader>
@@ -316,10 +313,10 @@ export default function TeamPage() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="text-center space-y-2">
-                <div className="text-6xl">{teamPod.emoji}</div>
+                <div className="text-6xl">{teamPod?.emoji}</div>
                 <div>
-                  <div className="font-bold text-lg">{teamPod.name}</div>
-                  <div className="text-sm text-muted-foreground">{teamPod.manager}</div>
+                  <div className="font-bold text-lg">{teamPod?.name}</div>
+                  <div className="text-sm text-muted-foreground">{teamPod?.manager}</div>
                 </div>
                 {hasSubmittedMove && (
                   <Badge variant="secondary">Move Submitted</Badge>
@@ -444,3 +441,6 @@ export default function TeamPage() {
       <CommentaryBox show={!!currentMatch} />
     </div>
   );
+}
+
+    
