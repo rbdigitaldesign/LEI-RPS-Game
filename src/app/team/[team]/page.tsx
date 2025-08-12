@@ -18,7 +18,8 @@ export default function TeamPage() {
   const searchParams = useSearchParams();
   const rawTeamName = (params?.team as string) || searchParams?.get('team');
   
-  const teamName = rawTeamName ? decodeURIComponent(rawTeamName) : null;
+  const decodedTeamName = rawTeamName ? decodeURIComponent(rawTeamName) : null;
+  const teamNameKey = decodedTeamName ? decodedTeamName.toLowerCase() : null;
   
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
@@ -33,7 +34,7 @@ export default function TeamPage() {
   const { toast } = useToast();
 
   const submitMove = async () => {
-    if (!selectedMove || !teamName) return;
+    if (!selectedMove || !teamPod) return;
 
     setIsSubmitting(true);
     try {
@@ -42,7 +43,7 @@ export default function TeamPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'playMove',
-          teamName,
+          teamName: teamPod.name,
           move: selectedMove
         })
       });
@@ -60,8 +61,8 @@ export default function TeamPage() {
   };
 
   useEffect(() => {
-    if (tournament && teamName) {
-      const pod = tournament.pods.find(p => p.name === teamName);
+    if (tournament && teamNameKey) {
+      const pod = tournament.pods.find(p => p.name.toLowerCase() === teamNameKey);
       setTeamPod(pod || null);
 
       if (pod) {
@@ -69,17 +70,17 @@ export default function TeamPage() {
           .flatMap(r => r.matches)
           .find(m => 
             m.id === tournament.currentMatchId && 
-            !(m as any).isBye && 
-            (m.pod1?.name === teamName || m.pod2?.name === teamName)
+            !m.isBye && 
+            (m.pod1?.name === pod.name || m.pod2?.name === pod.name)
           );
 
         setCurrentMatch(match || null);
 
         if (match) {
-          const opponent = match.pod1?.name === teamName ? match.pod2 : match.pod1;
+          const opponent = match.pod1?.name === pod.name ? match.pod2 : match.pod1;
           setOpponentPod(opponent);
 
-          const teamIsPod1 = match.pod1?.name === teamName;
+          const teamIsPod1 = match.pod1?.name === pod.name;
           const teamMove = teamIsPod1 ? match.moves?.pod1 : match.moves?.pod2;
           setHasSubmittedMove(!!teamMove);
 
@@ -96,7 +97,7 @@ export default function TeamPage() {
           }
 
           if (match.winner && match.winner !== lastMatchWinner) {
-            const isWinner = match.winner.name === teamName;
+            const isWinner = match.winner.name === pod.name;
             
             if (isWinner) {
               toast({
@@ -120,14 +121,14 @@ export default function TeamPage() {
 
         const isTeamEliminated = tournament.rounds
             .flatMap(r => r.matches)
-            .some(m => m.loser?.name === teamName);
+            .some(m => m.loser?.name === pod.name);
         
         setIsEliminated(isTeamEliminated);
       }
     }
-  }, [tournament, teamName, lastMoveHistory.length, toast, lastMatchWinner]);
+  }, [tournament, teamNameKey, lastMoveHistory.length, toast, lastMatchWinner]);
 
-  if (!teamName) {
+  if (!decodedTeamName) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -175,7 +176,8 @@ export default function TeamPage() {
               <CardTitle className="text-destructive font-headline">Team Not Found</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Team "{teamName}" is not part of this tournament.</p>
+              <p>The team "{decodedTeamName}" was not found in the tournament.</p>
+              <p className="text-sm text-muted-foreground mt-2">Check the URL and try again.</p>
             </CardContent>
           </Card>
         </main>
@@ -184,7 +186,7 @@ export default function TeamPage() {
   }
 
   if (tournament.winner) {
-    const isWinner = tournament.winner.name === teamName;
+    const isWinner = tournament.winner.name === teamPod.name;
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -442,5 +444,3 @@ export default function TeamPage() {
       <CommentaryBox show={!!currentMatch} />
     </div>
   );
-
-    
