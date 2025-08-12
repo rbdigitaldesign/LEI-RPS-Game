@@ -7,7 +7,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Trophy, Info, Handshake, Flame } from 'lucide-react';
+import { Trophy, Handshake, Flame } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -16,7 +16,6 @@ import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from './pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { CommentaryBox } from './commentary-box';
 
 export function MainPageContent() {
@@ -173,6 +172,35 @@ export function MainPageContent() {
             <div className="flex flex-col xl:flex-row gap-6 items-start flex-grow w-full">
                 <div className="flex-grow w-full">
                   <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
+                   {tournament && (() => {
+                    const eliminatedTeams = tournament.rounds
+                      .flatMap((r: any) => r.matches)
+                      .filter((m: any) => m.winner && m.loser && !m.isBye)
+                      .map((m: any) => m.loser)
+                      .filter((team: any, index: number, arr: any[]) => 
+                        arr.findIndex((t: any) => t.name === team.name) === index
+                      );
+                    
+                    if (eliminatedTeams.length > 0) {
+                      return (
+                        <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                          <h4 className="font-medium text-red-200 mb-2">Eliminated Teams:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {eliminatedTeams.map((team: any) => (
+                              <span 
+                                key={team.name} 
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-300 rounded text-sm"
+                              >
+                                <span className="grayscale">{team.emoji}</span>
+                                {team.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
                 <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
                   <Card className="p-4 md:p-6 text-center">
@@ -225,29 +253,11 @@ export function MainPageContent() {
                       </AnimatePresence>
                     </CardContent>
                   </Card>
-                   <Card>
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="item-1" className="border-b-0">
-                        <AccordionTrigger className="p-4">
-                          <CardTitle className="flex items-center gap-2 text-base font-headline">
-                              <Info size={16} />
-                              Acknowledgements
-                          </CardTitle>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4">
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            Acknowledgement and sincere grattitude is given to Aaron Honson from the Media Team for their expertise in coding. This application was developed by Rich Bartlett using vibe coding methods in Firebase Studio in conjunction with Gemini AI. Informal user experience testing was conducted with the Orca Pod. Background music, 8-BIT BATTLE MUSIC, was sourced from Dragon Fren on SoundCloud.
-                          </p>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </Card>
                 </div>
               </div>
           </div>
         )}
       </main>
-
       <CommentaryBox show={!winner} />
     </div>
   );
