@@ -14,9 +14,9 @@ import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
-import { PreIntroScreen } from './pre-intro-screen';
+import { PreIntroScreen } from '@/components/pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CommentaryBox } from './commentary-box';
+import { CommentaryBox } from '@/components/commentary-box';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();

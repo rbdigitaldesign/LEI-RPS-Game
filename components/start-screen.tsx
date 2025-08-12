@@ -3,8 +3,8 @@
 
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
-import { Header } from './header';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Header } from '@/components/header';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
