@@ -11,7 +11,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@genkit-ai/firebase": "^1.15.5",
     "@genkit-ai/googleai": "^1.15.5",
     "@genkit-ai/next": "^1.15.5",
     "@hookform/resolvers": "^4.1.3",
