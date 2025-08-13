@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/header';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import type { Move, Match, Pod } from '@/lib/types';
-import { Trophy, Clock, Users } from 'lucide-react';
+import { Trophy, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,7 +27,6 @@ export default function TeamPage() {
   const [teamPod, setTeamPod] = useState<Pod | null>(null);
   const [opponentPod, setOpponentPod] = useState<Pod | null>(null);
   const [lastMoveHistoryLength, setLastMoveHistoryLength] = useState(0);
-  const [lastMatchWinner, setLastMatchWinner] = useState<Pod | null>(null);
   const [isEliminated, setIsEliminated] = useState<boolean>(false);
   const { toast } = useToast();
 
@@ -93,7 +93,7 @@ export default function TeamPage() {
             setLastMoveHistoryLength(match.moveHistory.length);
           }
 
-          if (match.winner && match.winner !== lastMatchWinner) {
+          if (match.winner) {
             const isWinner = match.winner.name === teamName;
             
             if (isWinner) {
@@ -109,7 +109,6 @@ export default function TeamPage() {
                 duration: 5000,
               });
             }
-            setLastMatchWinner(match.winner);
           }
         } else {
           setOpponentPod(null);
@@ -123,7 +122,7 @@ export default function TeamPage() {
         setIsEliminated(isTeamEliminated);
       }
     }
-  }, [tournament, teamName, lastMoveHistoryLength, toast, lastMatchWinner]);
+  }, [tournament, teamName, lastMoveHistoryLength, toast]);
 
   useEffect(() => {
     if (isEliminated) {
@@ -439,5 +438,3 @@ export default function TeamPage() {
     </div>
   );
 }
-
-    
