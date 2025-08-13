@@ -218,7 +218,7 @@ function TeamPageContent({ teamName }: { teamName: string }) {
           </motion.div>
         </AnimatePresence>
       </main>
-      <CommentaryBox show={true} />
+      
     </div>
   );
 }
