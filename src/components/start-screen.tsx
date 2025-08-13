@@ -67,7 +67,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             </Button>
         </div>
       </Header>
-      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-contain bg-center bg-no-repeat"
+      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-cover bg-center bg-no-repeat"
        >
         {isClient && !isMuted && (
           <iframe

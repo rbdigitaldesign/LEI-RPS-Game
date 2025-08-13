@@ -21,6 +21,9 @@ const config = {
       fontFamily: {
         sans: ['Space Grotesk', 'sans-serif'],
       },
+      backgroundImage: {
+        'hero-pattern': "url('https://i.imgur.com/DoA6NkS.png')",
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
