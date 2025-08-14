@@ -12,13 +12,14 @@ const PODS = [
 function norm(s: string) { return decodeURIComponent(s).trim().toLowerCase(); }
 
 import TeamPageContent from '@/components/team-page-content';
+import { notFound } from 'next/navigation';
 
 export default function Page({ params }: { params: { team?: string[] } }) {
   const raw = (params.team ?? []).join('/');
   const map = new Map(PODS.map(n => [n.toLowerCase(), n]));
   const canonical = map.get(norm(raw));
   if (!canonical) {
-    return <main style={{padding:24}}><h1>Team not found</h1><p>{raw || '(none)'}</p></main>;
+    return notFound();
   }
   return <TeamPageContent teamName={canonical} />;
 }
