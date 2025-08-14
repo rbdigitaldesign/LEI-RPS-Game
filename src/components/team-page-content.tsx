@@ -1,8 +1,7 @@
-// app/team/[...team]/page.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound } from 'next/navigation';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,29 +12,6 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader, Swords, Check, Trophy, Hourglass } from 'lucide-react';
-import { CommentaryBox } from '@/components/commentary-box';
-
-// --- Hardening & Alias Glue ---
-export const dynamic = 'force-dynamic';
-export const dynamicParams = true;
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
-
-const ALIASES: Record<string, string> = {
-  'rakali': 'Rakalis',
-  'capybara': 'Capybaras',
-};
-const CANON = new Map(PODS.map(p => [p.name.trim().toLowerCase(), p.name]));
-CANON.set('cox travis', 'Cox Travis');
-
-function resolveName(raw: string): string | null {
-  const key = raw.trim().toLowerCase();
-  if (CANON.has(key)) return CANON.get(key)!;
-  const aliased = ALIASES[key];
-  if (aliased && CANON.has(aliased.toLowerCase())) return CANON.get(aliased.toLowerCase())!;
-  return null;
-}
-// --- End Hardening ---
 
 const PodDisplay = ({ pod, opponent, submitted }: { pod: Pod | null, opponent: Pod | null, submitted?: boolean }) => {
   if (!pod) return <div />;
@@ -59,7 +35,7 @@ const PodDisplay = ({ pod, opponent, submitted }: { pod: Pod | null, opponent: P
   );
 };
 
-function TeamPageContent({ teamName }: { teamName: string }) {
+export function TeamPageContent({ teamName }: { teamName: string }) {
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +44,8 @@ function TeamPageContent({ teamName }: { teamName: string }) {
 
   useEffect(() => setIsClient(true), []);
   
-  const teamPod = PODS.find(p => p.name === teamName) || null;
+  const allPods = [...PODS, { id: 99, name: 'Cox Travis', manager: 'The AI', emoji: '🤖' }];
+  const teamPod = allPods.find(p => p.name === teamName) || null;
 
   const currentMatch = tournament?.rounds
     .flatMap(r => r.matches)
@@ -127,6 +104,21 @@ function TeamPageContent({ teamName }: { teamName: string }) {
           </CardContent>
         </Card>
       );
+    }
+
+    const isEliminated = tournament.rounds.flatMap(r => r.matches).some(m => m.loser?.name === teamName);
+    if(isEliminated) {
+        return (
+            <Card className="w-full max-w-lg text-center bg-card/50">
+                <CardHeader>
+                    <Trophy className="mx-auto h-12 w-12 text-red-500"/>
+                    <CardTitle>You have been eliminated</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground">Better luck next time!</p>
+                </CardContent>
+            </Card>
+        )
     }
 
     if (!currentMatch) {
@@ -218,18 +210,6 @@ function TeamPageContent({ teamName }: { teamName: string }) {
           </motion.div>
         </AnimatePresence>
       </main>
-      <CommentaryBox show={true} />
     </div>
   );
-}
-
-type Props = { params: { team?: string[] } };
-
-export default function TeamPage({ params }: Props) {
-  const segs = params.team ?? [];
-  const raw = decodeURIComponent((segs[0] ?? '').trim());
-  const name = resolveName(raw);
-  if (!name) return notFound();
-  
-  return <TeamPageContent teamName={name} />;
 }
