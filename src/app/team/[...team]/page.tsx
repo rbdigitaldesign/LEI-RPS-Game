@@ -1,39 +1,24 @@
-
-import { notFound } from 'next/navigation';
-import { TeamPageContent } from '@/components/team-page-content';
-import { PODS } from '@/lib/constants';
-
+// app/team/[...team]/page.tsx  (Server Component for V6)
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
 
-const ALIASES: Record<string, string> = {
-  'rakali': 'Rakalis',
-  'capybara': 'Capybaras',
-};
+const PODS = [
+  'Owls','Racoons','Octopus','Dolphins','Orcas','Rakalis','Capybaras','Wombats',
+  'Bees','Platypus','Functional Leads','Associate Directors','Portfolio Managers',
+  'Pandas','Travis Cox','Cox Travis'
+];
 
-const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis'];
-const CANON = new Map(ALL_POD_NAMES.map(p => [p.trim().toLowerCase(), p]));
+function norm(s: string) { return decodeURIComponent(s).trim().toLowerCase(); }
 
-function resolveName(raw: string): string | null {
-  const key = raw.trim().toLowerCase();
-  if (CANON.has(key)) return CANON.get(key)!;
-  const aliased = ALIASES[key];
-  if (aliased && CANON.has(aliased.toLowerCase())) return CANON.get(aliased.toLowerCase())!;
-  return null;
-}
+import TeamPageContent from '@/components/team-page-content';
 
-type Props = { params: { team?: string[] } };
-
-export default function TeamPage({ params }: Props) {
-  const segs = params.team ?? [];
-  const raw = decodeURIComponent(segs.join('/')).trim();
-  const name = resolveName(raw);
-
-  if (!name) {
-    return notFound();
+export default function Page({ params }: { params: { team?: string[] } }) {
+  const raw = (params.team ?? []).join('/');
+  const map = new Map(PODS.map(n => [n.toLowerCase(), n]));
+  const canonical = map.get(norm(raw));
+  if (!canonical) {
+    return <main style={{padding:24}}><h1>Team not found</h1><p>{raw || '(none)'}</p></main>;
   }
-  
-  return <TeamPageContent teamName={name} />;
+  return <TeamPageContent teamName={canonical} />;
 }
