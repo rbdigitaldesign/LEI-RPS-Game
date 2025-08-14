@@ -1,31 +1,39 @@
+
+import { notFound } from 'next/navigation';
+import { TeamPageContent } from '@/components/team-page-content';
+import { PODS } from '@/lib/constants';
+
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
-const PODS = [
-  'Owls','Racoons','Octopus','Dolphins','Orcas','Rakalis','Capybaras','Wombats',
-  'Bees','Platypus','Functional Leads','Associate Directors','Portfolio Managers',
-  'Pandas','Travis Cox','Cox Travis'
-];
+const ALIASES: Record<string, string> = {
+  'rakali': 'Rakalis',
+  'capybara': 'Capybaras',
+};
 
-function norm(s: string) { return decodeURIComponent(s).trim().toLowerCase(); }
+const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis'];
+const CANON = new Map(ALL_POD_NAMES.map(p => [p.trim().toLowerCase(), p]));
 
-export default function Page({ params }: { params: { team?: string[] } }) {
-  const raw = (params.team ?? []).join('/');
-  const map = new Map(PODS.map(n => [n.toLowerCase(), n]));
-  const name = map.get(norm(raw));
+function resolveName(raw: string): string | null {
+  const key = raw.trim().toLowerCase();
+  if (CANON.has(key)) return CANON.get(key)!;
+  const aliased = ALIASES[key];
+  if (aliased && CANON.has(aliased.toLowerCase())) return CANON.get(aliased.toLowerCase())!;
+  return null;
+}
+
+type Props = { params: { team?: string[] } };
+
+export default function TeamPage({ params }: Props) {
+  const segs = params.team ?? [];
+  const raw = decodeURIComponent(segs.join('/')).trim();
+  const name = resolveName(raw);
+
   if (!name) {
-    return (
-      <main style={{padding:24}}>
-        <h1>team not found</h1>
-        <p>unknown team: {raw || '(none)'}</p>
-      </main>
-    );
+    return notFound();
   }
-  return (
-    <main style={{padding:24}}>
-      <h1>{name}</h1>
-      <p>route ok. rendering without external imports.</p>
-    </main>
-  );
+  
+  return <TeamPageContent teamName={name} />;
 }
