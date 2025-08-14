@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader, Swords, Check, Trophy, Hourglass } from 'lucide-react';
-import { CommentaryBox } from '@/components/commentary-box';
 
 // --- Hardening & Alias Glue ---
 export const dynamic = 'force-dynamic';
@@ -27,9 +26,13 @@ const ALIASES: Record<string, string> = {
 };
 const CANON = new Map(PODS.map(p => [p.name.trim().toLowerCase(), p.name]));
 CANON.set('cox travis', 'Cox Travis');
+CANON.set('functional leads', 'Functional Leads');
+CANON.set('associate directors', 'Associate Directors');
+CANON.set('portfolio managers', 'Portfolio Managers');
+
 
 function resolveName(raw: string): string | null {
-  const key = raw.trim().toLowerCase();
+  const key = decodeURIComponent(raw).trim().toLowerCase();
   if (CANON.has(key)) return CANON.get(key)!;
   const aliased = ALIASES[key];
   if (aliased && CANON.has(aliased.toLowerCase())) return CANON.get(aliased.toLowerCase())!;
@@ -59,7 +62,7 @@ const PodDisplay = ({ pod, opponent, submitted }: { pod: Pod | null, opponent: P
   );
 };
 
-function TeamPageContent({ teamName }: { teamName: string }) {
+function TeamView({ teamName }: { teamName: string }) {
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -218,18 +221,15 @@ function TeamPageContent({ teamName }: { teamName: string }) {
           </motion.div>
         </AnimatePresence>
       </main>
-      
     </div>
   );
 }
 
-type Props = { params: { team?: string[] } };
-
-export default function TeamPage({ params }: Props) {
-  const segs = params.team ?? [];
-  const raw = decodeURIComponent((segs[0] ?? '').trim());
+export default async function Page({ params }: { params: { team: string[] } }) {
+  const raw = (params.team ?? []).join('/');
   const name = resolveName(raw);
-  if (!name) return notFound();
-  
-  return <TeamPageContent teamName={name} />;
+  if (!name) {
+    return (<div style={{padding:24}}><h1>Team not found</h1><p>Unknown team: {raw}</p></div>);
+  }
+  return <TeamView teamName={name} />;
 }
