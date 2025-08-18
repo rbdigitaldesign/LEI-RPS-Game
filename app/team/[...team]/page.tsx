@@ -1,14 +1,9 @@
-
 'use client';
 
 import { notFound } from 'next/navigation';
+import React from 'react';
 import { TeamPageContent } from '@/components/team-page-content';
 import { PODS } from '@/lib/constants';
-
-export const dynamic = 'force-dynamic';
-export const dynamicParams = true;
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
 
 const ALIASES: Record<string, string> = {
   'rakali': 'Rakalis',
@@ -29,7 +24,7 @@ function resolveName(raw: string): string | null {
 type Props = { params: { team?: string[] } };
 
 export default function TeamPage({ params }: Props) {
-  const segs = params.team ?? [];
+  const segs = React.use(params).team ?? [];
   const raw = decodeURIComponent(segs.join('/')).trim();
   const name = resolveName(raw);
 

@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { PreIntroScreen } from '@/components/pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommentaryBox } from '@/components/commentary-box';
+import Image from 'next/image';
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -146,12 +147,16 @@ export function MainPageContent() {
                 <p className="text-sm font-medium text-accent">
                     Ultimate Pod Champion
                 </p>
-                <CardTitle className="text-5xl font-headline tracking-tighter text-primary">{winner.name}</CardTitle>
+                <CardTitle className="text-5xl font-headline tracking-tighter text-primary flex items-center justify-center gap-4">
+                  <span className="text-4xl">{winner.emoji}</span>
+                  {winner.name}
+                  <span className="text-4xl">{winner.emoji}</span>
+                </CardTitle>
                 <p className="text-muted-foreground">Represented by {winner.manager}</p>
               </CardHeader>
               <CardContent className="flex flex-col items-center space-y-4">
-                <div className="relative w-48 h-48 border-4 border-primary bg-secondary flex items-center justify-center rounded-lg">
-                  <span className="text-8xl">{winner.emoji}</span>
+                <div className="relative w-48 h-48">
+                  <Image src="https://i.imgur.com/GzGlabJ.gif" alt="Trophy" layout="fill" objectFit="contain" unoptimized />
                 </div>
                  <div className="flex items-center gap-2 text-2xl font-semibold text-primary">
                     <Trophy className="w-8 h-8"/>
@@ -261,5 +266,3 @@ export function MainPageContent() {
     </div>
   );
 }
-
-    

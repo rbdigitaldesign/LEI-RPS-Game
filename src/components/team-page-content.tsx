@@ -11,8 +11,10 @@ import type { Move, Pod } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Swords, Bot, Hourglass } from 'lucide-react';
+import { AlertTriangle, Swords, Bot, Hourglass, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { CommentaryBox } from '@/components/commentary-box';
+import { PODS } from '@/lib/constants';
 
 async function playMove(teamName: string, move: Move) {
   const response = await fetch('/api/tournament', {
@@ -30,11 +32,14 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { toast } = useToast();
 
   const currentMatch = tournament?.rounds
     .flatMap(r => r.matches)
     .find(m => m.id === tournament.currentMatchId);
+
+  const myOwnPod = PODS.find(pod => pod.name === teamName);
 
   const myPod = currentMatch?.pod1?.name === teamName ? currentMatch.pod1 : currentMatch?.pod2;
   const opponentPod = currentMatch?.pod1?.name === teamName ? currentMatch.pod2 : currentMatch?.pod1;
@@ -49,10 +54,6 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     setIsSubmitting(true);
     try {
       await playMove(teamName, selectedMove);
-      toast({
-        title: 'Move Submitted!',
-        description: `You played ${selectedMove}. Waiting for opponent.`,
-      });
       refetch();
     } catch (error) {
       toast({
@@ -64,6 +65,26 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
       setIsSubmitting(false);
     }
   };
+
+  const isEliminated = tournament?.rounds
+  .flatMap(r => r.matches)
+  .some(m => m.loser?.name === teamName);
+
+  useEffect(() => {
+    if (isEliminated) {
+      toast({
+        title: "You've been eliminated!",
+        description: "Redirecting to the tournament overview in 4 seconds...",
+        duration: 4000,
+        variant: "destructive",
+      });
+      const redirectTimer = setTimeout(() => {
+        window.location.href = '/?skipIntro=true';
+      }, 4000);
+
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [isEliminated, toast]);
   
   const renderContent = () => {
     if (!tournament) {
@@ -77,6 +98,37 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
             <Hourglass className="mx-auto mt-4 h-8 w-8 animate-spin" />
           </CardContent>
         </Card>
+      );
+    }
+
+
+    if (isEliminated) {
+      return (
+
+            <Card className="w-full max-w-md text-center border-2 border-destructive">
+              <CardHeader>
+                
+                <div className="text-lg font-medium text-destructive font-headline">
+                  Eliminated from Tournament
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-6xl grayscale">{myOwnPod.emoji}</div>
+                <div className="text-lg text-destructive font-headline">❌ ELIMINATED</div>
+                <p className="text-sm text-muted-foreground">
+                  Your team has been eliminated from the tournament. Thank you for participating!
+                </p>
+                {tournament.winner && (
+                  <div className="mt-4 p-3 bg-muted rounded">
+                    <p className="text-sm font-medium">Tournament Winner:</p>
+                    <div className="flex items-center justify-center gap-2 mt-1">
+                      <span className="text-2xl">{(tournament.winner as Pod).emoji}</span>
+                      <span className="font-bold">{(tournament.winner as Pod).name}</span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
       );
     }
 
@@ -99,19 +151,33 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
 
     if (!isMyTurn || moveAlreadySubmitted) {
       return (
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CardTitle>Waiting...</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              {moveAlreadySubmitted ? 'Your move has been submitted. Waiting for your opponent.' : "It's not your turn yet. Please wait."}
-            </p>
-            <Hourglass className="mx-auto mt-4 h-8 w-8 animate-pulse" />
-          </CardContent>
-        </Card>
+        <Card className="w-full max-w-2xl text-center border-primary ring-4 ring-primary/20">
+        <CardHeader>
+          <div className="flex items-center justify-center gap-4 mb-2">
+            
+  
+            <div className="flex flex-col items-center">
+            <span className="text-6xl">{myOwnPod?.emoji}</span>
+            <CardTitle className="font-headline mt-2 text-2xl">{myOwnPod?.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">Represented by {myOwnPod?.manager}</p>
+            </div>
+             
+          
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-center gap-2">
+            <Clock className="w-5 h-5 text-muted-foreground"/>
+            <span>Waiting for your next match...</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            The tournament is in progress. You'll be notified when it's your turn to play.
+          </p>
+        </CardContent>
+      </Card>
       );
     }
+
 
     return (
       <Card className="w-full max-w-2xl text-center border-primary ring-4 ring-primary/20">
@@ -175,6 +241,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
             </motion.div>
          </AnimatePresence>
       </main>
+      <CommentaryBox show={true} />
     </div>
   );
 }
