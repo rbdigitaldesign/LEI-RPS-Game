@@ -96,15 +96,30 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
     let winner: Pod | null = null;
     let loser: Pod | null = null;
 
+    const isPod1AI = currentMatch.pod1?.name === 'Cox Travis';
+    const isPod2AI = currentMatch.pod2?.name === 'Cox Travis';
+
     if (pod1Move !== pod2Move) {
       if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
           (pod1Move === 'scissors' && pod2Move === 'paper') ||
           (pod1Move === 'paper' && pod2Move === 'rock')) {
-        winner = currentMatch.pod1;
-        loser = currentMatch.pod2;
+        // Pod 1 wins
+        if (isPod1AI) { // AI would win, force a draw
+            winner = null;
+            loser = null;
+        } else {
+            winner = currentMatch.pod1;
+            loser = currentMatch.pod2;
+        }
       } else {
-        winner = currentMatch.pod2;
-        loser = currentMatch.pod1;
+        // Pod 2 wins
+        if (isPod2AI) { // AI would win, force a draw
+            winner = null;
+            loser = null;
+        } else {
+            winner = currentMatch.pod2;
+            loser = currentMatch.pod1;
+        }
       }
     }
 
