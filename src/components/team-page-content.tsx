@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -11,7 +12,7 @@ import type { Move, Pod, Match } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon, Handshake } from 'lucide-react';
+import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon, Handshake, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { CommentaryBox } from '@/components/commentary-box';
 import { PODS } from '@/lib/constants';
@@ -34,9 +35,16 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timer, setTimer] = useState(60);
   const [isTie, setIsTie] = useState(false);
+  const [hasTournamentStarted, setHasTournamentStarted] = useState(false);
 
   const { toast } = useToast();
   const lastMatchState = useRef<Match | null | undefined>(null);
+
+  useEffect(() => {
+    if (tournament) {
+      setHasTournamentStarted(true);
+    }
+  }, [tournament]);
 
   const currentMatch = tournament?.rounds
     .flatMap(r => r.matches)
@@ -87,6 +95,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
 
   useEffect(() => {
     if (isMyTurn && !moveAlreadySubmitted) {
+      setSelectedMove(null); // Reset selection for new turn
       setTimer(60);
       const interval = setInterval(() => {
         setTimer(prevTimer => {
@@ -124,6 +133,21 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   }, [isEliminated, toast]);
   
   const renderContent = () => {
+    if (hasTournamentStarted && !tournament) {
+      // Tournament was active, but now it's not (i.e., it was reset)
+      return (
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+             <RefreshCw className="mx-auto h-8 w-8 animate-spin text-primary" />
+            <CardTitle>Tournament Reset</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">The tournament has been reset. Redirecting...</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
     if (isTie) {
         return (
             <Card className="w-full max-w-md text-center border-2 border-yellow-500">
@@ -192,7 +216,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
                 <CardContent>
                     <p className="text-muted-foreground">{isWinner ? `Congratulations, ${teamName}!` : `The winner is ${tournament.winner.name}.`}</p>
                     <Button asChild className="mt-4">
-                        <Link href="/">Back to Bracket</Link>
+                        <Link href="/?skipIntro=true">Back to Bracket</Link>
                     </Button>
                 </CardContent>
             </Card>
@@ -280,6 +304,21 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
       </Card>
     );
   };
+  
+    // Effect for redirecting on reset
+    useEffect(() => {
+        if (hasTournamentStarted && !tournament) {
+            toast({
+                title: 'Tournament Reset',
+                description: 'The tournament has been reset. Redirecting to the main page...',
+                duration: 4000,
+            });
+            const redirectTimer = setTimeout(() => {
+                window.location.href = '/?skipIntro=true';
+            }, 4000);
+            return () => clearTimeout(redirectTimer);
+        }
+    }, [hasTournamentStarted, tournament, toast]);
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center p-4 bg-background">

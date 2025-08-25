@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { PODS } from '@/lib/constants';
 import { Users, ArrowLeft, Bot } from 'lucide-react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
+import { CommentaryBox } from '@/components/commentary-box';
 import Link from 'next/link';
 
 export default function TeamsPage() {
@@ -21,7 +24,6 @@ export default function TeamsPage() {
     const enteredPassword = prompt('Enter password to reset tournament:', '');
     if (enteredPassword === 'orcas2025') {
       resetTournament();
-      startTournament();
     } else if (enteredPassword !== null) {
       alert('Incorrect password.');
     }
@@ -168,8 +170,7 @@ export default function TeamsPage() {
           </Card>
         </div>
       </main>
+      <CommentaryBox show={true} />
     </div>
   );
 }
-
-    
