@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Header } from '@/components/header';
 import { MoveIcon } from '@/components/icons/move-icon';
 import { MOVES } from '@/lib/constants';
-import type { Move, Pod } from '@/lib/types';
+import type { Move, Pod, Match } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon } from 'lucide-react';
+import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon, Handshake } from 'lucide-react';
 import Link from 'next/link';
 import { CommentaryBox } from '@/components/commentary-box';
 import { PODS } from '@/lib/constants';
@@ -33,8 +33,10 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timer, setTimer] = useState(60);
+  const [isTie, setIsTie] = useState(false);
 
   const { toast } = useToast();
+  const lastMatchState = useRef<Match | null | undefined>(null);
 
   const currentMatch = tournament?.rounds
     .flatMap(r => r.matches)
@@ -49,6 +51,22 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   
   const teamIsPod1 = currentMatch?.pod1?.name === teamName;
   const moveAlreadySubmitted = teamIsPod1 ? !!(currentMatch?.moves as any)?.pod1 : !!(currentMatch?.moves as any)?.pod2;
+
+  useEffect(() => {
+    if (currentMatch && lastMatchState.current) {
+        if (currentMatch.moveHistory && lastMatchState.current.moveHistory) {
+            if (currentMatch.moveHistory.length > lastMatchState.current.moveHistory.length) {
+                const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
+                if (latestRound.pod1 === latestRound.pod2) {
+                    setIsTie(true);
+                    setTimeout(() => setIsTie(false), 2500); 
+                }
+            }
+        }
+    }
+    lastMatchState.current = currentMatch;
+  }, [currentMatch]);
+
 
   const handleSubmitMove = useCallback(async (move: Move) => {
     if (!move) return;
@@ -84,12 +102,6 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
       return () => clearInterval(interval);
     }
   }, [isMyTurn, moveAlreadySubmitted, handleSubmitMove]);
-  
-  useEffect(() => {
-    if (selectedMove) {
-        handleSubmitMove(selectedMove);
-    }
-  }, [selectedMove, handleSubmitMove]);
 
   const isEliminated = tournament?.rounds
   .flatMap(r => r.matches)
@@ -112,6 +124,20 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   }, [isEliminated, toast]);
   
   const renderContent = () => {
+    if (isTie) {
+        return (
+            <Card className="w-full max-w-md text-center border-2 border-yellow-500">
+                <CardHeader>
+                    <Handshake className="w-16 h-16 text-yellow-500 mx-auto" />
+                    <CardTitle className="text-5xl font-bold tracking-tighter text-yellow-500 mt-2 font-headline">DRAW</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-lg text-muted-foreground mt-2">A rematch is taking place!</p>
+                </CardContent>
+            </Card>
+        );
+    }
+
     if (!tournament) {
       return (
         <Card className="w-full max-w-md text-center">
@@ -129,7 +155,6 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
 
     if (isEliminated) {
       return (
-
             <Card className="w-full max-w-md text-center border-2 border-destructive">
               <CardHeader>
                 
@@ -275,5 +300,3 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     </div>
   );
 }
-
-    
