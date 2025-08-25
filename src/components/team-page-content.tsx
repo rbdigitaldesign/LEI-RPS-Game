@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,7 +11,7 @@ import type { Move, Pod } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Swords, Bot, Hourglass, Clock } from 'lucide-react';
+import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon } from 'lucide-react';
 import Link from 'next/link';
 import { CommentaryBox } from '@/components/commentary-box';
 import { PODS } from '@/lib/constants';
@@ -32,6 +32,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const { tournament, refetch } = useServerTournament();
   const [selectedMove, setSelectedMove] = useState<Move | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [timer, setTimer] = useState(60);
 
   const { toast } = useToast();
 
@@ -49,11 +50,11 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const teamIsPod1 = currentMatch?.pod1?.name === teamName;
   const moveAlreadySubmitted = teamIsPod1 ? !!(currentMatch?.moves as any)?.pod1 : !!(currentMatch?.moves as any)?.pod2;
 
-  const handleSubmitMove = async () => {
-    if (!selectedMove) return;
+  const handleSubmitMove = useCallback(async (move: Move) => {
+    if (!move) return;
     setIsSubmitting(true);
     try {
-      await playMove(teamName, selectedMove);
+      await playMove(teamName, move);
       refetch();
     } catch (error) {
       toast({
@@ -64,7 +65,31 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [teamName, refetch, toast]);
+
+  useEffect(() => {
+    if (isMyTurn && !moveAlreadySubmitted) {
+      setTimer(60);
+      const interval = setInterval(() => {
+        setTimer(prevTimer => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+            const randomMove = MOVES[Math.floor(Math.random() * MOVES.length)];
+            handleSubmitMove(randomMove);
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isMyTurn, moveAlreadySubmitted, handleSubmitMove]);
+  
+  useEffect(() => {
+    if (selectedMove) {
+        handleSubmitMove(selectedMove);
+    }
+  }, [selectedMove, handleSubmitMove]);
 
   const isEliminated = tournament?.rounds
   .flatMap(r => r.matches)
@@ -113,7 +138,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-6xl grayscale">{myOwnPod.emoji}</div>
+                <div className="text-6xl grayscale">{myOwnPod?.emoji}</div>
                 <div className="text-lg text-destructive font-headline">❌ ELIMINATED</div>
                 <p className="text-sm text-muted-foreground">
                   Your team has been eliminated from the tournament. Thank you for participating!
@@ -182,6 +207,10 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     return (
       <Card className="w-full max-w-2xl text-center border-primary ring-4 ring-primary/20">
         <CardHeader>
+           <div className="flex items-center justify-center gap-2 text-2xl font-bold font-headline mb-4">
+            <TimerIcon className="w-8 h-8"/>
+            <span className={cn(timer <= 10 && 'text-destructive')}>{timer}s</span>
+          </div>
           <div className="flex justify-around items-center">
             <div className="flex flex-col items-center">
               <span className="text-6xl">{myPod?.emoji}</span>
@@ -207,6 +236,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
                 )}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                disabled={isSubmitting}
               >
                 <MoveIcon move={move} className="text-6xl" />
                 <span className="block mt-2 font-bold capitalize">{move}</span>
@@ -214,7 +244,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
             ))}
           </div>
           <Button
-            onClick={handleSubmitMove}
+            onClick={() => selectedMove && handleSubmitMove(selectedMove)}
             disabled={!selectedMove || isSubmitting}
             size="lg"
             className="w-full mt-4 font-bold text-xl"
@@ -245,3 +275,5 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     </div>
   );
 }
+
+    
