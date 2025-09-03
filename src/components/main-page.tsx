@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -13,7 +14,6 @@ import { StartScreen } from '@/components/start-screen';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CommentaryBox } from '@/components/commentary-box';
 import Image from 'next/image';
 
 export function MainPageContent() {
@@ -243,7 +243,6 @@ export function MainPageContent() {
           </div>
         )}
       </main>
-      <CommentaryBox show={!winner} />
     </div>
   );
 }

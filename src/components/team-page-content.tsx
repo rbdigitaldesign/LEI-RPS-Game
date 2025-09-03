@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon, Handshake, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import { CommentaryBox } from '@/components/commentary-box';
 import { PODS } from '@/lib/constants';
 
 async function playMove(teamName: string, move: Move) {
@@ -76,17 +75,34 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   }, [currentMatch]);
 
 
-  const handleSubmitMove = useCallback(async (move: Move) => {
-    if (!move) return;
+  const handleSubmitMove = useCallback(async () => {
+    if (!selectedMove) return;
     setIsSubmitting(true);
     try {
-      await playMove(teamName, move);
+      await playMove(teamName, selectedMove);
       refetch();
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Could not submit your move. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [teamName, refetch, toast, selectedMove]);
+
+  const handleAutoSubmit = useCallback(async () => {
+    const randomMove = MOVES[Math.floor(Math.random() * MOVES.length)];
+    setIsSubmitting(true);
+     try {
+      await playMove(teamName, randomMove);
+      refetch();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not submit your move automatically. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
@@ -101,8 +117,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
         setTimer(prevTimer => {
           if (prevTimer <= 1) {
             clearInterval(interval);
-            const randomMove = MOVES[Math.floor(Math.random() * MOVES.length)];
-            handleSubmitMove(randomMove);
+            handleAutoSubmit();
             return 0;
           }
           return prevTimer - 1;
@@ -110,7 +125,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isMyTurn, moveAlreadySubmitted, handleSubmitMove]);
+  }, [isMyTurn, moveAlreadySubmitted, handleAutoSubmit]);
 
   const isEliminated = tournament?.rounds
   .flatMap(r => r.matches)
@@ -293,7 +308,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
             ))}
           </div>
           <Button
-            onClick={() => selectedMove && handleSubmitMove(selectedMove)}
+            onClick={handleSubmitMove}
             disabled={!selectedMove || isSubmitting}
             size="lg"
             className="w-full mt-4 font-bold text-xl"
@@ -335,7 +350,6 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
             </motion.div>
          </AnimatePresence>
       </main>
-      <CommentaryBox show={true} />
     </div>
   );
 }
