@@ -111,8 +111,8 @@ export default function TeamsPage() {
       </Header>
       
       <main className="flex-grow container mx-auto p-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3 font-headline"><Users/> Pod Battleground</h1>
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3 font-headline"><Users/> Pod Battleground</h1>
           <p className="text-muted-foreground">
             Engage in your pod in battle by clicking "Team page" to access the match interface.
           </p>
