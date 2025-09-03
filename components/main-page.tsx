@@ -10,11 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Trophy, Handshake, Flame, CheckCircle, XCircle, Hourglass } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
-import { IntroTrailer } from '@/components/intro-trailer';
 import { StartScreen } from '@/components/start-screen';
 import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
-import { PreIntroScreen } from '@/components/pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommentaryBox } from '@/components/commentary-box';
 
@@ -49,8 +47,6 @@ export function MainPageContent() {
   const searchParams = useSearchParams();
   const teamParam = searchParams?.get('team');
   const { tournament, startTournament, resetTournament, isProcessing, winner } = useServerTournament();
-  const [preIntroFinished, setPreIntroFinished] = useState(false);
-  const [introFinished, setIntroFinished] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const lastTournamentState = useRef<TournamentState | null>(null);
   const [lastCompletedMatch, setLastCompletedMatch] = useState<Match | null>(null);
@@ -58,12 +54,7 @@ export function MainPageContent() {
 
   useEffect(() => {
     setIsClient(true);
-    const skipIntroParam = searchParams?.get('skipIntro');
-    if (sessionStorage.getItem('introSeen') || skipIntroParam === 'true') {
-      setPreIntroFinished(true);
-      setIntroFinished(true);
-    }
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     if (tournament && lastTournamentState.current) {
@@ -137,16 +128,6 @@ export function MainPageContent() {
         </main>
       </div>
     );
-  }
-
-  const skipIntroParam = searchParams?.get('skipIntro');
-
-  if (!preIntroFinished && skipIntroParam !== 'true') {
-      return <PreIntroScreen onStart={() => { setPreIntroFinished(true); }} />;
-  }
-  
-  if (!introFinished) {
-    return <IntroTrailer onFinished={() => { setIntroFinished(true); sessionStorage.setItem('introSeen', 'true'); }} />;
   }
 
   if (!tournament) {
