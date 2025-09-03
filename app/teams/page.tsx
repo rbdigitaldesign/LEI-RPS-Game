@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -144,7 +143,7 @@ export default function TeamsPage() {
               </Card>
             );
           })}
-          {/* Special card for the AI bot */}
+          {/* Special card for the AI bots */}
           <Card className="transition-all hover:shadow-lg border-dashed">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-4">
@@ -163,7 +162,29 @@ export default function TeamsPage() {
                 disabled
               >
                 <Bot className="mr-2 h-4 w-4" />
-                Bot
+                Friendly Bot
+              </Button>
+            </CardContent>
+          </Card>
+          <Card className="transition-all hover:shadow-lg border-dashed">
+            <CardHeader className="pb-4">
+              <div className="flex items-center gap-4">
+                <span className="text-4xl">🦾</span>
+                <div>
+                  <CardTitle className="text-lg">Terminator</CardTitle>
+                  <p className="text-sm text-muted-foreground">Represented by Skynet</p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0 flex items-center justify-between">
+              {getStatusBadge(getTeamStatus('Terminator'))}
+              <Button 
+                variant="secondary"
+                size="sm"
+                disabled
+              >
+                <Bot className="mr-2 h-4 w-4" />
+                Losing Bot
               </Button>
             </CardContent>
           </Card>

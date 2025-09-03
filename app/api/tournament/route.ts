@@ -25,14 +25,20 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 const createBracket = (initialPods: Pod[]): TournamentState => {
   let allPods = [...initialPods];
   
-  // Always add the AI opponent to make it an even 16
-  const aiPod: Pod = {
+  // Always add the AI opponents to make it an even 16
+  const friendlyAIPod: Pod = {
       id: 99,
       name: 'Cox Travis',
       manager: 'The AI',
       emoji: '👿',
   };
-  allPods.push(aiPod);
+  const loserAIPod: Pod = {
+      id: 100,
+      name: 'Terminator',
+      manager: 'Skynet',
+      emoji: '🦾',
+  };
+  allPods.push(friendlyAIPod, loserAIPod);
   
   let shuffledPods = shuffleArray(allPods);
   
@@ -201,6 +207,36 @@ const advanceTournament = (state: TournamentState) => {
     }
 };
 
+const handleAIMatch = (state: TournamentState) => {
+    if (!state || !state.currentMatchId) return;
+
+    const currentMatch = state.rounds
+        .flatMap(r => r.matches)
+        .find(m => m.id === state.currentMatchId);
+
+    if (!currentMatch || !currentMatch.pod1 || !currentMatch.pod2) return;
+
+    const isPod1AI = currentMatch.pod1.name === 'Cox Travis' || currentMatch.pod1.name === 'Terminator';
+    const isPod2AI = currentMatch.pod2.name === 'Cox Travis' || currentMatch.pod2.name === 'Terminator';
+
+    if (isPod1AI && isPod2AI) {
+        const moves: Move[] = ['rock', 'paper', 'scissors'];
+        const pod1Move = moves[Math.floor(Math.random() * moves.length)];
+        const pod2Move = moves[Math.floor(Math.random() * moves.length)];
+
+        resolveMatch(currentMatch, pod1Move, pod2Move);
+
+        if (currentMatch.winner) {
+            advanceTournament(state);
+            // Since the next match could also be AI vs AI
+            setTimeout(() => handleAIMatch(state), 100); 
+        } else {
+             // It's a draw, re-run
+            setTimeout(() => handleAIMatch(state), 100);
+        }
+    }
+}
+
 
 export async function GET() {
   return NextResponse.json(
@@ -216,11 +252,12 @@ export async function POST(request: NextRequest) {
     case 'start':
       const initialPods = PODS.map((p, i) => ({ ...p, id: i + 1 }));
       tournamentState = createBracket(initialPods);
-      return NextResponse.json({ tournament: tournamentState });
+      handleAIMatch(tournamentState);
+      return NextResponse.json({ tournament: tournamentState, headers: corsHeaders });
 
     case 'reset':
       tournamentState = null;
-      return NextResponse.json({ tournament: null });
+      return NextResponse.json({ tournament: null, headers: corsHeaders });
 
     case 'playMove':
       if (!tournamentState || !data.teamName || !data.move) {
@@ -275,10 +312,11 @@ export async function POST(request: NextRequest) {
         
         if (currentMatch.winner) {
             advanceTournament(tournamentState);
+            handleAIMatch(tournamentState);
         }
       }
 
-      return NextResponse.json({ tournament: tournamentState });
+      return NextResponse.json({ tournament: tournamentState, headers: corsHeaders });
 
     default:
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

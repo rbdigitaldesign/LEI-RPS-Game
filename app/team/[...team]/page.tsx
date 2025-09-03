@@ -1,3 +1,4 @@
+
 'use client';
 
 import { notFound } from 'next/navigation';
@@ -9,7 +10,7 @@ const ALIASES: Record<string, string> = {
   'capybara': 'Capybaras',
 };
 
-const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis', 'Terminator'];
+const ALL_POD_NAMES = [...PODS.map(p => p.name)];
 const CANON = new Map(ALL_POD_NAMES.map(p => [p.trim().toLowerCase(), p]));
 
 function resolveName(raw: string): string | null {
