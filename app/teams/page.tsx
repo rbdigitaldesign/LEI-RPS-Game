@@ -162,7 +162,7 @@ export default function TeamsPage() {
                 disabled
               >
                 <Bot className="mr-2 h-4 w-4" />
-                Friendly Bot
+                AI Bot
               </Button>
             </CardContent>
           </Card>
@@ -184,7 +184,7 @@ export default function TeamsPage() {
                 disabled
               >
                 <Bot className="mr-2 h-4 w-4" />
-                Losing Bot
+                AI Bot
               </Button>
             </CardContent>
           </Card>
