@@ -161,7 +161,7 @@ export function MainPageContent() {
             <Header>
                 <div className="flex items-center gap-2">
                     <Button asChild variant="secondary" size="sm">
-                      <Link href="/teams">View Pods</Link>
+                      <Link href="/teams" target="_blank" rel="noopener noreferrer">View Pods</Link>
                     </Button>
                     <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
                         Reset
@@ -205,7 +205,7 @@ export function MainPageContent() {
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
-              <Link href="/teams">View Pods</Link>
+              <Link href="/teams" target="_blank" rel="noopener noreferrer">View Pods</Link>
             </Button>
             <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
                 Reset

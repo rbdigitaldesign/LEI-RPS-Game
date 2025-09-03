@@ -54,7 +54,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
-            <Link href="/teams">View Pods</Link>
+            <Link href="/teams" target="_blank" rel="noopener noreferrer">View Pods</Link>
             </Button>
             <Button
               variant="outline"
@@ -67,7 +67,7 @@ export function StartScreen({ onStartTournament, isProcessing }: StartScreenProp
             </Button>
         </div>
       </Header>
-      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-cover bg-center bg-no-repeat"
+      <main className="flex-grow flex items-center justify-center p-4 bg-hero-pattern bg-contain bg-center bg-no-repeat"
        >
         {isClient && !isMuted && (
           <iframe
