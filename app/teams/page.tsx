@@ -109,7 +109,7 @@ export default function TeamsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3 font-headline"><Users/> Pod Battleground</h1>
           <p className="text-muted-foreground">
-            Select a pod below to access their match interface, or view the tournament overview.
+            Engage in your pod in battle by clicking "Team page" to access the match interface.
           </p>
         </div>
 
