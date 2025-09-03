@@ -9,7 +9,7 @@ const ALIASES: Record<string, string> = {
   'capybara': 'Capybaras',
 };
 
-const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis', 'Skynet'];
+const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis', 'Terminator'];
 const CANON = new Map(ALL_POD_NAMES.map(p => [p.trim().toLowerCase(), p]));
 
 function resolveName(raw: string): string | null {

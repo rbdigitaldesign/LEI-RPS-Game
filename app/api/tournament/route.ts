@@ -98,8 +98,8 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
 
     const isPod1FriendlyAI = currentMatch.pod1?.name === 'Cox Travis';
     const isPod2FriendlyAI = currentMatch.pod2?.name === 'Cox Travis';
-    const isPod1LoserAI = currentMatch.pod1?.name === 'Skynet';
-    const isPod2LoserAI = currentMatch.pod2?.name === 'Skynet';
+    const isPod1LoserAI = currentMatch.pod1?.name === 'Terminator';
+    const isPod2LoserAI = currentMatch.pod2?.name === 'Terminator';
 
     const isAIVsAI = (isPod1FriendlyAI && isPod2LoserAI) || (isPod1LoserAI && isPod2FriendlyAI);
 
@@ -111,7 +111,7 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
         if (isPod1FriendlyAI && !isAIVsAI) { // Friendly AI would win vs human, force draw
             winner = null;
             loser = null;
-        } else if (isPod1LoserAI && !isAIVs_AI) { // Loser AI would win vs human, force loss for AI
+        } else if (isPod1LoserAI && !isAIVsAI) { // Loser AI would win vs human, force loss for AI
             winner = currentMatch.pod2;
             loser = currentMatch.pod1;
         } else {
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
       }
       
       const moves: Move[] = ['rock', 'paper', 'scissors'];
-      const isAIBotInMatch = currentMatch.pod1?.name === 'Cox Travis' || currentMatch.pod2?.name === 'Cox Travis' || currentMatch.pod1?.name === 'Skynet' || currentMatch.pod2?.name === 'Skynet';
+      const isAIBotInMatch = currentMatch.pod1?.name === 'Cox Travis' || currentMatch.pod2?.name === 'Cox Travis' || currentMatch.pod1?.name === 'Terminator' || currentMatch.pod2?.name === 'Terminator';
       
       // Assign human move
       if (currentMatch.pod1?.name === data.teamName) {
@@ -260,9 +260,9 @@ export async function POST(request: NextRequest) {
           } else if(currentMatch.pod2?.name === 'Cox Travis' && !(currentMatch.moves as any).pod2) {
               (currentMatch.moves as any).pod2 = aiMove;
           }
-          if(currentMatch.pod1?.name === 'Skynet' && !(currentMatch.moves as any).pod1) {
+          if(currentMatch.pod1?.name === 'Terminator' && !(currentMatch.moves as any).pod1) {
               (currentMatch.moves as any).pod1 = aiMove;
-          } else if(currentMatch.pod2?.name === 'Skynet' && !(currentMatch.moves as any).pod2) {
+          } else if(currentMatch.pod2?.name === 'Terminator' && !(currentMatch.moves as any).pod2) {
               (currentMatch.moves as any).pod2 = aiMove;
           }
       }
