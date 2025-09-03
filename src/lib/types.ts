@@ -27,8 +27,12 @@ export type Round = {
 }
 
 export type TournamentState = {
+  status: 'waiting' | 'readying' | 'countdown' | 'in_progress' | 'finished';
   pods: Pod[];
+  readyTeams: string[];
   rounds: Round[];
   currentMatchId: string | null;
   winner: Pod | null;
 };
+
+    

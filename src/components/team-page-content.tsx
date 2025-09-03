@@ -12,7 +12,7 @@ import type { Move, Pod, Match } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon, Handshake, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Swords, Bot, Hourglass, Clock, Timer as TimerIcon, Handshake, RefreshCw, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { PODS } from '@/lib/constants';
 
@@ -27,6 +27,45 @@ async function playMove(teamName: string, move: Move) {
   }
   return response.json();
 }
+
+async function setTeamReady(teamName: string) {
+    const response = await fetch('/api/tournament', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'teamReady', teamName }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to set team as ready');
+    }
+    return response.json();
+}
+
+const Countdown = () => {
+    const [count, setCount] = useState(3);
+
+    useEffect(() => {
+        if (count > 0) {
+            const timer = setTimeout(() => setCount(count - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [count]);
+
+    return (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <motion.div
+                key={count}
+                initial={{ opacity: 0, scale: 2 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.5 }}
+                className="text-9xl font-headline text-primary"
+            >
+                {count > 0 ? count : 'GO!'}
+            </motion.div>
+        </div>
+    );
+};
+
 
 export function TeamPageContent({ teamName }: { teamName: string }) {
   const { tournament, refetch } = useServerTournament();
@@ -58,6 +97,8 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   
   const teamIsPod1 = currentMatch?.pod1?.name === teamName;
   const moveAlreadySubmitted = teamIsPod1 ? !!(currentMatch?.moves as any)?.pod1 : !!(currentMatch?.moves as any)?.pod2;
+
+  const isTeamReady = tournament?.readyTeams?.includes(teamName) ?? false;
 
   useEffect(() => {
     if (currentMatch && lastMatchState.current) {
@@ -146,7 +187,19 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
       return () => clearTimeout(redirectTimer);
     }
   }, [isEliminated, toast]);
-  
+
+  const handleReadyClick = async () => {
+    setIsSubmitting(true);
+    try {
+        await setTeamReady(teamName);
+        refetch();
+    } catch (error) {
+        toast({ variant: 'destructive', title: 'Error setting ready status' });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
   const renderContent = () => {
     if (hasTournamentStarted && !tournament) {
       // Tournament was active, but now it's not (i.e., it was reset)
@@ -161,6 +214,37 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
           </CardContent>
         </Card>
       );
+    }
+    
+    if (tournament?.status === 'countdown') {
+        return <Countdown />;
+    }
+
+    if (tournament?.status === 'readying') {
+        return (
+            <Card className="w-full max-w-lg text-center">
+                <CardHeader>
+                    <span className="text-6xl">{myOwnPod?.emoji}</span>
+                    <CardTitle className="text-3xl font-headline mt-2">{teamName}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {isTeamReady ? (
+                        <div className="space-y-4">
+                            <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
+                            <p className="text-xl font-bold text-green-400">You are ready!</p>
+                            <p className="text-muted-foreground">Waiting for other pods to get ready...</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <p className="text-lg text-muted-foreground">The tournament is about to begin.</p>
+                            <Button onClick={handleReadyClick} disabled={isSubmitting} size="lg" className="w-full h-24 text-2xl font-headline">
+                                {isSubmitting ? 'Getting Ready...' : 'Ready to Battle!'}
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        );
     }
 
     if (isTie) {
@@ -341,7 +425,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
       <main className="flex flex-grow flex-col items-center justify-center w-full">
          <AnimatePresence mode="wait">
             <motion.div
-                key={currentMatch?.id || 'waiting'}
+                key={currentMatch?.id || tournament?.status || 'waiting'}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -353,3 +437,5 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     </div>
   );
 }
+
+    

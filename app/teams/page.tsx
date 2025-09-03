@@ -11,7 +11,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import Link from 'next/link';
 
 export default function TeamsPage() {
-  const { tournament, startTournament, resetTournament, isProcessing } = useServerTournament();
+  const { tournament, resetTournament, isProcessing } = useServerTournament();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,9 @@ export default function TeamsPage() {
   }
   
   const getTeamStatus = (teamName: string) => {
-    if (!tournament) return 'waiting';
+    if (!tournament || tournament.status === 'readying') {
+      return tournament?.readyTeams?.includes(teamName) ? 'ready' : 'waiting-to-ready';
+    }
     
     if (tournament.winner) {
       return tournament.winner.name === teamName ? 'winner' : 'eliminated';
@@ -80,10 +82,18 @@ export default function TeamsPage() {
         return <span className="bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">❌ Eliminated</span>;
       case 'winner':
         return <span className="bg-yellow-400/30 text-yellow-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">🏆 Champion</span>;
+      case 'ready':
+        return <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">✅ Ready</span>;
+      case 'waiting-to-ready':
+         return <span className="bg-gray-500/20 text-gray-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⌛ Waiting</span>;
       default:
         return <span className="bg-gray-500/20 text-gray-300 px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1.5">⏳ Not Started</span>;
     }
   };
+
+  const canPlay = (status: string) => {
+    return status === 'playing' || status === 'waiting-to-ready';
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -92,11 +102,7 @@ export default function TeamsPage() {
             <Button asChild variant="outline" size="sm">
                 <Link href="/?skipIntro=true"><ArrowLeft/> Back to Tournament</Link>
             </Button>
-          {!tournament ? (
-            <Button onClick={startTournament} disabled={isProcessing}>
-              {isProcessing ? 'Starting...' : 'Start Tournament'}
-            </Button>
-          ) : (
+          {tournament && (
             <Button variant="destructive" onClick={handleReset} disabled={isProcessing}>
               {isProcessing ? 'Resetting...' : 'Reset Tournament'}
             </Button>
@@ -114,11 +120,12 @@ export default function TeamsPage() {
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {PODS.map((pod) => {
+            if (pod.name === 'Cox Travis') return null; // We'll render AI bots separately
             const status = getTeamStatus(pod.name);
-            const canPlay = status === 'playing';
+            const isPlayable = canPlay(status);
             
             return (
-              <Card key={pod.name} className={`transition-all hover:shadow-lg ${canPlay ? 'ring-2 ring-primary' : ''}`}>
+              <Card key={pod.name} className={`transition-all hover:shadow-lg ${isPlayable ? 'ring-2 ring-primary' : ''}`}>
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-4">
                     <span className="text-4xl">{pod.emoji}</span>
@@ -132,11 +139,11 @@ export default function TeamsPage() {
                   {getStatusBadge(status)}
                   <Button 
                     asChild
-                    variant={canPlay ? "default" : "outline"}
+                    variant={isPlayable ? "default" : "outline"}
                     size="sm"
                   >
                     <a href={`/team/${encodeURIComponent(pod.name)}`} target="_blank" rel="noopener noreferrer">
-                      {canPlay ? 'Play Now!' : 'Team Page'}
+                      {status === 'waiting-to-ready' ? 'Get Ready!' : (isPlayable ? 'Play Now!' : 'Team Page')}
                     </a>
                   </Button>
                 </CardContent>
