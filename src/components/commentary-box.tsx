@@ -89,8 +89,6 @@ type CommentaryBoxProps = {
 };
 
 export function CommentaryBox({ show }: CommentaryBoxProps) {
-  console.log('CommentaryBox show prop:', show);
-
   const [commentaryQueue, setCommentaryQueue] = useState<string[]>([]);
   const [currentCommentaryIndex, setCurrentCommentaryIndex] = useState(0);
 

@@ -16,6 +16,7 @@ import type { TournamentState, Match } from '@/lib/types';
 import Link from 'next/link';
 import { PreIntroScreen } from '@/components/pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CommentaryBox } from '@/components/commentary-box';
 
 const Countdown = () => {
     const [count, setCount] = useState(3);
@@ -159,6 +160,9 @@ export function MainPageContent() {
         <div className="flex flex-col min-h-screen">
             <Header>
                 <div className="flex items-center gap-2">
+                    <Button asChild variant="secondary" size="sm">
+                      <Link href="/teams">View Pods</Link>
+                    </Button>
                     <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
                         Reset
                     </Button>
@@ -328,6 +332,7 @@ export function MainPageContent() {
           </div>
         )}
       </main>
+      <CommentaryBox show={!winner && tournament.status === 'in_progress'} />
     </div>
   );
 }
