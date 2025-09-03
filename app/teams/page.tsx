@@ -148,7 +148,7 @@ export default function TeamsPage() {
           <Card className="transition-all hover:shadow-lg border-dashed">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-4">
-                <span className="text-4xl">🤖</span>
+                <span className="text-4xl">👿</span>
                 <div>
                   <CardTitle className="text-lg">Cox Travis</CardTitle>
                   <p className="text-sm text-muted-foreground">Represented by The AI</p>

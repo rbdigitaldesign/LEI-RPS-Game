@@ -30,7 +30,7 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
       id: 99,
       name: 'Cox Travis',
       manager: 'The AI',
-      emoji: '🤖',
+      emoji: '👿',
   };
   allPods.push(aiPod);
   
