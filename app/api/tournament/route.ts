@@ -96,26 +96,36 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
     let winner: Pod | null = null;
     let loser: Pod | null = null;
 
-    const isPod1AI = currentMatch.pod1?.name === 'Cox Travis';
-    const isPod2AI = currentMatch.pod2?.name === 'Cox Travis';
+    const isPod1FriendlyAI = currentMatch.pod1?.name === 'Cox Travis';
+    const isPod2FriendlyAI = currentMatch.pod2?.name === 'Cox Travis';
+    const isPod1LoserAI = currentMatch.pod1?.name === 'Skynet';
+    const isPod2LoserAI = currentMatch.pod2?.name === 'Skynet';
+
+    const isAIVsAI = (isPod1FriendlyAI && isPod2LoserAI) || (isPod1LoserAI && isPod2FriendlyAI);
 
     if (pod1Move !== pod2Move) {
       if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
           (pod1Move === 'scissors' && pod2Move === 'paper') ||
           (pod1Move === 'paper' && pod2Move === 'rock')) {
-        // Pod 1 wins
-        if (isPod1AI) { // AI would win, force a draw
+        // Pod 1 would win
+        if (isPod1FriendlyAI && !isAIVsAI) { // Friendly AI would win vs human, force draw
             winner = null;
             loser = null;
+        } else if (isPod1LoserAI && !isAIVs_AI) { // Loser AI would win vs human, force loss for AI
+            winner = currentMatch.pod2;
+            loser = currentMatch.pod1;
         } else {
             winner = currentMatch.pod1;
             loser = currentMatch.pod2;
         }
       } else {
-        // Pod 2 wins
-        if (isPod2AI) { // AI would win, force a draw
+        // Pod 2 would win
+        if (isPod2FriendlyAI && !isAIVsAI) { // Friendly AI would win vs human, force draw
             winner = null;
             loser = null;
+        } else if (isPod2LoserAI && !isAIVsAI) { // Loser AI would win vs human, force loss for AI
+            winner = currentMatch.pod1;
+            loser = currentMatch.pod2;
         } else {
             winner = currentMatch.pod2;
             loser = currentMatch.pod1;
@@ -233,7 +243,7 @@ export async function POST(request: NextRequest) {
       }
       
       const moves: Move[] = ['rock', 'paper', 'scissors'];
-      const isAIBotMatch = currentMatch.pod1?.name === 'Cox Travis' || currentMatch.pod2?.name === 'Cox Travis';
+      const isAIBotInMatch = currentMatch.pod1?.name === 'Cox Travis' || currentMatch.pod2?.name === 'Cox Travis' || currentMatch.pod1?.name === 'Skynet' || currentMatch.pod2?.name === 'Skynet';
       
       // Assign human move
       if (currentMatch.pod1?.name === data.teamName) {
@@ -242,12 +252,17 @@ export async function POST(request: NextRequest) {
         (currentMatch.moves as any).pod2 = data.move;
       }
 
-      // If it's a bot match, assign bot move
-      if (isAIBotMatch) {
+      // If it's a bot match, assign bot move for any bot not played by a human
+      if (isAIBotInMatch) {
           const aiMove = moves[Math.floor(Math.random() * moves.length)];
-          if(currentMatch.pod1?.name === 'Cox Travis') {
+          if(currentMatch.pod1?.name === 'Cox Travis' && !(currentMatch.moves as any).pod1) {
               (currentMatch.moves as any).pod1 = aiMove;
-          } else {
+          } else if(currentMatch.pod2?.name === 'Cox Travis' && !(currentMatch.moves as any).pod2) {
+              (currentMatch.moves as any).pod2 = aiMove;
+          }
+          if(currentMatch.pod1?.name === 'Skynet' && !(currentMatch.moves as any).pod1) {
+              (currentMatch.moves as any).pod1 = aiMove;
+          } else if(currentMatch.pod2?.name === 'Skynet' && !(currentMatch.moves as any).pod2) {
               (currentMatch.moves as any).pod2 = aiMove;
           }
       }

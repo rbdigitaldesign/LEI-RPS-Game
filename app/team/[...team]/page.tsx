@@ -1,7 +1,6 @@
 'use client';
 
 import { notFound } from 'next/navigation';
-import React from 'react';
 import { TeamPageContent } from '@/components/team-page-content';
 import { PODS } from '@/lib/constants';
 
@@ -10,7 +9,7 @@ const ALIASES: Record<string, string> = {
   'capybara': 'Capybaras',
 };
 
-const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis'];
+const ALL_POD_NAMES = [...PODS.map(p => p.name), 'Cox Travis', 'Skynet'];
 const CANON = new Map(ALL_POD_NAMES.map(p => [p.trim().toLowerCase(), p]));
 
 function resolveName(raw: string): string | null {
@@ -24,7 +23,7 @@ function resolveName(raw: string): string | null {
 type Props = { params: { team?: string[] } };
 
 export default function TeamPage({ params }: Props) {
-  const segs = React.use(params).team ?? [];
+  const segs = params.team ?? [];
   const raw = decodeURIComponent(segs.join('/')).trim();
   const name = resolveName(raw);
 
