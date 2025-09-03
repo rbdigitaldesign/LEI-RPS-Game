@@ -7,7 +7,7 @@ import { useServerTournament } from '@/hooks/use-server-tournament';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Trophy, Handshake, Flame } from 'lucide-react';
+import { Trophy, Handshake, Flame, CheckCircle, XCircle, Hourglass } from 'lucide-react';
 import { TournamentBracket } from '@/components/tournament-bracket';
 import { TournamentReport } from '@/components/tournament-report';
 import { IntroTrailer } from '@/components/intro-trailer';
@@ -17,6 +17,33 @@ import Link from 'next/link';
 import { PreIntroScreen } from '@/components/pre-intro-screen';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CommentaryBox } from '@/components/commentary-box';
+
+const Countdown = () => {
+    const [count, setCount] = useState(3);
+
+    useEffect(() => {
+        if (count > 0) {
+            const timer = setTimeout(() => setCount(count - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [count]);
+
+    return (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <motion.div
+                key={count}
+                initial={{ opacity: 0, scale: 2 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.5 }}
+                className="text-9xl font-headline text-primary"
+            >
+                {count > 0 ? count : 'GO!'}
+            </motion.div>
+        </div>
+    );
+};
+
 
 export function MainPageContent() {
   const searchParams = useSearchParams();
@@ -126,12 +153,59 @@ export function MainPageContent() {
     return <StartScreen onStartTournament={startTournament} isProcessing={isProcessing} />;
   }
 
+  if (tournament.status === 'readying') {
+    const readyCount = tournament.readyTeams?.length || 0;
+    const totalCount = tournament.pods?.length || 0;
+    return (
+        <div className="flex flex-col min-h-screen">
+            <Header>
+                <div className="flex items-center gap-2">
+                    <Button asChild variant="secondary" size="sm">
+                      <Link href="/teams" target="_blank" rel="noopener noreferrer">View Pods</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
+                        Reset
+                    </Button>
+                </div>
+            </Header>
+            <main className="flex-grow p-4 flex flex-col items-center justify-center">
+                <Card className="w-full max-w-3xl text-center">
+                    <CardHeader>
+                        <CardTitle className="font-headline text-3xl text-primary">Waiting for Pods</CardTitle>
+                        <CardDescription>The tournament will begin once all pods are ready.</CardDescription>
+                        <div className="flex items-center justify-center gap-2 text-lg font-bold pt-4">
+                            <Hourglass className="animate-spin" /> {readyCount} / {totalCount} Pods Ready
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {tournament.pods?.map(pod => {
+                                const isReady = tournament.readyTeams?.includes(pod.name);
+                                return (
+                                    <div key={pod.id} className={`p-3 rounded-lg flex items-center gap-2 text-sm ${isReady ? 'bg-green-500/20 text-green-300' : 'bg-secondary'}`}>
+                                        {isReady ? <CheckCircle className="text-green-400" /> : <XCircle className="text-red-400" />}
+                                        <span className="font-medium">{pod.name}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </CardContent>
+                </Card>
+            </main>
+        </div>
+    );
+  }
+
+  if (tournament.status === 'countdown') {
+    return <Countdown />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header>
         <div className="flex items-center gap-2">
             <Button asChild variant="secondary" size="sm">
-              <Link href="/teams">View Pods</Link>
+              <Link href="/teams" target="_blank" rel="noopener noreferrer">View Pods</Link>
             </Button>
             <Button variant="outline" size="sm" onClick={handleReset} disabled={isProcessing}>
                 Reset
@@ -174,7 +248,7 @@ export function MainPageContent() {
                   <TournamentBracket rounds={tournament.rounds} currentMatchId={tournament.currentMatchId} />
                 </div>
                 <div className="w-full xl:w-96 flex-shrink-0 flex flex-col gap-6">
-                  {tournament && (() => {
+                  {tournament && tournament.rounds.length > 0 && (() => {
                     const eliminatedTeams = tournament.rounds
                       .flatMap((r: any) => r.matches)
                       .filter((m: any) => m.winner && m.loser && !m.isBye)
@@ -258,7 +332,7 @@ export function MainPageContent() {
           </div>
         )}
       </main>
-      <CommentaryBox show={!winner} />
+      <CommentaryBox show={false} />
     </div>
   );
 }
