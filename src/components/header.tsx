@@ -4,17 +4,11 @@
 import type { ReactNode } from 'react';
 
 export function Header({ children }: { children?: ReactNode }) {
-  const handleTitleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    sessionStorage.removeItem('introSeen');
-    window.location.href = '/';
-  };
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex">
-          <a className="mr-6 flex items-center space-x-2" href="/" onClick={handleTitleClick}>
+          <a className="mr-6 flex items-center space-x-2" href="/">
             <span className="text-xl font-bold text-primary font-headline">RPS Pod Showdown</span>
           </a>
         </div>
