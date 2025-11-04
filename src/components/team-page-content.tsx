@@ -8,7 +8,7 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/com
 import { Header } from '@/components/header';
 import { MoveIcon } from '@/components/icons/move-icon';
 import { MOVES } from '@/lib/constants';
-import type { Move, Pod, Match } from '@/lib/types';
+import type { Move, Pod, Match, TournamentState } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -76,7 +76,7 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const [hasTournamentStarted, setHasTournamentStarted] = useState(false);
 
   const { toast } = useToast();
-  const lastMatchState = useRef<Match | null | undefined>(null);
+  const lastTournamentState = useRef<TournamentState | null>(null);
 
   useEffect(() => {
     if (tournament) {
@@ -101,19 +101,40 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
   const isTeamReady = tournament?.readyTeams?.includes(teamName) ?? false;
 
   useEffect(() => {
-    if (currentMatch && lastMatchState.current) {
-        if (currentMatch.moveHistory && lastMatchState.current.moveHistory) {
-            if (currentMatch.moveHistory.length > lastMatchState.current.moveHistory.length) {
-                const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
-                if (latestRound.pod1 === latestRound.pod2) {
-                    setIsTie(true);
-                    setTimeout(() => setIsTie(false), 2500); 
+    if (tournament && lastTournamentState.current) {
+        const previousCompletedMatches = lastTournamentState.current.rounds
+            .flatMap(r => r.matches)
+            .filter(m => m.winner)
+            .map(m => m.id);
+        
+        const newlyCompletedMatches = tournament.rounds
+            .flatMap(r => r.matches)
+            .filter(m => m.winner && !previousCompletedMatches.includes(m.id));
+
+        const justWonMatch = newlyCompletedMatches.find(m => m.winner?.name === teamName);
+        if (justWonMatch) {
+            toast({
+                title: "You Won!",
+                description: "Congratulations! Waiting for your next opponent.",
+                duration: 5000,
+            });
+        }
+        
+        if (currentMatch && lastTournamentState.current) {
+            const previousMatch = lastTournamentState.current.rounds.flatMap(r => r.matches).find(m => m.id === currentMatch.id);
+            if (previousMatch && currentMatch.moveHistory && previousMatch.moveHistory) {
+                if (currentMatch.moveHistory.length > previousMatch.moveHistory.length) {
+                    const latestRound = currentMatch.moveHistory[currentMatch.moveHistory.length - 1];
+                    if (latestRound.pod1 === latestRound.pod2) {
+                        setIsTie(true);
+                        setTimeout(() => setIsTie(false), 2500); 
+                    }
                 }
             }
         }
     }
-    lastMatchState.current = currentMatch;
-  }, [currentMatch]);
+    lastTournamentState.current = tournament;
+  }, [tournament, teamName, toast, currentMatch]);
 
 
   const handleSubmitMove = useCallback(async () => {
@@ -437,5 +458,3 @@ export function TeamPageContent({ teamName }: { teamName: string }) {
     </div>
   );
 }
-
-    
