@@ -75,24 +75,25 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
     let winner: Pod | null = null;
     let loser: Pod | null = null;
 
-    const isPod1FriendlyAI = currentMatch.pod1?.name === 'Cox Travis';
-    const isPod2FriendlyAI = currentMatch.pod2?.name === 'Cox Travis';
-    const isPod1LoserAI = currentMatch.pod1?.name === 'Terminator';
-    const isPod2LoserAI = currentMatch.pod2?.name === 'Terminator';
-    const isAIVsAI = (isPod1FriendlyAI && isPod2LoserAI) || (isPod1LoserAI && isPod2FriendlyAI);
+    const isPod1AI = currentMatch.pod1?.name === 'Cox Travis' || currentMatch.pod1?.name === 'Terminator';
+    const isPod2AI = currentMatch.pod2?.name === 'Cox Travis' || currentMatch.pod2?.name === 'Terminator';
 
-    if (pod1Move !== pod2Move) {
-      if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
-          (pod1Move === 'scissors' && pod2Move === 'paper') ||
-          (pod1Move === 'paper' && pod2Move === 'rock')) {
-        if (isPod1FriendlyAI && !isAIVsAI) { winner = null; loser = null; }
-        else if (isPod1LoserAI && !isAIVsAI) { winner = currentMatch.pod2; loser = currentMatch.pod1; }
-        else { winner = currentMatch.pod1; loser = currentMatch.pod2; }
-      } else {
-        if (isPod2FriendlyAI && !isAIVsAI) { winner = null; loser = null; }
-        else if (isPod2LoserAI && !isAIVsAI) { winner = currentMatch.pod1; loser = currentMatch.pod2; }
-        else { winner = currentMatch.pod2; loser = currentMatch.pod1; }
-      }
+    if (isPod1AI && !isPod2AI) { // Pod 1 is AI, Pod 2 is human
+        winner = currentMatch.pod2;
+        loser = currentMatch.pod1;
+    } else if (!isPod1AI && isPod2AI) { // Pod 1 is human, Pod 2 is AI
+        winner = currentMatch.pod1;
+        loser = currentMatch.pod2;
+    } else if (pod1Move !== pod2Move) { // Human vs Human or AI vs AI
+        if ((pod1Move === 'rock' && pod2Move === 'scissors') ||
+            (pod1Move === 'scissors' && pod2Move === 'paper') ||
+            (pod1Move === 'paper' && pod2Move === 'rock')) {
+            winner = currentMatch.pod1;
+            loser = currentMatch.pod2;
+        } else {
+            winner = currentMatch.pod2;
+            loser = currentMatch.pod1;
+        }
     }
 
     currentMatch.moveHistory = currentMatch.moveHistory || [];
@@ -103,6 +104,7 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
       currentMatch.winner = winner;
       currentMatch.loser = loser;
     } else {
+      // This will only be reached in a Human vs Human draw
       currentMatch.moves = undefined;
     }
 };
