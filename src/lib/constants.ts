@@ -1,4 +1,3 @@
-
 import type { Pod, Move } from './types';
 
 export const PODS: Omit<Pod, 'id'>[] = [
@@ -19,5 +18,3 @@ export const PODS: Omit<Pod, 'id'>[] = [
 ];
 
 export const MOVES: Move[] = ['rock', 'paper', 'scissors'];
-
-    
