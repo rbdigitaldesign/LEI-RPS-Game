@@ -30,7 +30,7 @@ const createBracket = (initialPods: Pod[]): TournamentState => {
   let shuffledPods = shuffleArray(allPods);
   
   const numPods = shuffledPods.length;
-  const totalRounds = Math.log2(numPods); // Should be exactly 4 for 16 teams
+  const totalRounds = Math.log2(numPods); // 4 rounds for 16 teams
   
   let rounds: Round[] = [];
   let currentPods: (Pod | null)[] = [...shuffledPods];
@@ -81,8 +81,8 @@ const resolveMatch = (currentMatch: Match, pod1Move: Move, pod2Move: Move) => {
     const isPod1AI = currentMatch.pod1?.name === 'Cox Travis' || currentMatch.pod1?.name === 'Terminator';
     const isPod2AI = currentMatch.pod2?.name === 'Cox Travis' || currentMatch.pod2?.name === 'Terminator';
 
-    // FAIRNESS CHECK: No specific human team (e.g. Orcas) is hardcoded to win.
-    // The only bias is that Humans always defeat AI bots.
+    // FAIRNESS CHECK: No specific human team (e.g. Orcas) is favored by the code.
+    // GUARANTEED WIN: Humans always defeat AI bots on the first try.
     if (isPod1AI && !isPod2AI) { 
         winner = currentMatch.pod2;
         loser = currentMatch.pod1;
@@ -187,8 +187,6 @@ export async function POST(request: NextRequest) {
         const allHumanPodsReady = tournamentState.pods.every(p => tournamentState!.readyTeams.includes(p.name));
         if (allHumanPodsReady) {
             tournamentState.status = 'countdown';
-            // Transition to in_progress after 3 seconds
-            // In a real app, this timer logic might be handled by the client or a background job
         }
       }
       return NextResponse.json({ tournament: tournamentState, headers: corsHeaders });
@@ -222,8 +220,8 @@ export async function POST(request: NextRequest) {
       if (isPod1AI || isPod2AI) {
           const moves: Move[] = ['rock', 'paper', 'scissors'];
           const aiMove = moves[Math.floor(Math.random() * moves.length)];
-          if (isPod1AI) (currentMatch.moves as any).pod1 = aiMove;
-          if (isPod2AI) (currentMatch.moves as any).pod2 = aiMove;
+          if (isPod1AI && !(currentMatch.moves as any).pod1) (currentMatch.moves as any).pod1 = aiMove;
+          if (isPod2AI && !(currentMatch.moves as any).pod2) (currentMatch.moves as any).pod2 = aiMove;
       }
 
       if ((currentMatch.moves as any).pod1 && (currentMatch.moves as any).pod2) {

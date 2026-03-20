@@ -1,5 +1,6 @@
 import type { Pod, Move } from './types';
 
+// Exactly 14 human teams as requested
 export const PODS: Omit<Pod, 'id'>[] = [
   { name: 'Owls', manager: 'Rebecca', emoji: '🦉' },
   { name: 'Racoons', manager: 'Aaron and Dave', emoji: '🦝' },

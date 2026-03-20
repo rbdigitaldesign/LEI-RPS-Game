@@ -11,7 +11,11 @@ export default function Home() {
   }, []);
 
   if (!isMounted) {
-    return null; // Prevents hydration mismatch by not rendering anything on server
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-pulse text-white font-mono">LOADING BATTLEGROUND...</div>
+      </div>
+    );
   }
 
   return (
